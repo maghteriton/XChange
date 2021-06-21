@@ -1,5 +1,8 @@
 package org.knowm.xchange.bittrex;
 
+import static org.knowm.xchange.bittrex.BittrexConstants.OFFLINE;
+import static org.knowm.xchange.bittrex.BittrexConstants.ONLINE;
+
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,9 +30,6 @@ import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.UserTrade;
 
 public final class BittrexAdapters {
-
-  public static final String BITTREX_CURRENCY_ONLINE_STRING = "ONLINE";
-  public static final String BITTREX_CURRENCY_OFFLINE_STRING = "OFFLINE";
 
   public static List<CurrencyPair> adaptCurrencyPairs(Collection<BittrexSymbol> bittrexSymbols) {
     return bittrexSymbols.stream()
@@ -222,29 +222,32 @@ public final class BittrexAdapters {
     return Wallet.Builder.from(wallets).build();
   }
 
-  public static void adaptMetaData(List<BittrexSymbol> rawSymbols,
-                                   List<BittrexCurrency> bittrexCurrencies,
-                                   Map<CurrencyPair, Fee> dynamicTradingFees,
-                                   ExchangeMetaData metaData) {
+  public static void adaptMetaData(
+      List<BittrexSymbol> rawSymbols,
+      List<BittrexCurrency> bittrexCurrencies,
+      Map<CurrencyPair, Fee> dynamicTradingFees,
+      ExchangeMetaData metaData) {
     List<CurrencyPair> currencyPairs = BittrexAdapters.adaptCurrencyPairs(rawSymbols);
     for (CurrencyPair currencyPair : currencyPairs) {
-      CurrencyPairMetaData defaultCurrencyPairMetaData = metaData.getCurrencyPairs().get(currencyPair);
+      CurrencyPairMetaData defaultCurrencyPairMetaData =
+          metaData.getCurrencyPairs().get(currencyPair);
       BigDecimal resultingFee = null;
       // Prioritize dynamic fee
-      if( dynamicTradingFees != null ){
+      if (dynamicTradingFees != null) {
         Fee fee = dynamicTradingFees.get(currencyPair);
-        if( fee != null){
+        if (fee != null) {
           resultingFee = fee.getMakerFee();
         }
-      }else{
-        if (defaultCurrencyPairMetaData != null ){
+      } else {
+        if (defaultCurrencyPairMetaData != null) {
           resultingFee = defaultCurrencyPairMetaData.getTradingFee();
         }
       }
 
       CurrencyPairMetaData newCurrencyPairMetaData;
-      if(defaultCurrencyPairMetaData != null){
-        newCurrencyPairMetaData = new CurrencyPairMetaData(
+      if (defaultCurrencyPairMetaData != null) {
+        newCurrencyPairMetaData =
+            new CurrencyPairMetaData(
                 resultingFee,
                 defaultCurrencyPairMetaData.getMinimumAmount(),
                 defaultCurrencyPairMetaData.getMaximumAmount(),
@@ -252,15 +255,9 @@ public final class BittrexAdapters {
                 defaultCurrencyPairMetaData.getVolumeScale(),
                 defaultCurrencyPairMetaData.getFeeTiers(),
                 defaultCurrencyPairMetaData.getTradingFeeCurrency());
-      }else{
-        newCurrencyPairMetaData =new CurrencyPairMetaData(
-                resultingFee,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+      } else {
+        newCurrencyPairMetaData =
+            new CurrencyPairMetaData(resultingFee, null, null, null, null, null, null);
       }
 
       metaData.getCurrencyPairs().put(currencyPair, newCurrencyPairMetaData);
@@ -268,14 +265,17 @@ public final class BittrexAdapters {
 
     for (BittrexCurrency bittrexCurrency : bittrexCurrencies) {
       WalletHealth walletHealth = WalletHealth.UNKNOWN;
-      if( bittrexCurrency.getStatus().equals(BITTREX_CURRENCY_ONLINE_STRING) ){
+      if (ONLINE.equals(bittrexCurrency.getStatus())) {
         walletHealth = WalletHealth.ONLINE;
-      }else if( bittrexCurrency.getStatus().equals(BITTREX_CURRENCY_OFFLINE_STRING)) {
+      } else if (OFFLINE.equals(bittrexCurrency.getStatus())) {
         walletHealth = WalletHealth.OFFLINE;
       }
-      metaData.getCurrencies().put(bittrexCurrency.getSymbol(),
-              new CurrencyMetaData(1, BigDecimal.valueOf(bittrexCurrency.getTxFee()),
-                      null, walletHealth));
+      metaData
+          .getCurrencies()
+          .put(
+              bittrexCurrency.getSymbol(),
+              new CurrencyMetaData(
+                  1, BigDecimal.valueOf(bittrexCurrency.getTxFee()), null, walletHealth));
     }
   }
 
