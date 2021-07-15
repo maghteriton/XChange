@@ -71,7 +71,6 @@ public class HuobiCurrency {
         return chain;
     }
 
-
     public String getDisplayName() {
         return displayName;
     }
