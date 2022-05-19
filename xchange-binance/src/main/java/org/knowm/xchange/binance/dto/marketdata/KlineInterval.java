@@ -40,4 +40,26 @@ public enum KlineInterval {
   public String code() {
     return code;
   }
+
+  public static KlineInterval getIntervalFromSecs(long seconds) {
+    long millis = seconds * 1000;
+
+    KlineInterval result = null;
+    for (KlineInterval interval : KlineInterval.values()) {
+      if (interval.millis == millis) {
+        result = interval;
+        break;
+      }
+    }
+    return result;
+  }
+
+  public static long[] getSupportedPeriodsInSecs() {
+    long[] result = new long[KlineInterval.values().length];
+    int index = 0;
+    for (KlineInterval interval : KlineInterval.values()) {
+      result[index++] = interval.getMillis() / 1000;
+    }
+    return result;
+  }
 }
