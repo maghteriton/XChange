@@ -83,7 +83,7 @@ public class OkexMarketDataServiceRaw extends OkexBaseService {
     OkexResponse<List<OkexOrderbook>> books =
         okex.getOrderbook(
             instrument,
-            20,
+            40,
             (String)
                 exchange.getExchangeSpecification().getExchangeSpecificParametersItem("simulated"));
     return books;
