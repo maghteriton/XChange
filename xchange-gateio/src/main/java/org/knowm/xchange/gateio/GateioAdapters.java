@@ -21,8 +21,8 @@ import org.knowm.xchange.dto.account.Wallet;
 import org.knowm.xchange.dto.marketdata.*;
 import org.knowm.xchange.dto.marketdata.Trades.TradeSortType;
 import org.knowm.xchange.dto.meta.CurrencyMetaData;
-import org.knowm.xchange.dto.meta.CurrencyPairMetaData;
 import org.knowm.xchange.dto.meta.ExchangeMetaData;
+import org.knowm.xchange.dto.meta.InstrumentMetaData;
 import org.knowm.xchange.dto.meta.WalletHealth;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.OpenOrders;
@@ -39,6 +39,7 @@ import org.knowm.xchange.gateio.dto.trade.GateioOpenOrder;
 import org.knowm.xchange.gateio.dto.trade.GateioOpenOrders;
 import org.knowm.xchange.gateio.dto.trade.GateioTrade;
 import org.knowm.xchange.gateio.service.GateioMarketDataServiceRaw;
+import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.utils.DateUtils;
 
 /** Various adapters for converting from Bter DTOs to XChange DTOs */
@@ -108,7 +109,7 @@ public final class GateioAdapters {
   }
 
   public static LimitOrder adaptOrder(
-      GateioOpenOrder order, Collection<CurrencyPair> currencyPairs) {
+      GateioOpenOrder order, Collection<Instrument> currencyPairs) {
 
     String[] currencyPairSplit = order.getCurrencyPair().split("_");
     CurrencyPair currencyPair = new CurrencyPair(currencyPairSplit[0], currencyPairSplit[1]);
@@ -122,7 +123,7 @@ public final class GateioAdapters {
   }
 
   public static OpenOrders adaptOpenOrders(
-      GateioOpenOrders openOrders, Collection<CurrencyPair> currencyPairs) {
+      GateioOpenOrders openOrders, Collection<Instrument> currencyPairs) {
 
     List<LimitOrder> adaptedOrders = new ArrayList<>();
     for (GateioOpenOrder openOrder : openOrders.getOrders()) {
@@ -223,7 +224,7 @@ public final class GateioAdapters {
   public static ExchangeMetaData adaptToExchangeMetaData(
       GateioMarketDataServiceRaw marketDataService) throws IOException {
 
-    Map<CurrencyPair, CurrencyPairMetaData> currencyPairs = new HashMap<>();
+    Map<Instrument, InstrumentMetaData> currencyPairs = new HashMap<>();
     Map<Currency, CurrencyMetaData> currencies = new HashMap<>();
 
     for (Entry<CurrencyPair, GateioMarketInfo> entry :
@@ -232,14 +233,11 @@ public final class GateioAdapters {
       CurrencyPair currencyPair = entry.getKey();
       GateioMarketInfo btermarketInfo = entry.getValue();
 
-      CurrencyPairMetaData currencyPairMetaData =
-          new CurrencyPairMetaData(
-              btermarketInfo.getFee(),
-              btermarketInfo.getMinAmount(),
-              null,
-              btermarketInfo.getDecimalPlaces(),
-              null);
-      currencyPairs.put(currencyPair, currencyPairMetaData);
+      currencyPairs.put(currencyPair, new InstrumentMetaData.Builder()
+                      .tradingFee(btermarketInfo.getFee())
+                      .minimumAmount(btermarketInfo.getMinAmount())
+                      .priceScale(btermarketInfo.getDecimalPlaces())
+              .build());
     }
 
     if (marketDataService.getApiKey() != null) {
