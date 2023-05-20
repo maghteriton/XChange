@@ -7,10 +7,7 @@ import org.knowm.xchange.derivative.FuturesContract;
 import org.knowm.xchange.derivative.OptionsContract;
 import org.knowm.xchange.dto.Order;
 import org.knowm.xchange.dto.Order.OrderType;
-import org.knowm.xchange.dto.account.Balance;
-import org.knowm.xchange.dto.account.OpenPosition;
-import org.knowm.xchange.dto.account.OpenPositions;
-import org.knowm.xchange.dto.account.Wallet;
+import org.knowm.xchange.dto.account.*;
 import org.knowm.xchange.dto.marketdata.*;
 import org.knowm.xchange.dto.meta.CurrencyMetaData;
 import org.knowm.xchange.dto.meta.ExchangeMetaData;
@@ -40,6 +37,7 @@ public class OkexAdapters {
   private static final String TRADING_WALLET_ID = "trading";
   private static final String FOUNDING_WALLET_ID = "founding";
   private static final String FUTURES_WALLET_ID = "futures";
+  private static final String COLON = ":";
 
   public static UserTrades adaptUserTrades(List<OkexOrderDetails> okexTradeHistory, ExchangeMetaData exchangeMetaData) {
     List<UserTrade> userTradeList = new ArrayList<>();
@@ -463,5 +461,73 @@ public class OkexAdapters {
                     : BigDecimal.ZERO)
             .features(new HashSet<>(Collections.singletonList(Wallet.WalletFeature.FUTURES_TRADING)))
             .build();
+  }
+
+  public static List<FundingRecord> adaptOkexDepositHistory(
+          List<OkexDepositHistory> okexDepositHistoryList) {
+    List<FundingRecord> fundingRecordList = new ArrayList<>();
+    if (!okexDepositHistoryList.isEmpty()) {
+      for (OkexDepositHistory okexDepositHistory : okexDepositHistoryList) {
+        FundingRecord fundingRecord = createFundingRecord(okexDepositHistory);
+        fundingRecordList.add(fundingRecord);
+      }
+    }
+    return fundingRecordList;
+  }
+
+  private static FundingRecord createFundingRecord(OkexDepositHistory okexDepositHistory) {
+    String address = okexDepositHistory.getTo();
+    String tag = null;
+    if (okexDepositHistory.getTo().contains(COLON)) {
+      String[] addressAndTag = okexDepositHistory.getTo().split(COLON);
+      address = addressAndTag[0];
+      tag = addressAndTag[1];
+    }
+
+    return new FundingRecord(
+            address,
+            tag,
+            new Date(Long.parseLong(okexDepositHistory.getTs())),
+            Currency.getInstance(okexDepositHistory.getCurrency()),
+            new BigDecimal(okexDepositHistory.getWithdrawalAmount()),
+            okexDepositHistory.getDepId(),
+            okexDepositHistory.getTxId(),
+            FundingRecord.Type.DEPOSIT,
+            adaptOkexDepositState(okexDepositHistory.getState()),
+            null,
+            null,
+            null);
+  }
+
+  private static FundingRecord.Status adaptOkexDepositState(String state) {
+    FundingRecord.Status result = null;
+    if (state.equals(OkexDepositState.WAITING_FOR_CONFORMATION.getState())
+            || state.equals(OkexDepositState.DEPOSIT_CREATED.getState())
+            || state.equals(OkexDepositState.PENDING.getState())) {
+      result = FundingRecord.Status.PROCESSING;
+    } else if (state.equals(OkexDepositState.DEPOSIT_SUCCESS.getState())) {
+      result = FundingRecord.Status.COMPLETE;
+    } else if (state.equals(OkexDepositState.FROZEN.getState())
+            || state.equals(OkexDepositState.INTERCEPTED.getState())) {
+      result = FundingRecord.Status.FAILED;
+    }
+    return result;
+  }
+
+  public static List<DepositAddress> adaptOkexDepositAddresses(
+          List<OkexDepositAddress> okexDepositAddressList) {
+    List<DepositAddress> depositAddressList = new ArrayList<>();
+    okexDepositAddressList.forEach(
+            okexDepositAddress -> {
+              DepositAddress depositAddress =
+                      new DepositAddress(
+                              okexDepositAddress.getCurrency(),
+                              okexDepositAddress.getAddress(),
+                              okexDepositAddress.getTag(),
+                              okexDepositAddress.getChain());
+              depositAddressList.add(depositAddress);
+            });
+
+    return depositAddressList;
   }
 }

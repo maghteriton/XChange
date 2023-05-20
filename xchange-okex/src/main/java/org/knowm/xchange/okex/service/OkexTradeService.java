@@ -20,17 +20,10 @@ import org.knowm.xchange.exceptions.FundsExceededException;
 import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.okex.OkexAdapters;
 import org.knowm.xchange.okex.OkexExchange;
-import org.knowm.xchange.okex.dto.trade.OkexOrderResponse;
+import org.knowm.xchange.okex.dto.account.OkexAccountType;
+import org.knowm.xchange.okex.dto.trade.*;
 import org.knowm.xchange.okex.dto.OkexException;
 import org.knowm.xchange.okex.dto.OkexResponse;
-import org.knowm.xchange.okex.dto.trade.OkexCancelOrderRequest;
-import org.knowm.xchange.okex.dto.trade.OkexOrderDetails;
-import org.knowm.xchange.okex.v5.OkexAdapters;
-import org.knowm.xchange.okex.v5.OkexExchange;
-import org.knowm.xchange.okex.v5.dto.OkexException;
-import org.knowm.xchange.okex.v5.dto.OkexResponse;
-import org.knowm.xchange.okex.v5.dto.account.OkexAccountType;
-import org.knowm.xchange.okex.v5.dto.trade.*;
 import org.knowm.xchange.service.trade.TradeService;
 import org.knowm.xchange.service.trade.params.CancelOrderByIdParams;
 import org.knowm.xchange.service.trade.params.CancelOrderByInstrument;
@@ -249,7 +242,7 @@ public class OkexTradeService extends OkexTradeServiceRaw implements TradeServic
    * @throws IOException Indication that a networking error occurred while fetching JSON data
    */
   public boolean fundsTransfer(
-      Currency currency, BigDecimal amount, OkexAccountType fromAccount, OkexAccountType toAccount)
+          Currency currency, BigDecimal amount, OkexAccountType fromAccount, OkexAccountType toAccount)
       throws IOException {
     OkexFundsTransferRequest fundsTransferRequest =
         OkexFundsTransferRequest.builder()

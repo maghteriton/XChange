@@ -19,22 +19,7 @@ import org.knowm.xchange.okex.dto.OkexResponse;
 import org.knowm.xchange.okex.dto.account.*;
 import org.knowm.xchange.okex.dto.marketdata.OkexCurrency;
 import org.knowm.xchange.okex.dto.subaccount.OkexSubAccountDetails;
-import org.knowm.xchange.okex.dto.trade.OkexAmendOrderRequest;
-import org.knowm.xchange.okex.dto.trade.OkexCancelOrderRequest;
-import org.knowm.xchange.okex.dto.trade.OkexOrderDetails;
-import org.knowm.xchange.okex.dto.trade.OkexOrderRequest;
-import org.knowm.xchange.okex.dto.trade.OkexOrderResponse;
-import org.knowm.xchange.okex.v5.dto.OkexException;
-import org.knowm.xchange.okex.v5.dto.OkexResponse;
-import org.knowm.xchange.okex.v5.dto.account.*;
-import org.knowm.xchange.okex.v5.dto.account.OkexAssetBalance;
-import org.knowm.xchange.okex.v5.dto.account.OkexDepositAddress;
-import org.knowm.xchange.okex.v5.dto.account.OkexTradeFee;
-import org.knowm.xchange.okex.v5.dto.account.OkexWalletBalance;
-import org.knowm.xchange.okex.v5.dto.account.PiggyBalance;
-import org.knowm.xchange.okex.v5.dto.marketdata.OkexCurrency;
-import org.knowm.xchange.okex.v5.dto.subaccount.OkexSubAccountDetails;
-import org.knowm.xchange.okex.v5.dto.trade.*;
+import org.knowm.xchange.okex.dto.trade.*;
 import si.mazi.rescu.ParamsDigest;
 
 @Path("/api/v5")
@@ -342,18 +327,6 @@ public interface OkexAuthenticated extends Okex {
       @QueryParam("after") String after,
       @QueryParam("before") String before,
       @QueryParam("limit") String limit)
-      throws OkexException, IOException;
-
-  @POST
-  @Path(withdrawal)
-  @Consumes(MediaType.APPLICATION_JSON)
-  OkexResponse<List<WithdrawalInfo>> withdrawal(
-      @HeaderParam("OK-ACCESS-KEY") String apiKey,
-      @HeaderParam("OK-ACCESS-SIGN") ParamsDigest signature,
-      @HeaderParam("OK-ACCESS-TIMESTAMP") String timestamp,
-      @HeaderParam("OK-ACCESS-PASSPHRASE") String passphrase,
-      @HeaderParam("X-SIMULATED-TRADING") String simulatedTrading,
-      OkexWithdrawRequest requestPayload)
       throws OkexException, IOException;
 
   @POST

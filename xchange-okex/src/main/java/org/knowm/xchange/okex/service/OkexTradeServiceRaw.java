@@ -1,7 +1,5 @@
 package org.knowm.xchange.okex.service;
 
-package org.knowm.xchange.okex.v5.service;
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -11,27 +9,13 @@ import org.knowm.xchange.okex.OkexExchange;
 import org.knowm.xchange.okex.dto.OkexException;
 import org.knowm.xchange.okex.dto.OkexResponse;
 import org.knowm.xchange.okex.dto.account.OkexPosition;
-import org.knowm.xchange.okex.dto.trade.OkexAmendOrderRequest;
-import org.knowm.xchange.okex.dto.trade.OkexCancelOrderRequest;
-import org.knowm.xchange.okex.dto.trade.OkexOrderDetails;
-import org.knowm.xchange.okex.dto.trade.OkexOrderRequest;
-import org.knowm.xchange.okex.dto.trade.OkexOrderResponse;
-import org.knowm.xchange.okex.v5.OkexExchange;
-import org.knowm.xchange.okex.v5.dto.OkexException;
-import org.knowm.xchange.okex.v5.dto.OkexResponse;
-import org.knowm.xchange.okex.v5.dto.trade.OkexFundsTransferRequest;
-import org.knowm.xchange.okex.v5.dto.trade.OkexFundsTransferResponse;
-import org.knowm.xchange.okex.v5.dto.trade.OkexAmendOrderRequest;
-import org.knowm.xchange.okex.v5.dto.trade.OkexCancelOrderRequest;
-import org.knowm.xchange.okex.v5.dto.trade.OkexOrderDetails;
-import org.knowm.xchange.okex.v5.dto.trade.OkexOrderRequest;
-import org.knowm.xchange.okex.v5.dto.trade.OkexOrderResponse;
+import org.knowm.xchange.okex.dto.trade.*;
 import org.knowm.xchange.utils.DateUtils;
 
+import static org.knowm.xchange.okex.OkexAuthenticated.fundsTransferPath;
 import static org.knowm.xchange.okex.OkexExchange.PARAM_PASSPHRASE;
 import static org.knowm.xchange.okex.OkexExchange.PARAM_SIMULATED;
 
-import static org.knowm.xchange.okex.v5.OkexAuthenticated.*;
 
 /** Author: Max Gao (gaamox@tutanota.com) Created: 08-06-2021 */
 public class OkexTradeServiceRaw extends OkexBaseService {

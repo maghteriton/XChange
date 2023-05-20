@@ -26,6 +26,12 @@ public class OkexMarketDataService extends OkexMarketDataServiceRaw implements M
   }
 
   @Override
+  public OrderBook getOrderBook(CurrencyPair currencyPair, Object... args) throws IOException {
+    return OkexAdapters.adaptOrderBook(
+            getOkexOrderbook(OkexAdapters.adaptInstrument(currencyPair)), currencyPair);
+  }
+
+  @Override
   public OrderBook getOrderBook(Instrument instrument, Object... args) throws IOException {
     return OkexAdapters.adaptOrderBook(
         getOkexOrderbook(OkexAdapters.adaptInstrument(instrument)), instrument);

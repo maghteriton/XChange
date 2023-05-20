@@ -18,6 +18,7 @@ import org.knowm.xchange.okex.dto.account.PiggyBalance;
 import org.knowm.xchange.okex.dto.subaccount.OkexSubAccountDetails;
 import org.knowm.xchange.utils.DateUtils;
 
+import static org.knowm.xchange.okex.OkexAuthenticated.subAccountList;
 import static org.knowm.xchange.okex.OkexExchange.PARAM_PASSPHRASE;
 import static org.knowm.xchange.okex.OkexExchange.PARAM_SIMULATED;
 
@@ -357,7 +358,7 @@ public class OkexAccountServiceRaw extends OkexBaseService {
                             .getExchangeSpecificParametersItem(PARAM_SIMULATED),
                     enable == null ? null : enable.toString(),
                     subAcct))
-        .withRateLimiter(rateLimiter(OkexAuthenticated.subAccountList))
+        .withRateLimiter(rateLimiter(subAccountList))
         .call();
   }
 
@@ -378,7 +379,7 @@ public class OkexAccountServiceRaw extends OkexBaseService {
                             .getExchangeSpecification()
                             .getExchangeSpecificParametersItem(PARAM_SIMULATED),
                     subAcct))
-        .withRateLimiter(rateLimiter(OkexAuthenticated.subAccountList))
+        .withRateLimiter(rateLimiter(subAccountList))
         .call();
   }
 
@@ -398,7 +399,34 @@ public class OkexAccountServiceRaw extends OkexBaseService {
                             .getExchangeSpecification()
                             .getExchangeSpecificParametersItem(PARAM_SIMULATED),
                     ccy))
-        .withRateLimiter(rateLimiter(OkexAuthenticated.subAccountList))
+        .withRateLimiter(rateLimiter(subAccountList))
         .call();
+  }
+
+  public OkexResponse<List<OkexDepositHistory>> getDepositHistory(
+          OkexDepositHistoryRequest okexDepositHistoryRequest) throws IOException {
+    return decorateApiCall(
+            () ->
+                    this.okexAuthenticated.getDepositHistory(
+                            exchange.getExchangeSpecification().getApiKey(),
+                            signatureCreator,
+                            DateUtils.toUTCISODateString(new Date()),
+                            (String)
+                                    exchange
+                                            .getExchangeSpecification()
+                                            .getExchangeSpecificParametersItem("passphrase"),
+                            (String)
+                                    exchange
+                                            .getExchangeSpecification()
+                                            .getExchangeSpecificParametersItem("simulated"),
+                            okexDepositHistoryRequest.getCurrency(),
+                            okexDepositHistoryRequest.getDepId(),
+                            okexDepositHistoryRequest.getTxId(),
+                            okexDepositHistoryRequest.getState(),
+                            okexDepositHistoryRequest.getAfter(),
+                            okexDepositHistoryRequest.getBefore(),
+                            okexDepositHistoryRequest.getLimit()))
+            .withRateLimiter(rateLimiter(subAccountList))
+            .call();
   }
 }
