@@ -36,6 +36,7 @@ import org.knowm.xchange.dto.account.Balance;
 import org.knowm.xchange.dto.account.FundingRecord;
 import org.knowm.xchange.dto.account.FundingRecord.Status;
 import org.knowm.xchange.dto.account.FundingRecord.Type;
+import org.knowm.xchange.dto.account.Wallet;
 import org.knowm.xchange.dto.marketdata.OrderBook;
 import org.knowm.xchange.dto.marketdata.Ticker;
 import org.knowm.xchange.dto.marketdata.Trade;
@@ -151,7 +152,9 @@ public class KucoinAdapters {
       FeeTier[] feeTiers = staticMetaData != null ? staticMetaData.getFeeTiers() : null;
       Currency feeCurrency = new Currency(symbol.getFeeCurrency());
 
-      currencyPairs.put(pair, new InstrumentMetaData.Builder()
+      currencyPairs.put(
+          pair,
+          new InstrumentMetaData.Builder()
               .tradingFee(takerTradingFee)
               .minimumAmount(minSize)
               .maximumAmount(maxSize)
@@ -456,5 +459,17 @@ public class KucoinAdapters {
         .setDescription(dr.getMemo())
         .setDate(dr.getCreatedAt())
         .build();
+  }
+
+  public static String adaptWalletName(Wallet.WalletFeature walletFeature) {
+    switch (walletFeature.name()) {
+      case "FUNDING":
+        return KucoinWallet.main.name();
+      case "TRADING":
+        return KucoinWallet.trade.name();
+      default:
+        throw new ExchangeException(
+            String.format("Not supported walletFeature  :%s", walletFeature.name()));
+    }
   }
 }

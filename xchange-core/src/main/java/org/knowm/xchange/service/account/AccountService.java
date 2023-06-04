@@ -192,4 +192,21 @@ public interface AccountService extends BaseService {
   default Map<Instrument, Fee> getDynamicTradingFeesByInstrument() throws IOException {
     throw new NotYetImplementedForExchangeException("getDynamicTradingFeesByInstrument");
   }
+
+  /**
+   * @param currency The digital currency that you want to transfer.
+   * @param amount The amount to transfer.
+   * @param fromWallet The account you want to transfer from.
+   * @param toWallet The account you want to transfer to.
+   * @return The order ID of a funds transfer
+   * @throws IOException - Indication that a networking error occurred while fetching JSON data
+   */
+  default String fundsTransfer(
+      Currency currency,
+      BigDecimal amount,
+      Wallet.WalletFeature fromWallet,
+      Wallet.WalletFeature toWallet)
+      throws IOException {
+    throw new NotYetImplementedForExchangeException("fundsTransfer");
+  }
 }

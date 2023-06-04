@@ -3,21 +3,24 @@ package org.knowm.xchange.kucoin;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.FundingRecord;
 import org.knowm.xchange.dto.account.FundingRecord.Type;
 import org.knowm.xchange.dto.account.Wallet;
+import org.knowm.xchange.kucoin.dto.request.ApplyWithdrawApiRequest;
+import org.knowm.xchange.kucoin.dto.request.InnerTransferRequest;
 import org.knowm.xchange.kucoin.dto.response.AccountBalancesResponse;
 import org.knowm.xchange.service.account.AccountService;
-import org.knowm.xchange.service.trade.params.HistoryParamsFundingType;
-import org.knowm.xchange.service.trade.params.TradeHistoryParamCurrency;
-import org.knowm.xchange.service.trade.params.TradeHistoryParams;
-import org.knowm.xchange.service.trade.params.TradeHistoryParamsTimeSpan;
+import org.knowm.xchange.service.trade.params.*;
 
 public class KucoinAccountService extends KucoinAccountServiceRaw implements AccountService {
 
@@ -40,6 +43,12 @@ public class KucoinAccountService extends KucoinAccountServiceRaw implements Acc
                                 .map(KucoinAdapters::adaptBalance)
                                 .collect(toList()))
                         .id(type)
+                        .features(
+                            type.equals(KucoinWallet.trade.name())
+                                ? Stream.of(Wallet.WalletFeature.TRADING)
+                                    .collect(Collectors.toSet())
+                                : Stream.of(Wallet.WalletFeature.FUNDING)
+                                    .collect(Collectors.toSet()))
                         .build())
             .collect(toList()));
   }
@@ -82,5 +91,42 @@ public class KucoinAccountService extends KucoinAccountServiceRaw implements Acc
               .collect(Collectors.toList()));
     }
     return result;
+  }
+
+  @Override
+  public String withdrawFunds(WithdrawFundsParams params) throws IOException {
+    if (!(params instanceof DefaultWithdrawFundsParams)) {
+      throw new IllegalArgumentException("DefaultWithdrawFundsParams must be provided.");
+    }
+
+    DefaultWithdrawFundsParams defaultParams = (DefaultWithdrawFundsParams) params;
+
+    ApplyWithdrawApiRequest withdrawApiRequest =
+        ApplyWithdrawApiRequest.builder()
+            .address(defaultParams.getAddress())
+            .memo(defaultParams.getAddressTag())
+            .currency(defaultParams.getCurrency().getSymbol())
+            .amount(defaultParams.amount)
+            .build();
+
+    return applyWithdraw(withdrawApiRequest).getWithdrawalId();
+  }
+
+  @Override
+  public String fundsTransfer(
+      Currency currency,
+      BigDecimal amount,
+      Wallet.WalletFeature fromWalletFeature,
+      Wallet.WalletFeature toWalletFeature)
+      throws IOException {
+    InnerTransferRequest innerTransferRequest =
+        InnerTransferRequest.builder()
+            .clientOid(String.valueOf(UUID.randomUUID()))
+            .currency(currency.getCurrencyCode())
+            .from(KucoinAdapters.adaptWalletName(fromWalletFeature))
+            .to(KucoinAdapters.adaptWalletName(toWalletFeature))
+            .amount(amount)
+            .build();
+    return innerTransfer(innerTransferRequest).getOrderId();
   }
 }
