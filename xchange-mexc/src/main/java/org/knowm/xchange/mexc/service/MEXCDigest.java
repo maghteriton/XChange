@@ -43,8 +43,8 @@ public class MEXCDigest extends BaseParamsDigest {
     String apiKey = headerParams.getParamValue(API_KEY).toString();
     String reqTime = headerParams.getParamValue(REQ_TIME).toString();
 
-    if (HttpMethod.GET.name().equals(restInvocation.getHttpMethod()) ||
-            HttpMethod.DELETE.name().equals(restInvocation.getHttpMethod())) {
+    if (HttpMethod.GET.name().equals(restInvocation.getHttpMethod())
+        || HttpMethod.DELETE.name().equals(restInvocation.getHttpMethod())) {
       Params queryParamsMap = paramsMap.get(QueryParam.class);
       return apiKey + reqTime + queryParamsMap.asQueryString();
     }
@@ -52,7 +52,7 @@ public class MEXCDigest extends BaseParamsDigest {
     if (HttpMethod.POST.name().equals(restInvocation.getHttpMethod())) {
       return apiKey + reqTime + restInvocation.getRequestBody();
     }
-    throw new NotYetImplementedForExchangeException("Only GET, DELETE and POST are supported in digest");
+    throw new NotYetImplementedForExchangeException(
+        "Only GET, DELETE and POST are supported in digest");
   }
-
 }
