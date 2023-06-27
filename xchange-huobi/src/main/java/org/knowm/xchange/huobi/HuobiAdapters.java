@@ -461,7 +461,7 @@ public class HuobiAdapters {
     }
   }
 
-  public static CandleStickData adaptCandleStickData(HuobiKline[] klines, CurrencyPair currencyPair, Date endDate) {
+  public static CandleStickData adaptCandleStickData(HuobiKline[] klines, CurrencyPair currencyPair, Date startDate) {
     CandleStickData candleStickData = null;
     if(klines.length != 0) {
       List<CandleStick> candleStickList = new ArrayList<>();
@@ -469,7 +469,7 @@ public class HuobiAdapters {
       while(iterator.hasNext()) {
         HuobiKline huobiKline = iterator.next();
         Date date = new Date(TimeUnit.SECONDS.toMillis(huobiKline.getId()));
-        if(date.before(endDate)) {
+        if(date.before(startDate)) {
           candleStickList.add(new CandleStick.Builder()
                   .timestamp(date)
                   .open(huobiKline.getOpen())

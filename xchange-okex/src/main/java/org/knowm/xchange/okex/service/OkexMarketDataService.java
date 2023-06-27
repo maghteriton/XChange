@@ -72,8 +72,8 @@ public class OkexMarketDataService extends OkexMarketDataServiceRaw implements M
 
     OkexResponse<List<OkexCandleStick>> historyCandle = getHistoryCandle(
             OkexAdapters.adaptInstrument(currencyPair),
-            String.valueOf(defaultCandleStickParam.getEndDate().getTime()),
             String.valueOf(defaultCandleStickParam.getStartDate().getTime()),
+            String.valueOf(defaultCandleStickParam.getEndDate().getTime()),
             periodType.getFieldValue(), limit);
     return OkexAdapters.adaptCandleStickData(historyCandle.getData(), currencyPair);
   }
