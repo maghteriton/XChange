@@ -7,6 +7,8 @@ import org.knowm.xchange.dto.account.Balance;
 import org.knowm.xchange.dto.account.DepositAddress;
 import org.knowm.xchange.dto.account.FundingRecord;
 import org.knowm.xchange.dto.account.Wallet;
+import org.knowm.xchange.dto.marketdata.CandleStick;
+import org.knowm.xchange.dto.marketdata.CandleStickData;
 import org.knowm.xchange.dto.marketdata.OrderBook;
 import org.knowm.xchange.dto.meta.CurrencyMetaData;
 import org.knowm.xchange.dto.meta.ExchangeMetaData;
@@ -15,10 +17,7 @@ import org.knowm.xchange.dto.meta.WalletHealth;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.mexc.dto.account.*;
-import org.knowm.xchange.mexc.dto.market.MEXCCurrency;
-import org.knowm.xchange.mexc.dto.market.MEXCCurrencyInfo;
-import org.knowm.xchange.mexc.dto.market.MEXCDepth;
-import org.knowm.xchange.mexc.dto.market.MEXCSymbols;
+import org.knowm.xchange.mexc.dto.market.*;
 import org.knowm.xchange.mexc.dto.trade.MEXCOrder;
 import org.knowm.xchange.mexc.dto.trade.MEXCOrderRequestPayload;
 
@@ -267,5 +266,27 @@ public class MEXCAdapters {
                         e.getPrice())));
 
     return new OrderBook(new Date(), asks, bids);
+  }
+
+  public static CandleStickData adaptCandleStickData(
+      List<MEXCCandleData> mexcCandleStickData, CurrencyPair currencyPair) {
+    CandleStickData candleStickData = null;
+    if (!mexcCandleStickData.isEmpty()) {
+      List<CandleStick> candleStickList = new ArrayList<>();
+      mexcCandleStickData.forEach(
+          data ->
+              candleStickList.add(
+                  new CandleStick.Builder()
+                      .timestamp(new Date(data.getTime() * 1000))
+                      .open(data.getOpen())
+                      .high(data.getHigh())
+                      .low(data.getLow())
+                      .close(data.getClose())
+                      .volume(data.getVol())
+                      .build()));
+      candleStickData = new CandleStickData(currencyPair, candleStickList);
+    }
+
+    return candleStickData;
   }
 }

@@ -100,7 +100,7 @@ public class HuobiMarketDataService extends HuobiMarketDataServiceRaw implements
                         .id(t.getId())
                         .build())
             .collect(Collectors.toList());
-    Trades sortedTrades =  new Trades(trades);
+    Trades sortedTrades = new Trades(trades);
     Collections.reverse(sortedTrades.getTrades());
 
     return sortedTrades;
@@ -126,7 +126,7 @@ public class HuobiMarketDataService extends HuobiMarketDataServiceRaw implements
     }
 
     long timeDifferenceInMilis =
-        Math.abs(new Date().getTime() - defaultCandleStickParam.getStartDate().getTime());
+        Math.abs(new Date().getTime() - defaultCandleStickParam.getEndDate().getTime());
     int size =
         Math.min(
             (int) (timeDifferenceInMilis / klineInterval.getMillis()), MAX_NUMBER_OF_KLINE_RETURNS);
@@ -134,6 +134,6 @@ public class HuobiMarketDataService extends HuobiMarketDataServiceRaw implements
     return HuobiAdapters.adaptCandleStickData(
         getKlines(currencyPair, klineInterval, size),
         currencyPair,
-        defaultCandleStickParam.getEndDate());
+        defaultCandleStickParam.getStartDate());
   }
 }

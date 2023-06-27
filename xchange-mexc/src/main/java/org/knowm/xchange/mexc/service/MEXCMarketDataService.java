@@ -5,13 +5,15 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.CurrencyPair;
+import org.knowm.xchange.dto.marketdata.CandleStickData;
 import org.knowm.xchange.dto.marketdata.OrderBook;
 import org.knowm.xchange.exceptions.ExchangeException;
+import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 import org.knowm.xchange.mexc.MEXCAdapters;
-import org.knowm.xchange.mexc.dto.market.MEXCCurrencyInfo;
-import org.knowm.xchange.mexc.dto.market.MEXCDepth;
-import org.knowm.xchange.mexc.dto.market.MEXCSymbols;
+import org.knowm.xchange.mexc.dto.market.*;
 import org.knowm.xchange.service.marketdata.MarketDataService;
+import org.knowm.xchange.service.trade.params.CandleStickDataParams;
+import org.knowm.xchange.service.trade.params.DefaultCandleStickParam;
 
 public class MEXCMarketDataService extends MEXCMarketDataServiceRaw implements MarketDataService {
 
@@ -61,5 +63,35 @@ public class MEXCMarketDataService extends MEXCMarketDataServiceRaw implements M
       throw new ExchangeException(e);
     }
     return currencyInfoList;
+  }
+
+  @Override
+  public CandleStickData getCandleStickData(CurrencyPair currencyPair, CandleStickDataParams params)
+      throws IOException {
+
+    if (!(params instanceof DefaultCandleStickParam)) {
+      throw new NotYetImplementedForExchangeException("Only DefaultCandleStickParam is supported");
+    }
+
+    DefaultCandleStickParam defaultCandleStickParam = (DefaultCandleStickParam) params;
+    long after = defaultCandleStickParam.getEndDate().getTime() / 1000;
+    long periodInSecs = defaultCandleStickParam.getPeriodInSecs();
+    MEXCKlineInterval interval = MEXCKlineInterval.m30;
+    for (MEXCKlineInterval mexcKlineInterval : MEXCKlineInterval.values()) {
+      if (mexcKlineInterval.getSeconds() == periodInSecs) {
+        interval = mexcKlineInterval;
+        break;
+      }
+    }
+
+    List<MEXCCandleData> mexcCandleStickDataList;
+    try {
+      mexcCandleStickDataList =
+          getMEXCCandleStickData(currencyPair, interval.getCode(), after, 1000);
+    } catch (MEXCException e) {
+      throw new ExchangeException(e);
+    }
+
+    return MEXCAdapters.adaptCandleStickData(mexcCandleStickDataList, currencyPair);
   }
 }

@@ -17,13 +17,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.knowm.xchange.currency.Currency;
@@ -37,10 +31,8 @@ import org.knowm.xchange.dto.account.FundingRecord;
 import org.knowm.xchange.dto.account.FundingRecord.Status;
 import org.knowm.xchange.dto.account.FundingRecord.Type;
 import org.knowm.xchange.dto.account.Wallet;
+import org.knowm.xchange.dto.marketdata.*;
 import org.knowm.xchange.dto.marketdata.OrderBook;
-import org.knowm.xchange.dto.marketdata.Ticker;
-import org.knowm.xchange.dto.marketdata.Trade;
-import org.knowm.xchange.dto.marketdata.Trades;
 import org.knowm.xchange.dto.marketdata.Trades.TradeSortType;
 import org.knowm.xchange.dto.meta.*;
 import org.knowm.xchange.dto.trade.LimitOrder;
@@ -51,19 +43,7 @@ import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.kucoin.KucoinTradeService.KucoinOrderFlags;
 import org.knowm.xchange.kucoin.dto.request.OrderCreateApiRequest;
-import org.knowm.xchange.kucoin.dto.response.AccountBalancesResponse;
-import org.knowm.xchange.kucoin.dto.response.AllTickersResponse;
-import org.knowm.xchange.kucoin.dto.response.CurrenciesResponse;
-import org.knowm.xchange.kucoin.dto.response.DepositResponse;
-import org.knowm.xchange.kucoin.dto.response.HistOrdersResponse;
-import org.knowm.xchange.kucoin.dto.response.OrderBookResponse;
-import org.knowm.xchange.kucoin.dto.response.OrderResponse;
-import org.knowm.xchange.kucoin.dto.response.SymbolResponse;
-import org.knowm.xchange.kucoin.dto.response.SymbolTickResponse;
-import org.knowm.xchange.kucoin.dto.response.TradeFeeResponse;
-import org.knowm.xchange.kucoin.dto.response.TradeHistoryResponse;
-import org.knowm.xchange.kucoin.dto.response.TradeResponse;
-import org.knowm.xchange.kucoin.dto.response.WithdrawalResponse;
+import org.knowm.xchange.kucoin.dto.response.*;
 
 public class KucoinAdapters {
 
@@ -402,6 +382,28 @@ public class KucoinAdapters {
         .symbol(adaptCurrencyPair((CurrencyPair) order.getInstrument()))
         .size(order.getOriginalAmount())
         .side(adaptSide(order.getType()));
+  }
+
+  public static CandleStickData adaptCandleStickData(
+      CurrencyPair currencyPair, List<KucoinKline> kucoinKlines) {
+    CandleStickData candleStickData = null;
+    if (!kucoinKlines.isEmpty()) {
+      List<CandleStick> candleStickList = new ArrayList<>();
+      kucoinKlines.forEach(
+          data ->
+              candleStickList.add(
+                  new CandleStick.Builder()
+                      .timestamp(new Date(data.getTime() * 1000))
+                      .open(data.getOpen())
+                      .high(data.getHigh())
+                      .low(data.getLow())
+                      .close(data.getClose())
+                      .volume(data.getVolume())
+                      .build()));
+      candleStickData = new CandleStickData(currencyPair, candleStickList);
+    }
+
+    return candleStickData;
   }
 
   private static final class PriceAndSize {

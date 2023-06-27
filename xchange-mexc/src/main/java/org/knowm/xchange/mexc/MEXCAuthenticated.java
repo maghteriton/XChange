@@ -100,4 +100,13 @@ public interface MEXCAuthenticated {
       @HeaderParam("Signature") ParamsDigest signature,
       @QueryParam("currency") String currency)
       throws IOException, MEXCException;
+
+  @GET
+  @Path("/market/kline")
+  MEXCResult<List<List<String>>> getCandleStickData(
+      @QueryParam("symbol") String symbol,
+      @QueryParam("interval") String interval,
+      @QueryParam("start_time") Long after,
+      @QueryParam("limit") Integer limit)
+      throws IOException, MEXCException;
 }
