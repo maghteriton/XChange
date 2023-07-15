@@ -10,16 +10,21 @@ import org.knowm.xchange.dto.account.Wallet;
 import org.knowm.xchange.dto.marketdata.CandleStick;
 import org.knowm.xchange.dto.marketdata.CandleStickData;
 import org.knowm.xchange.dto.marketdata.OrderBook;
+import org.knowm.xchange.dto.marketdata.Trades;
 import org.knowm.xchange.dto.meta.CurrencyMetaData;
 import org.knowm.xchange.dto.meta.ExchangeMetaData;
 import org.knowm.xchange.dto.meta.InstrumentMetaData;
 import org.knowm.xchange.dto.meta.WalletHealth;
 import org.knowm.xchange.dto.trade.LimitOrder;
+import org.knowm.xchange.dto.trade.UserTrade;
+import org.knowm.xchange.dto.trade.UserTrades;
 import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.mexc.dto.account.*;
 import org.knowm.xchange.mexc.dto.market.*;
+import org.knowm.xchange.mexc.dto.trade.MEXCDeal;
 import org.knowm.xchange.mexc.dto.trade.MEXCOrder;
 import org.knowm.xchange.mexc.dto.trade.MEXCOrderRequestPayload;
+import org.knowm.xchange.utils.DateUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -288,5 +293,33 @@ public class MEXCAdapters {
     }
 
     return candleStickData;
+  }
+
+  public static UserTrades adaptUserTrades(List<MEXCDeal> dealHistory) {
+
+    List<UserTrade> tradeList = new ArrayList<>();
+    dealHistory.forEach(deal -> tradeList.add(adaptTrade(deal)));
+
+    return new UserTrades(tradeList, Trades.TradeSortType.SortByTimestamp);
+  }
+
+  private static UserTrade adaptTrade(MEXCDeal deal) {
+    Date timestamp = DateUtils.fromMillisUtc(deal.getCreateTime());
+    Order.OrderType type =
+        deal.getTradeType().equals(Order.OrderType.BID.name())
+            ? Order.OrderType.BID
+            : Order.OrderType.ASK;
+
+    return new UserTrade.Builder()
+        .type(type)
+        .originalAmount(new BigDecimal(deal.getAmount()))
+        .currencyPair((CurrencyPair) adaptSymbol(deal.getSymbol()))
+        .price(new BigDecimal(deal.getPrice()))
+        .timestamp(timestamp)
+        .id(deal.getId())
+        .orderId(deal.getOrderId())
+        .feeAmount(new BigDecimal(deal.getFee()))
+        .feeCurrency(new Currency(deal.getFeeCurrency()))
+        .build();
   }
 }

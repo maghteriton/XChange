@@ -5,15 +5,20 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.knowm.xchange.Exchange;
+import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
 import org.knowm.xchange.dto.trade.LimitOrder;
+import org.knowm.xchange.dto.trade.UserTrades;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.mexc.MEXCAdapters;
 import org.knowm.xchange.mexc.dto.MEXCResult;
+import org.knowm.xchange.mexc.dto.trade.MEXCDeal;
 import org.knowm.xchange.mexc.dto.trade.MEXCOrder;
 import org.knowm.xchange.mexc.dto.trade.MEXCOrderRequestPayload;
 import org.knowm.xchange.service.trade.TradeService;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamCurrencyPair;
+import org.knowm.xchange.service.trade.params.TradeHistoryParams;
 import org.knowm.xchange.service.trade.params.orders.DefaultQueryOrderParam;
 import org.knowm.xchange.service.trade.params.orders.OrderQueryParams;
 
@@ -43,6 +48,11 @@ public class MEXCTradeService extends MEXCTradeServiceRaw implements TradeServic
     } catch (MEXCException e) {
       throw new ExchangeException(e);
     }
+  }
+
+  @Override
+  public Class getRequiredOrderQueryParamClass() {
+    return DefaultQueryOrderParam.class;
   }
 
   @Override
@@ -84,5 +94,20 @@ public class MEXCTradeService extends MEXCTradeServiceRaw implements TradeServic
     }
 
     return orders;
+  }
+
+  @Override
+  public UserTrades getTradeHistory(TradeHistoryParams params)
+      throws ExchangeException, IOException {
+    CurrencyPair currencyPair = ((TradeHistoryParamCurrencyPair) params).getCurrencyPair();
+
+    MEXCResult<List<MEXCDeal>> tradeHistory;
+    try {
+      tradeHistory = getTradeHistory(currencyPair);
+    } catch (MEXCException e) {
+      throw new ExchangeException(e);
+    }
+
+    return MEXCAdapters.adaptUserTrades(tradeHistory.getData());
   }
 }

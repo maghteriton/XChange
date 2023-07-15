@@ -109,6 +109,11 @@ public class GateioTradeService extends GateioTradeServiceRaw implements TradeSe
   }
 
   @Override
+  public Class getRequiredOrderQueryParamClass() {
+    return DefaultQueryOrderParamCurrencyPair.class;
+  }
+
+  @Override
   public Collection<Order> getOrder(OrderQueryParams... orderQueryParams) throws IOException {
     List<Order> orders = new ArrayList<>();
     for (OrderQueryParams param : orderQueryParams) {

@@ -10,6 +10,7 @@ import org.knowm.xchange.mexc.dto.account.*;
 import org.knowm.xchange.mexc.dto.market.MEXCCurrencyInfo;
 import org.knowm.xchange.mexc.dto.market.MEXCDepth;
 import org.knowm.xchange.mexc.dto.market.MEXCSymbols;
+import org.knowm.xchange.mexc.dto.trade.MEXCDeal;
 import org.knowm.xchange.mexc.dto.trade.MEXCOrder;
 import org.knowm.xchange.mexc.dto.trade.MEXCOrderRequestPayload;
 import org.knowm.xchange.mexc.service.MEXCException;
@@ -108,5 +109,14 @@ public interface MEXCAuthenticated {
       @QueryParam("interval") String interval,
       @QueryParam("start_time") Long after,
       @QueryParam("limit") Integer limit)
+      throws IOException, MEXCException;
+
+  @GET
+  @Path("/order/deals")
+  MEXCResult<List<MEXCDeal>> getDealHistory(
+      @HeaderParam("ApiKey") String apiKey,
+      @HeaderParam("Request-Time") SynchronizedValueFactory<Long> timestamp,
+      @HeaderParam("Signature") ParamsDigest signature,
+      @QueryParam("symbol") String symbol)
       throws IOException, MEXCException;
 }
