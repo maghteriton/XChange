@@ -1,7 +1,10 @@
 package org.knowm.xchange.mexc.service;
 
 import org.knowm.xchange.Exchange;
+import org.knowm.xchange.currency.CurrencyPair;
+import org.knowm.xchange.mexc.MEXCAdapters;
 import org.knowm.xchange.mexc.dto.MEXCResult;
+import org.knowm.xchange.mexc.dto.trade.MEXCDeal;
 import org.knowm.xchange.mexc.dto.trade.MEXCOrder;
 import org.knowm.xchange.mexc.dto.trade.MEXCOrderRequestPayload;
 
@@ -13,17 +16,18 @@ public class MEXCTradeServiceRaw extends MEXCBaseService {
     super(exchange);
   }
 
-  public MEXCResult<String> placeOrder(MEXCOrderRequestPayload orderRequestPayload) throws IOException {
+  public MEXCResult<String> placeOrder(MEXCOrderRequestPayload orderRequestPayload)
+      throws IOException {
     return mexcAuthenticated.placeOrder(
-            apiKey,
-            nonceFactory,
-            signatureCreator,
-            orderRequestPayload
-    );
+        apiKey, nonceFactory, signatureCreator, orderRequestPayload);
   }
 
   public MEXCResult<List<MEXCOrder>> getOrders(List<String> orderIds) throws IOException {
     return mexcAuthenticated.getOrders(apiKey, nonceFactory, signatureCreator, orderIds);
   }
 
+  public MEXCResult<List<MEXCDeal>> getTradeHistory(CurrencyPair currencyPair) throws IOException {
+    return mexcAuthenticated.getDealHistory(
+        apiKey, nonceFactory, signatureCreator, MEXCAdapters.convertToMEXCSymbol(currencyPair));
+  }
 }
