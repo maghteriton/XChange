@@ -37,6 +37,8 @@ public class MEXCAdapters {
   private static final SimpleDateFormat DATE_FORMAT =
       new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
+  private static final String SUCCESS = "success";
+
   public static Wallet adaptMEXCBalances(Map<String, MEXCBalance> mexcBalances) {
     List<Balance> balances = new ArrayList<>(mexcBalances.size());
     for (Map.Entry<String, MEXCBalance> mexcBalance : mexcBalances.entrySet()) {
@@ -301,6 +303,10 @@ public class MEXCAdapters {
     dealHistory.forEach(deal -> tradeList.add(adaptTrade(deal)));
 
     return new UserTrades(tradeList, Trades.TradeSortType.SortByTimestamp);
+  }
+
+  public static Boolean adaptCancelOrder(Map<String, String> cancelOrderMap, String orderId) {
+    return SUCCESS.equalsIgnoreCase(cancelOrderMap.get(orderId));
   }
 
   private static UserTrade adaptTrade(MEXCDeal deal) {

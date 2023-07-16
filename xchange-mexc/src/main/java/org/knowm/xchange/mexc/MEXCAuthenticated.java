@@ -119,4 +119,13 @@ public interface MEXCAuthenticated {
       @HeaderParam("Signature") ParamsDigest signature,
       @QueryParam("symbol") String symbol)
       throws IOException, MEXCException;
+
+  @DELETE
+  @Path("/order/cancel")
+  MEXCResult<Map<String, String>> cancelOrderById(
+      @HeaderParam("ApiKey") String apiKey,
+      @HeaderParam("Request-Time") SynchronizedValueFactory<Long> timestamp,
+      @HeaderParam("Signature") ParamsDigest signature,
+      @QueryParam("order_ids") String oderIds)
+      throws IOException, MEXCException;
 }
