@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
+import org.knowm.xchange.dto.Order;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.account.Balance;
 import org.knowm.xchange.dto.account.DepositAddress;
@@ -32,7 +33,6 @@ import org.knowm.xchange.gateio.dto.GateioOrderType;
 import org.knowm.xchange.gateio.dto.account.GateioDepositAddress;
 import org.knowm.xchange.gateio.dto.account.GateioDepositsWithdrawals;
 import org.knowm.xchange.gateio.dto.account.GateioFunds;
-import org.knowm.xchange.gateio.dto.account.GateioMultiChainAddress;
 import org.knowm.xchange.gateio.dto.marketdata.*;
 import org.knowm.xchange.gateio.dto.marketdata.GateioMarketInfoWrapper.GateioMarketInfo;
 import org.knowm.xchange.gateio.dto.trade.GateioOpenOrder;
@@ -233,10 +233,12 @@ public final class GateioAdapters {
       CurrencyPair currencyPair = entry.getKey();
       GateioMarketInfo btermarketInfo = entry.getValue();
 
-      currencyPairs.put(currencyPair, new InstrumentMetaData.Builder()
-                      .tradingFee(btermarketInfo.getFee())
-                      .minimumAmount(btermarketInfo.getMinAmount())
-                      .priceScale(btermarketInfo.getDecimalPlaces())
+      currencyPairs.put(
+          currencyPair,
+          new InstrumentMetaData.Builder()
+              .tradingFee(btermarketInfo.getFee())
+              .minimumAmount(btermarketInfo.getMinAmount())
+              .priceScale(btermarketInfo.getDecimalPlaces())
               .build());
     }
 
@@ -292,7 +294,7 @@ public final class GateioAdapters {
                       d.id,
                       d.txid,
                       FundingRecord.Type.DEPOSIT,
-                      status(d.status),
+                      fundingStatus(d.status),
                       null,
                       null,
                       null);
@@ -311,7 +313,7 @@ public final class GateioAdapters {
                       w.id,
                       w.txid,
                       FundingRecord.Type.WITHDRAWAL,
-                      status(w.status),
+                      fundingStatus(w.status),
                       null,
                       null,
                       null);
@@ -321,7 +323,7 @@ public final class GateioAdapters {
     return result;
   }
 
-  private static FundingRecord.Status status(String gateioStatus) {
+  private static FundingRecord.Status fundingStatus(String gateioStatus) {
     switch (gateioStatus) {
       case "DONE":
         return Status.COMPLETE;
@@ -369,5 +371,16 @@ public final class GateioAdapters {
       candleStickData = new CandleStickData(currencyPair, candleStickList);
     }
     return candleStickData;
+  }
+
+  public static Order.OrderStatus adaptOrderStatus(String gateioStatus) {
+    switch (gateioStatus) {
+      case "closed":
+        return Order.OrderStatus.FILLED;
+      case "cancelled":
+        return Order.OrderStatus.CANCELED;
+      default:
+        return Order.OrderStatus.PENDING_NEW;
+    }
   }
 }
