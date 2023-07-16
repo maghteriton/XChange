@@ -10,6 +10,7 @@ import org.knowm.xchange.mexc.dto.trade.MEXCOrderRequestPayload;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class MEXCTradeServiceRaw extends MEXCBaseService {
   public MEXCTradeServiceRaw(Exchange exchange) {
@@ -29,5 +30,9 @@ public class MEXCTradeServiceRaw extends MEXCBaseService {
   public MEXCResult<List<MEXCDeal>> getTradeHistory(CurrencyPair currencyPair) throws IOException {
     return mexcAuthenticated.getDealHistory(
         apiKey, nonceFactory, signatureCreator, MEXCAdapters.convertToMEXCSymbol(currencyPair));
+  }
+
+  public MEXCResult<Map<String, String>> cancelOrderById(String oderIds) throws IOException {
+    return mexcAuthenticated.cancelOrderById(apiKey, nonceFactory, signatureCreator, oderIds);
   }
 }

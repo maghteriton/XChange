@@ -17,6 +17,8 @@ import org.knowm.xchange.mexc.dto.trade.MEXCDeal;
 import org.knowm.xchange.mexc.dto.trade.MEXCOrder;
 import org.knowm.xchange.mexc.dto.trade.MEXCOrderRequestPayload;
 import org.knowm.xchange.service.trade.TradeService;
+import org.knowm.xchange.service.trade.params.CancelOrderByIdParams;
+import org.knowm.xchange.service.trade.params.CancelOrderParams;
 import org.knowm.xchange.service.trade.params.TradeHistoryParamCurrencyPair;
 import org.knowm.xchange.service.trade.params.TradeHistoryParams;
 import org.knowm.xchange.service.trade.params.orders.DefaultQueryOrderParam;
@@ -109,5 +111,21 @@ public class MEXCTradeService extends MEXCTradeServiceRaw implements TradeServic
     }
 
     return MEXCAdapters.adaptUserTrades(tradeHistory.getData());
+  }
+
+  @Override
+  public boolean cancelOrder(CancelOrderParams orderParams) throws IOException {
+    if (!(orderParams instanceof CancelOrderByIdParams)) {
+      throw new NotAvailableFromExchangeException("cancelOrder in MEXC needs orderId.");
+    }
+    String orderId = ((CancelOrderByIdParams) orderParams).getOrderId();
+    MEXCResult<Map<String, String>> cancelOrderMap;
+    try {
+      cancelOrderMap = cancelOrderById(orderId);
+    } catch (MEXCException e) {
+      throw new ExchangeException(e);
+    }
+
+    return MEXCAdapters.adaptCancelOrder(cancelOrderMap.getData(), orderId);
   }
 }
