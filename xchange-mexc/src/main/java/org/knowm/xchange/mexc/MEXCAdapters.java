@@ -82,8 +82,8 @@ public class MEXCAdapters {
   public static MEXCOrderRequestPayload adaptOrder(LimitOrder limitOrder) {
     return new MEXCOrderRequestPayload(
         convertToMEXCSymbol((CurrencyPair) limitOrder.getInstrument()),
-        limitOrder.getLimitPrice().toString(),
-        limitOrder.getOriginalAmount().toString(),
+        limitOrder.getLimitPrice().toPlainString(),
+        limitOrder.getOriginalAmount().toPlainString(),
         limitOrder.getType().toString(),
         "LIMIT_ORDER",
         null);
