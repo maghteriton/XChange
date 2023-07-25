@@ -34,9 +34,9 @@ public class GateioTradeServiceRaw extends GateioBaseService {
    * actually gets created. The reason for this is that orders are simply submitted to a queue in
    * their back-end. One example for why an order might not get created is because there are
    * insufficient funds. The best attempt you can make to confirm that the order was created is to
-   * poll {@link #getGateioOpenOrders}. However if the order is created and executed before it is
-   * caught in its open state from calling {@link #getGateioOpenOrders} then the only way to confirm
-   * would be confirm the expected difference in funds available for your account.
+   * poll {@link #getAllGateioOpenOrders}. However if the order is created and executed before it is
+   * caught in its open state from calling {@link #getAllGateioOpenOrders} then the only way to
+   * confirm would be confirm the expected difference in funds available for your account.
    *
    * @param limitOrder
    * @return String order id of submitted request.
@@ -60,9 +60,9 @@ public class GateioTradeServiceRaw extends GateioBaseService {
    * actually gets created. The reason for this is that orders are simply submitted to a queue in
    * their back-end. One example for why an order might not get created is because there are
    * insufficient funds. The best attempt you can make to confirm that the order was created is to
-   * poll {@link #getGateioOpenOrders}. However if the order is created and executed before it is
-   * caught in its open state from calling {@link #getGateioOpenOrders} then the only way to confirm
-   * would be confirm the expected difference in funds available for your account.
+   * poll {@link #getAllGateioOpenOrders}. However if the order is created and executed before it is
+   * caught in its open state from calling {@link #getAllGateioOpenOrders} then the only way to
+   * confirm would be confirm the expected difference in funds available for your account.
    *
    * @param currencyPair
    * @param orderType
@@ -111,9 +111,15 @@ public class GateioTradeServiceRaw extends GateioBaseService {
     return handleResponse(cancelAllOrdersResult).isResult();
   }
 
-  public GateioOpenOrders getGateioOpenOrders() throws IOException {
+  public GateioOpenOrders getGateioOpenOrders(CurrencyPair currencyPair) throws IOException {
+    GateioOpenOrders gateioOpenOrdersReturn =
+        bter.getOpenOrders(apiKey, signatureCreator, GateioUtils.toPairString(currencyPair));
 
-    GateioOpenOrders gateioOpenOrdersReturn = bter.getOpenOrders(apiKey, signatureCreator);
+    return handleResponse(gateioOpenOrdersReturn);
+  }
+
+  public GateioOpenOrders getAllGateioOpenOrders() throws IOException {
+    GateioOpenOrders gateioOpenOrdersReturn = bter.getOpenOrders(apiKey, signatureCreator, null);
 
     return handleResponse(gateioOpenOrdersReturn);
   }

@@ -108,26 +108,25 @@ public final class GateioAdapters {
     return new OrderBook(null, asks, bids);
   }
 
-  public static LimitOrder adaptOrder(
-      GateioOpenOrder order, Collection<Instrument> currencyPairs) {
+  public static LimitOrder adaptOrder(GateioOpenOrder order) {
 
     String[] currencyPairSplit = order.getCurrencyPair().split("_");
     CurrencyPair currencyPair = new CurrencyPair(currencyPairSplit[0], currencyPairSplit[1]);
     return new LimitOrder(
         order.getType().equals("sell") ? OrderType.ASK : OrderType.BID,
         order.getAmount(),
+        order.getFilledAmount(),
         currencyPair,
         order.getOrderNumber(),
-        null,
+        new Date(DateUtils.toUnixTime(Long.parseLong(order.getTimestamp()))),
         order.getRate());
   }
 
-  public static OpenOrders adaptOpenOrders(
-      GateioOpenOrders openOrders, Collection<Instrument> currencyPairs) {
+  public static OpenOrders adaptOpenOrders(GateioOpenOrders openOrders) {
 
     List<LimitOrder> adaptedOrders = new ArrayList<>();
     for (GateioOpenOrder openOrder : openOrders.getOrders()) {
-      adaptedOrders.add(adaptOrder(openOrder, currencyPairs));
+      adaptedOrders.add(adaptOrder(openOrder));
     }
 
     return new OpenOrders(adaptedOrders);

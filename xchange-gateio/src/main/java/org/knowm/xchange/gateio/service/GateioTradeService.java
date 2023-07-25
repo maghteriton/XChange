@@ -10,6 +10,7 @@ import org.knowm.xchange.dto.trade.UserTrades;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.gateio.GateioAdapters;
+import org.knowm.xchange.gateio.dto.trade.GateioOpenOrder;
 import org.knowm.xchange.gateio.dto.trade.GateioOpenOrders;
 import org.knowm.xchange.gateio.dto.trade.GateioOrderStatus;
 import org.knowm.xchange.gateio.dto.trade.GateioTrade;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class GateioTradeService extends GateioTradeServiceRaw implements TradeService {
@@ -45,10 +47,8 @@ public class GateioTradeService extends GateioTradeServiceRaw implements TradeSe
 
   @Override
   public OpenOrders getOpenOrders(OpenOrdersParams params) throws IOException {
-    GateioOpenOrders openOrders = super.getGateioOpenOrders();
-    Collection<Instrument> currencyPairs = exchange.getExchangeInstruments();
-
-    return GateioAdapters.adaptOpenOrders(openOrders, currencyPairs);
+    GateioOpenOrders openOrders = super.getAllGateioOpenOrders();
+    return GateioAdapters.adaptOpenOrders(openOrders);
   }
 
   @Override
@@ -122,28 +122,41 @@ public class GateioTradeService extends GateioTradeServiceRaw implements TradeSe
         throw new NotAvailableFromExchangeException(
             "getOrder in gateio needs orderId and currency pair");
       }
+
       DefaultQueryOrderParamCurrencyPair queryOrderParamCurrencyPair =
           (DefaultQueryOrderParamCurrencyPair) param;
-      GateioOrderStatus gateioOrderStatus =
-          getGateioOrderStatus(
-              queryOrderParamCurrencyPair.getOrderId(),
-              queryOrderParamCurrencyPair.getCurrencyPair());
+      String orderId = queryOrderParamCurrencyPair.getOrderId();
+      CurrencyPair currencyPair = queryOrderParamCurrencyPair.getCurrencyPair();
 
-      BigDecimal remainingAmount =
-          gateioOrderStatus.getInitialAmount().subtract(gateioOrderStatus.getAmount());
-      LimitOrder limitOrder =
-          new LimitOrder.Builder(
-                  GateioAdapters.adaptOrderType(gateioOrderStatus.getType()),
-                  gateioOrderStatus.getCurrencyPair())
-              .originalAmount(gateioOrderStatus.getInitialAmount())
-              .remainingAmount(remainingAmount)
-              .id(gateioOrderStatus.getOrderNumber())
-              .limitPrice(gateioOrderStatus.getInitialRate())
-              .orderStatus(GateioAdapters.adaptOrderStatus(gateioOrderStatus.getStatus()))
-              .build();
+      GateioOpenOrders gateioOpenOrders = super.getGateioOpenOrders(currencyPair);
 
-      limitOrder.setAveragePrice(gateioOrderStatus.getRate());
-      orders.add(limitOrder);
+      // check open orders for more detailed results
+      if (!gateioOpenOrders.getOrders().isEmpty()
+          && gateioOpenOrders.getOrders().get(0).getOrderNumber().equals(orderId)) {
+        OpenOrders openOrders = GateioAdapters.adaptOpenOrders(gateioOpenOrders);
+        List<LimitOrder> limitOrderList = openOrders.getOpenOrders();
+        orders.addAll(limitOrderList);
+      } else {
+        // general orders are not detailed as open orders, but since it's not in
+        // this response does not include filled order amount
+        GateioOrderStatus gateioOrderStatus = getGateioOrderStatus(orderId, currencyPair);
+
+        BigDecimal remainingAmount =
+            gateioOrderStatus.getInitialAmount().subtract(gateioOrderStatus.getAmount());
+        LimitOrder limitOrder =
+            new LimitOrder.Builder(
+                    GateioAdapters.adaptOrderType(gateioOrderStatus.getType()),
+                    gateioOrderStatus.getCurrencyPair())
+                .originalAmount(gateioOrderStatus.getInitialAmount())
+                .remainingAmount(remainingAmount)
+                .id(gateioOrderStatus.getOrderNumber())
+                .limitPrice(gateioOrderStatus.getInitialRate())
+                .orderStatus(GateioAdapters.adaptOrderStatus(gateioOrderStatus.getStatus()))
+                .build();
+
+        limitOrder.setAveragePrice(gateioOrderStatus.getRate());
+        orders.add(limitOrder);
+      }
     }
 
     return orders;

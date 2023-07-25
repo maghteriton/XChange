@@ -85,7 +85,7 @@ public class GateioTradeDemo {
 
     Thread.sleep(2000); // wait for Gateio's back-end to propagate the order
 
-    GateioOpenOrders openOrders = tradeService.getGateioOpenOrders();
+    GateioOpenOrders openOrders = tradeService.getAllGateioOpenOrders();
     System.out.println(openOrders);
 
     List<GateioOpenOrder> openOrdersList = openOrders.getOrders();
@@ -105,7 +105,7 @@ public class GateioTradeDemo {
 
     Thread.sleep(2000); // wait for Gateio's back-end to propagate the cancelled order
 
-    openOrders = tradeService.getGateioOpenOrders();
+    openOrders = tradeService.getAllGateioOpenOrders();
     System.out.println(openOrders);
 
     List<GateioTrade> tradeHistory =

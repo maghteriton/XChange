@@ -86,7 +86,7 @@ public class MEXCTradeService extends MEXCTradeServiceRaw implements TradeServic
                 new Date(mexcOrder.getCreateTime()),
                 new BigDecimal(mexcOrder.getPrice()),
                 new BigDecimal(mexcOrder.getPrice()),
-                new BigDecimal(mexcOrder.getDealAmount()),
+                new BigDecimal(mexcOrder.getDealQuantity()),
                 null,
                 Order.OrderStatus.valueOf(mexcOrder.getState().toUpperCase(Locale.ENGLISH)),
                 null);

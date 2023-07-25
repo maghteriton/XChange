@@ -11,6 +11,10 @@ public class GateioOpenOrder {
 
   private BigDecimal amount;
 
+  private BigDecimal filledRate;
+
+  private BigDecimal filledAmount;
+
   private String id;
 
   private BigDecimal rate;
@@ -28,6 +32,8 @@ public class GateioOpenOrder {
       @JsonProperty("timestamp") String timestamp,
       @JsonProperty("total") String total,
       @JsonProperty("amount") BigDecimal amount,
+      @JsonProperty("filledRate") BigDecimal filledRate,
+      @JsonProperty("filledAmount") BigDecimal filledAmount,
       @JsonProperty("id") String id,
       @JsonProperty("rate") BigDecimal rate,
       @JsonProperty("status") String status,
@@ -37,6 +43,8 @@ public class GateioOpenOrder {
     this.timestamp = timestamp;
     this.total = total;
     this.amount = amount;
+    this.filledRate = filledRate;
+    this.filledAmount = filledAmount;
     this.id = id;
     this.rate = rate;
     this.status = status;
@@ -55,6 +63,14 @@ public class GateioOpenOrder {
 
   public BigDecimal getAmount() {
     return amount;
+  }
+
+  public BigDecimal getFilledRate() {
+    return filledRate;
+  }
+
+  public BigDecimal getFilledAmount() {
+    return filledAmount;
   }
 
   public String getId() {
@@ -92,6 +108,12 @@ public class GateioOpenOrder {
         + '\''
         + ", amount='"
         + amount
+        + '\''
+        + ", filledRate='"
+        + filledRate
+        + '\''
+        + ", filledAmount='"
+        + filledAmount
         + '\''
         + ", id='"
         + id

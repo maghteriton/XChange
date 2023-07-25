@@ -60,7 +60,7 @@ public class GateioAdapterTest {
     ObjectMapper mapper = new ObjectMapper();
     GateioOpenOrders openOrders = mapper.readValue(is, GateioOpenOrders.class);
 
-    OpenOrders adaptedOpenOrders = GateioAdapters.adaptOpenOrders(openOrders, currencyPairs);
+    OpenOrders adaptedOpenOrders = GateioAdapters.adaptOpenOrders(openOrders);
 
     List<LimitOrder> adaptedOrderList = adaptedOpenOrders.getOpenOrders();
     assertThat(adaptedOrderList).hasSize(2);

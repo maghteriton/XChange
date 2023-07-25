@@ -90,7 +90,9 @@ public interface GateioAuthenticated extends Gateio {
   @POST
   @Path("private/openOrders")
   GateioOpenOrders getOpenOrders(
-      @HeaderParam("KEY") String apiKey, @HeaderParam("SIGN") ParamsDigest signer)
+      @HeaderParam("KEY") String apiKey,
+      @HeaderParam("SIGN") ParamsDigest signer,
+      @FormParam("currencyPair") String currencyPair)
       throws IOException;
 
   @POST
