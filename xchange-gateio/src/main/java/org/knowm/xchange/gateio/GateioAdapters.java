@@ -3,7 +3,6 @@ package org.knowm.xchange.gateio;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -115,11 +114,14 @@ public final class GateioAdapters {
     return new LimitOrder(
         order.getType().equals("sell") ? OrderType.ASK : OrderType.BID,
         order.getAmount(),
-        order.getFilledAmount(),
         currencyPair,
         order.getOrderNumber(),
         new Date(DateUtils.toUnixTime(Long.parseLong(order.getTimestamp()))),
-        order.getRate());
+        order.getRate(),
+        order.getFilledRate(),
+        order.getFilledAmount(),
+        null,
+        Order.OrderStatus.valueOf(order.getStatus()));
   }
 
   public static OpenOrders adaptOpenOrders(GateioOpenOrders openOrders) {
@@ -160,7 +162,7 @@ public final class GateioAdapters {
     for (GateioTradeHistory.GateioPublicTrade trade : tradeHistory.getTrades()) {
       String tradeIdString = trade.getTradeId();
       if (!tradeIdString.isEmpty()) {
-        long tradeId = Long.valueOf(tradeIdString);
+        long tradeId = Long.parseLong(tradeIdString);
         if (tradeId > lastTradeId) {
           lastTradeId = tradeId;
         }
