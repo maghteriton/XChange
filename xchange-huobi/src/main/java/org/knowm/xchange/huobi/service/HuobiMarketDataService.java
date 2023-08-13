@@ -7,16 +7,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.knowm.xchange.Exchange;
+import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.marketdata.*;
+import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 import org.knowm.xchange.huobi.HuobiAdapters;
-import org.knowm.xchange.huobi.dto.marketdata.HuobiDepth;
-import org.knowm.xchange.huobi.dto.marketdata.HuobiTradeWrapper;
-import org.knowm.xchange.huobi.dto.marketdata.KlineInterval;
+import org.knowm.xchange.huobi.dto.marketdata.*;
 import org.knowm.xchange.service.marketdata.MarketDataService;
 import org.knowm.xchange.service.marketdata.params.Params;
 import org.knowm.xchange.service.trade.params.CandleStickDataParams;
@@ -135,5 +135,26 @@ public class HuobiMarketDataService extends HuobiMarketDataServiceRaw implements
         getKlines(currencyPair, klineInterval, size),
         currencyPair,
         defaultCandleStickParam.getStartDate());
+  }
+
+  @Override
+  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
+      throws IOException {
+    HuobiCurrencyWrapper[] huobiCurrencyWrappers = getHuobiCurrencies(currency.getCurrencyCode());
+
+    for (HuobiCurrencyWrapper wrapper : huobiCurrencyWrappers) {
+      HuobiCurrency[] huobiChains = wrapper.getHuobiChains();
+      for (HuobiCurrency huobiChain : huobiChains) {
+        if (huobiChain.getDisplayName().toUpperCase().contains(chain.toUpperCase())) {
+          return new CurrencyChainStatus(
+              currency,
+              huobiChain.getChain(),
+              HuobiAdapters.ONLINE.equals(huobiChain.getDepositStatus()),
+              HuobiAdapters.ONLINE.equals(huobiChain.getWithdrawStatus()));
+        }
+      }
+    }
+
+    return null; // returns null if not found
   }
 }

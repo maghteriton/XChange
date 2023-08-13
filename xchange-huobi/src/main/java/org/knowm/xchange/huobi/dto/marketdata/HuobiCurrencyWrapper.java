@@ -5,21 +5,21 @@ import java.util.Arrays;
 
 public class HuobiCurrencyWrapper {
 
-  private HuobiCurrency[] huobiCurrencies;
+  private final HuobiCurrency[] huobiChains;
   private String currency;
-  private String instStatus;
+  private final String instStatus;
 
   public HuobiCurrencyWrapper(
-      @JsonProperty("chains") HuobiCurrency[] huobiCurrencies,
+      @JsonProperty("chains") HuobiCurrency[] huobiChains,
       @JsonProperty("currency") String currency,
       @JsonProperty("instStatus") String instStatus) {
-    this.huobiCurrencies = huobiCurrencies;
+    this.huobiChains = huobiChains;
     this.currency = currency;
     this.instStatus = instStatus;
   }
 
-  public HuobiCurrency[] getHuobiCurrencies() {
-    return huobiCurrencies;
+  public HuobiCurrency[] getHuobiChains() {
+    return huobiChains;
   }
 
   public String getCurrency() {
@@ -38,7 +38,7 @@ public class HuobiCurrencyWrapper {
   public String toString() {
     return "HuobiCurrencyWrapper{"
         + "huobiCurrencies="
-        + Arrays.toString(huobiCurrencies)
+        + Arrays.toString(huobiChains)
         + ", currency='"
         + currency
         + '\''

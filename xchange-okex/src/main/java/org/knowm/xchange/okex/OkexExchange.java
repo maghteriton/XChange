@@ -121,7 +121,7 @@ public class OkexExchange extends BaseExchange {
     if (exchangeSpecification.getApiKey() != null
         && exchangeSpecification.getSecretKey() != null
         && exchangeSpecification.getExchangeSpecificParametersItem("passphrase") != null) {
-      currencies = ((OkexMarketDataServiceRaw) marketDataService).getOkexCurrencies().getData();
+      currencies = ((OkexMarketDataServiceRaw) marketDataService).getOkexCurrencies(null).getData();
       accountLevel =
               ((OkexAccountService) accountService).getOkexAccountConfiguration().getData().get(0).getAccountLevel();
       tradeFee = ((OkexAccountService) accountService).getTradeFee(

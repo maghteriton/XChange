@@ -1,5 +1,10 @@
 package org.knowm.xchange.gateio.service;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
@@ -10,30 +15,21 @@ import org.knowm.xchange.dto.trade.UserTrades;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.gateio.GateioAdapters;
-import org.knowm.xchange.gateio.dto.trade.GateioOpenOrder;
 import org.knowm.xchange.gateio.dto.trade.GateioOpenOrders;
 import org.knowm.xchange.gateio.dto.trade.GateioOrderStatus;
 import org.knowm.xchange.gateio.dto.trade.GateioTrade;
-import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.service.trade.TradeService;
 import org.knowm.xchange.service.trade.params.*;
 import org.knowm.xchange.service.trade.params.orders.DefaultQueryOrderParamCurrencyPair;
 import org.knowm.xchange.service.trade.params.orders.OpenOrdersParams;
 import org.knowm.xchange.service.trade.params.orders.OrderQueryParams;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 public class GateioTradeService extends GateioTradeServiceRaw implements TradeService {
 
   /**
    * Constructor
    *
-   * @param exchange
+   * @param exchange exchange
    */
   public GateioTradeService(Exchange exchange) {
 
@@ -130,17 +126,13 @@ public class GateioTradeService extends GateioTradeServiceRaw implements TradeSe
 
       GateioOpenOrders gateioOpenOrders = super.getGateioOpenOrders(currencyPair);
 
-      // check open orders for more detailed results
-      if (!gateioOpenOrders.getOrders().isEmpty()
-          && gateioOpenOrders.getOrders().get(0).getOrderNumber().equals(orderId)) {
+      // first check open orders.
+      if (!gateioOpenOrders.getOrders().isEmpty()) {
         OpenOrders openOrders = GateioAdapters.adaptOpenOrders(gateioOpenOrders);
         List<LimitOrder> limitOrderList = openOrders.getOpenOrders();
         orders.addAll(limitOrderList);
       } else {
-        // general orders are not detailed as open orders, but since it's not in
-        // this response does not include filled order amount
         GateioOrderStatus gateioOrderStatus = getGateioOrderStatus(orderId, currencyPair);
-
         BigDecimal remainingAmount =
             gateioOrderStatus.getInitialAmount().subtract(gateioOrderStatus.getAmount());
         LimitOrder limitOrder =

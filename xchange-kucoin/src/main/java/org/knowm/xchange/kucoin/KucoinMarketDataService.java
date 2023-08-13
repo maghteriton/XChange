@@ -4,13 +4,16 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import org.knowm.xchange.client.ResilienceRegistries;
+import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.marketdata.CandleStickData;
 import org.knowm.xchange.dto.marketdata.OrderBook;
 import org.knowm.xchange.dto.marketdata.Ticker;
 import org.knowm.xchange.dto.marketdata.Trades;
+import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 import org.knowm.xchange.kucoin.dto.KlineIntervalType;
+import org.knowm.xchange.kucoin.dto.response.CurrenciesResponse;
 import org.knowm.xchange.service.marketdata.MarketDataService;
 import org.knowm.xchange.service.marketdata.params.Params;
 import org.knowm.xchange.service.trade.params.CandleStickDataParams;
@@ -86,5 +89,22 @@ public class KucoinMarketDataService extends KucoinMarketDataServiceRaw
 
     return KucoinAdapters.adaptCandleStickData(
         currencyPair, getKucoinKlines(currencyPair, startAt, endAt, interval));
+  }
+
+  @Override
+  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
+      throws IOException {
+    String kucoinCurrencyChain = chain.toLowerCase();
+    CurrenciesResponse kucoinCurrency = getKucoinCurrency(currency, kucoinCurrencyChain);
+
+    if (kucoinCurrency != null) {
+      return new CurrencyChainStatus(
+          currency,
+          kucoinCurrencyChain,
+          kucoinCurrency.isDepositEnabled(),
+          kucoinCurrency.isWithdrawEnabled());
+    }
+
+    return null; // returns null if not found
   }
 }

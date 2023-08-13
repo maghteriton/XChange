@@ -322,18 +322,22 @@ public class OkexAdapters {
     }
 
     if (currs != null) {
-      currs
-          .forEach(
-              currency ->
-                  currencies.put(
-                      adaptCurrency(currency),
-                      new CurrencyMetaData(
-                          null,
-                          new BigDecimal(currency.getMaxFee()),
-                          new BigDecimal(currency.getMinWd()),
-                          currency.isCanWd() && currency.isCanDep()
-                              ? WalletHealth.ONLINE
-                              : WalletHealth.OFFLINE)));
+      OkexCurrency previousCurrency = null;
+      for (OkexCurrency currentCurrency : currs) {
+        //add only first currency metadata of same the currency to ExchangeMetaData
+        if (previousCurrency == null || !currentCurrency.getCurrency().equalsIgnoreCase(previousCurrency.getCurrency())) {
+          currencies.put(
+              adaptCurrency(currentCurrency),
+              new CurrencyMetaData(
+                  null,
+                  new BigDecimal(currentCurrency.getMaxFee()),
+                  new BigDecimal(currentCurrency.getMinWd()),
+                  currentCurrency.isCanWd() && currentCurrency.isCanDep()
+                      ? WalletHealth.ONLINE
+                      : WalletHealth.OFFLINE));
+          previousCurrency = currentCurrency;
+        }
+      }
     }
 
     return new ExchangeMetaData(

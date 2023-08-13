@@ -116,12 +116,12 @@ public final class GateioAdapters {
         order.getAmount(),
         currencyPair,
         order.getOrderNumber(),
-        new Date(DateUtils.toUnixTime(Long.parseLong(order.getTimestamp()))),
+        new Date(Long.parseLong(order.getTimestamp()) * 1000),
         order.getRate(),
         order.getFilledRate(),
         order.getFilledAmount(),
         null,
-        Order.OrderStatus.valueOf(order.getStatus()));
+        Order.OrderStatus.valueOf(order.getStatus().toUpperCase()));
   }
 
   public static OpenOrders adaptOpenOrders(GateioOpenOrders openOrders) {

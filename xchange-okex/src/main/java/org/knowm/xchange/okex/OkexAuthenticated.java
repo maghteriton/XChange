@@ -182,6 +182,7 @@ public interface OkexAuthenticated extends Okex {
   @GET
   @Path(currenciesPath)
   OkexResponse<List<OkexCurrency>> getCurrencies(
+      @QueryParam("ccy") List<Currency> currencies,
       @HeaderParam("OK-ACCESS-KEY") String apiKey,
       @HeaderParam("OK-ACCESS-SIGN") ParamsDigest signature,
       @HeaderParam("OK-ACCESS-TIMESTAMP") String timestamp,

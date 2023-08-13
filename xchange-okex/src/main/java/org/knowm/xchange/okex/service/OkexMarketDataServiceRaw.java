@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import org.knowm.xchange.client.ResilienceRegistries;
+import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.okex.Okex;
 import org.knowm.xchange.okex.OkexAuthenticated;
 import org.knowm.xchange.okex.OkexExchange;
@@ -79,11 +80,11 @@ public class OkexMarketDataServiceRaw extends OkexBaseService {
     }
   }
 
-  public OkexResponse<List<OkexCurrency>> getOkexCurrencies() throws OkexException, IOException {
+  public OkexResponse<List<OkexCurrency>> getOkexCurrencies(List<Currency> currencyList) throws OkexException, IOException {
     try {
       return decorateApiCall(
               () ->
-                  okexAuthenticated.getCurrencies(
+                  okexAuthenticated.getCurrencies(currencyList,
                       exchange.getExchangeSpecification().getApiKey(),
                       signatureCreator,
                       DateUtils.toUTCISODateString(new Date()),

@@ -3,8 +3,10 @@ package org.knowm.xchange.service.marketdata;
 import java.io.IOException;
 import java.util.List;
 import org.knowm.xchange.Exchange;
+import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.marketdata.*;
+import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
@@ -227,5 +229,16 @@ public interface MarketDataService extends BaseService {
    */
   default FundingRate getFundingRate(Instrument instrument) throws IOException {
     throw new NotYetImplementedForExchangeException("getFundingRate");
+  }
+
+
+  /**
+   * @param currency The digital currency.
+   * @param chain The chain name. (e.g. ERC20, BSC20, ETH, BSC...)
+   * @return Overall wallet health of the currency's chain and null if chain cannot be found.
+   * @throws IOException - Indication that a networking error occurred while fetching JSON data
+   */
+  default CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain) throws IOException {
+    throw new NotYetImplementedForExchangeException("getCurrencyChainWalletHealth");
   }
 }

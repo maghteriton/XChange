@@ -37,7 +37,7 @@ import org.knowm.xchange.huobi.dto.trade.HuobiOrder;
 import org.knowm.xchange.instrument.Instrument;
 
 public class HuobiAdapters {
-  private static final String ONLINE = "allowed";
+  public static final String ONLINE = "allowed";
   private static final String DELISTED = "delisted";
   private static final String TARGET_NETWORK = "ERC20";
   private static final BigDecimal fee = new BigDecimal("0.002"); // Trading fee at Huobi is 0.2 %
@@ -99,7 +99,7 @@ public class HuobiAdapters {
 
     Map<Currency, CurrencyMetaData> currencies = new HashMap<>();
     for (HuobiCurrencyWrapper huobiCurrencyWrapper : currencyWrapper) {
-      if (huobiCurrencyWrapper.getHuobiCurrencies().length != 0) {
+      if (huobiCurrencyWrapper.getHuobiChains().length != 0) {
         boolean isDelisted = DELISTED.equals(huobiCurrencyWrapper.getInstStatus());
         CurrencyMetaData currencyMetaData = adaptCurrencyMetaData(huobiCurrencyWrapper, isDelisted);
         Currency currency =
@@ -114,7 +114,7 @@ public class HuobiAdapters {
   private static CurrencyMetaData adaptCurrencyMetaData(
       HuobiCurrencyWrapper huobiCurrencyWrapper, boolean isDelisted) {
     CurrencyMetaData result = null;
-    List<HuobiCurrency> huobiCurrencies = Arrays.asList(huobiCurrencyWrapper.getHuobiCurrencies());
+    List<HuobiCurrency> huobiCurrencies = Arrays.asList(huobiCurrencyWrapper.getHuobiChains());
     if (!huobiCurrencies.isEmpty()) {
       result = getCurrencyMetaData(huobiCurrencies.get(0), isDelisted);
       for (HuobiCurrency huobiCurrency : huobiCurrencies) {

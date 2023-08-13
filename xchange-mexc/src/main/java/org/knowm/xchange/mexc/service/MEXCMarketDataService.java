@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.knowm.xchange.Exchange;
+import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.marketdata.CandleStickData;
 import org.knowm.xchange.dto.marketdata.OrderBook;
+import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 import org.knowm.xchange.mexc.MEXCAdapters;
@@ -93,5 +95,25 @@ public class MEXCMarketDataService extends MEXCMarketDataServiceRaw implements M
     }
 
     return MEXCAdapters.adaptCandleStickData(mexcCandleStickDataList, currencyPair);
+  }
+
+  @Override
+  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
+      throws IOException {
+    List<MEXCCurrencyInfo> coinList = getCoinList(currency.getCurrencyCode());
+
+    for (MEXCCurrencyInfo mexcCurrencyInfo : coinList) {
+      for (MEXCCurrency mexcCurrency : mexcCurrencyInfo.getMexcCoinList()) {
+        if (mexcCurrency.getChain().toUpperCase().contains(chain.toUpperCase())) {
+          return new CurrencyChainStatus(
+              currency,
+              mexcCurrency.getChain(),
+              mexcCurrency.getIsDepositEnabled(),
+              mexcCurrency.getIsWithdrawEnabled());
+        }
+      }
+    }
+
+    return null; // returns null if not found
   }
 }
