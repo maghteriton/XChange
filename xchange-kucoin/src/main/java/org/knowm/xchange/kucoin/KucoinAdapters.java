@@ -27,6 +27,7 @@ import org.knowm.xchange.dto.Order.IOrderFlags;
 import org.knowm.xchange.dto.Order.OrderStatus;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.account.Balance;
+import org.knowm.xchange.dto.account.DepositAddress;
 import org.knowm.xchange.dto.account.FundingRecord;
 import org.knowm.xchange.dto.account.FundingRecord.Status;
 import org.knowm.xchange.dto.account.FundingRecord.Type;
@@ -404,6 +405,19 @@ public class KucoinAdapters {
     }
 
     return candleStickData;
+  }
+
+  public static List<DepositAddress> adaptDepositAddresses(
+      Currency currency, List<DepositAddressResponse> kucoinDepositAddresses) {
+    return kucoinDepositAddresses.stream()
+        .map(
+            kucoinDepositAddress ->
+                new DepositAddress(
+                    currency.getCurrencyCode(),
+                    kucoinDepositAddress.getAddress(),
+                    kucoinDepositAddress.getMemo(),
+                    kucoinDepositAddress.getChain()))
+        .collect(Collectors.toList());
   }
 
   private static final class PriceAndSize {

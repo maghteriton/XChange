@@ -5,7 +5,6 @@ import static java.util.stream.Collectors.toList;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,7 +19,6 @@ import org.knowm.xchange.dto.account.Wallet;
 import org.knowm.xchange.kucoin.dto.request.ApplyWithdrawApiRequest;
 import org.knowm.xchange.kucoin.dto.request.InnerTransferRequest;
 import org.knowm.xchange.kucoin.dto.response.AccountBalancesResponse;
-import org.knowm.xchange.kucoin.dto.response.DepositAddressResponse;
 import org.knowm.xchange.service.account.AccountService;
 import org.knowm.xchange.service.trade.params.*;
 
@@ -134,12 +132,6 @@ public class KucoinAccountService extends KucoinAccountServiceRaw implements Acc
 
   @Override
   public List<DepositAddress> getDepositAddresses(Currency currency) throws IOException {
-    DepositAddressResponse depositAddress = getDepositAddress(currency.getCurrencyCode(), null);
-    return Collections.singletonList(
-        new DepositAddress(
-            currency.getCurrencyCode(),
-            depositAddress.getAddress(),
-            depositAddress.getMemo(),
-            depositAddress.getChain()));
+    return KucoinAdapters.adaptDepositAddresses(currency, getDepositAddresses(currency.getCurrencyCode()));
   }
 }
