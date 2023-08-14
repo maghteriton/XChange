@@ -13,15 +13,7 @@ import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.kucoin.dto.KlineIntervalType;
-import org.knowm.xchange.kucoin.dto.response.AllTickersResponse;
-import org.knowm.xchange.kucoin.dto.response.CurrenciesResponse;
-import org.knowm.xchange.kucoin.dto.response.KucoinKline;
-import org.knowm.xchange.kucoin.dto.response.OrderBookResponse;
-import org.knowm.xchange.kucoin.dto.response.SymbolResponse;
-import org.knowm.xchange.kucoin.dto.response.SymbolTickResponse;
-import org.knowm.xchange.kucoin.dto.response.TickerResponse;
-import org.knowm.xchange.kucoin.dto.response.TradeFeeResponse;
-import org.knowm.xchange.kucoin.dto.response.TradeHistoryResponse;
+import org.knowm.xchange.kucoin.dto.response.*;
 
 public class KucoinMarketDataServiceRaw extends KucoinBaseService {
 
@@ -108,13 +100,14 @@ public class KucoinMarketDataServiceRaw extends KucoinBaseService {
                 .call());
   }
 
-  public CurrenciesResponse getKucoinCurrency(Currency currency, String chain) throws IOException {
+  public CurrenciesV2Response getKucoinCurrency(Currency currency, String chain)
+      throws IOException {
     return classifyingExceptions(
-            () ->
-                    decorateApiCall(() -> symbolApi.getCurrency(currency.getCurrencyCode(), chain))
-                            .withRetry(retry("currencies"))
-                            .withRateLimiter(rateLimiter(PUBLIC_REST_ENDPOINT_RATE_LIMITER))
-                            .call());
+        () ->
+            decorateApiCall(() -> symbolApi.getCurrency(currency.getCurrencyCode(), chain))
+                .withRetry(retry("currencies"))
+                .withRateLimiter(rateLimiter(PUBLIC_REST_ENDPOINT_RATE_LIMITER))
+                .call());
   }
 
   public OrderBookResponse getKucoinOrderBookPartial(CurrencyPair pair) throws IOException {

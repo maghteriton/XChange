@@ -13,7 +13,7 @@ import org.knowm.xchange.dto.marketdata.Trades;
 import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 import org.knowm.xchange.kucoin.dto.KlineIntervalType;
-import org.knowm.xchange.kucoin.dto.response.CurrenciesResponse;
+import org.knowm.xchange.kucoin.dto.response.CurrenciesV2Response;
 import org.knowm.xchange.service.marketdata.MarketDataService;
 import org.knowm.xchange.service.marketdata.params.Params;
 import org.knowm.xchange.service.trade.params.CandleStickDataParams;
@@ -94,15 +94,17 @@ public class KucoinMarketDataService extends KucoinMarketDataServiceRaw
   @Override
   public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
       throws IOException {
-    String kucoinCurrencyChain = chain.toLowerCase();
-    CurrenciesResponse kucoinCurrency = getKucoinCurrency(currency, kucoinCurrencyChain);
-
-    if (kucoinCurrency != null) {
-      return new CurrencyChainStatus(
-          currency,
-          kucoinCurrencyChain,
-          kucoinCurrency.isDepositEnabled(),
-          kucoinCurrency.isWithdrawEnabled());
+    CurrenciesV2Response currenciesV2Response = getKucoinCurrency(currency, chain.toLowerCase());
+    if (currenciesV2Response != null && currenciesV2Response.getChains() != null) {
+      for (KucoinChain kucoinChain : currenciesV2Response.getChains()) {
+        if (kucoinChain.getChain().toUpperCase().contains(chain.toUpperCase())) {
+          return new CurrencyChainStatus(
+              currency,
+              kucoinChain.getChain(),
+              kucoinChain.getIsDepositEnabled(),
+              kucoinChain.getIsWithdrawEnabled());
+        }
+      }
     }
 
     return null; // returns null if not found
