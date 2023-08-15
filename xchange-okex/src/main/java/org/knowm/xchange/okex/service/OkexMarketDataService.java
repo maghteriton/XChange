@@ -92,7 +92,7 @@ public class OkexMarketDataService extends OkexMarketDataServiceRaw implements M
         getOkexCurrencies(Collections.singletonList(currency)).getData();
 
     for (OkexCurrency okexCurrency : okexCurrencyList) {
-      if (okexCurrency.getChain().toUpperCase().contains(chain.toUpperCase())) {
+      if (okexCurrency.getChain().equalsIgnoreCase(chain)) {
         return new CurrencyChainStatus(
             currency, okexCurrency.getChain(), okexCurrency.isCanDep(), okexCurrency.isCanWd());
       }

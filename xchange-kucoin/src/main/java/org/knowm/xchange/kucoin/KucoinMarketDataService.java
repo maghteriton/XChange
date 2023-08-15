@@ -97,7 +97,7 @@ public class KucoinMarketDataService extends KucoinMarketDataServiceRaw
     CurrenciesV2Response currenciesV2Response = getKucoinCurrency(currency, chain.toLowerCase());
     if (currenciesV2Response != null && currenciesV2Response.getChains() != null) {
       for (KucoinChain kucoinChain : currenciesV2Response.getChains()) {
-        if (kucoinChain.getChain().toUpperCase().contains(chain.toUpperCase())) {
+        if (kucoinChain.getChain().equalsIgnoreCase(chain)) {
           return new CurrencyChainStatus(
               currency,
               kucoinChain.getChain(),

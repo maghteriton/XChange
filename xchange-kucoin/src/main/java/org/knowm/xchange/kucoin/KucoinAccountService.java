@@ -107,6 +107,7 @@ public class KucoinAccountService extends KucoinAccountServiceRaw implements Acc
             .memo(defaultParams.getAddressTag())
             .currency(defaultParams.getCurrency().getSymbol())
             .amount(defaultParams.amount)
+            .chain(defaultParams.getChain())
             .build();
 
     return applyWithdraw(withdrawApiRequest).getWithdrawalId();

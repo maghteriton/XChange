@@ -104,7 +104,7 @@ public class MEXCMarketDataService extends MEXCMarketDataServiceRaw implements M
 
     for (MEXCCurrencyInfo mexcCurrencyInfo : coinList) {
       for (MEXCCurrency mexcCurrency : mexcCurrencyInfo.getMexcCoinList()) {
-        if (mexcCurrency.getChain().toUpperCase().contains(chain.toUpperCase())) {
+        if (mexcCurrency.getChain().equalsIgnoreCase(chain)) {
           return new CurrencyChainStatus(
               currency,
               mexcCurrency.getChain(),

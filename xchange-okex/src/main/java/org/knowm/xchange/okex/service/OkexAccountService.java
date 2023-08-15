@@ -47,7 +47,7 @@ public class OkexAccountService extends OkexAccountServiceRaw implements Account
               ON_CHAIN_METHOD,
               address,
               defaultParams.getCommission() != null ? defaultParams.getCommission().toPlainString() : null,
-              null,
+              defaultParams.getChain(),
               null
       );
       if (!okexResponse.isSuccess())

@@ -145,7 +145,7 @@ public class HuobiMarketDataService extends HuobiMarketDataServiceRaw implements
     for (HuobiCurrencyWrapper wrapper : huobiCurrencyWrappers) {
       HuobiCurrency[] huobiChains = wrapper.getHuobiChains();
       for (HuobiCurrency huobiChain : huobiChains) {
-        if (huobiChain.getDisplayName().toUpperCase().contains(chain.toUpperCase())) {
+        if (huobiChain.getDisplayName().equalsIgnoreCase(chain)) {
           return new CurrencyChainStatus(
               currency,
               huobiChain.getChain(),
