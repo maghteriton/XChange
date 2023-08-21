@@ -227,19 +227,20 @@ public class MEXCAdapters {
 
   public static List<DepositAddress> adaptDepositAddresses(MEXCDepositAddress mexcDepositAddress) {
     List<DepositAddress> depositAddresses = new ArrayList<>();
-    mexcDepositAddress
-        .getMexcChainList()
-        .forEach(
-            mexcChain -> {
-              DepositAddress depositAddress =
-                  new DepositAddress(
-                      mexcDepositAddress.getCurrency(),
-                      mexcChain.getRealAddress(),
-                      mexcChain.getMemo(),
-                      mexcChain.getChain());
-              depositAddresses.add(depositAddress);
-            });
-
+    if(!mexcDepositAddress.getMexcChainList().isEmpty()) {
+      mexcDepositAddress
+              .getMexcChainList()
+              .forEach(
+                      mexcChain -> {
+                        DepositAddress depositAddress =
+                                new DepositAddress(
+                                        mexcDepositAddress.getCurrency(),
+                                        mexcChain.getRealAddress(),
+                                        mexcChain.getMemo(),
+                                        mexcChain.getChain());
+                        depositAddresses.add(depositAddress);
+                      });
+    }
     return depositAddresses;
   }
 

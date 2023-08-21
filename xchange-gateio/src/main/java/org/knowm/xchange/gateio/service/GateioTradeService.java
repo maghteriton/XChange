@@ -133,14 +133,15 @@ public class GateioTradeService extends GateioTradeServiceRaw implements TradeSe
         orders.addAll(limitOrderList);
       } else {
         GateioOrderStatus gateioOrderStatus = getGateioOrderStatus(orderId, currencyPair);
-        BigDecimal remainingAmount =
-            gateioOrderStatus.getInitialAmount().subtract(gateioOrderStatus.getAmount());
+        BigDecimal filledAmount =
+            gateioOrderStatus.getInitialAmount().subtract(gateioOrderStatus.getRemainingAmount());
         LimitOrder limitOrder =
             new LimitOrder.Builder(
                     GateioAdapters.adaptOrderType(gateioOrderStatus.getType()),
                     gateioOrderStatus.getCurrencyPair())
                 .originalAmount(gateioOrderStatus.getInitialAmount())
-                .remainingAmount(remainingAmount)
+                .cumulativeAmount(filledAmount)
+                .remainingAmount(gateioOrderStatus.getRemainingAmount())
                 .id(gateioOrderStatus.getOrderNumber())
                 .limitPrice(gateioOrderStatus.getInitialRate())
                 .orderStatus(GateioAdapters.adaptOrderStatus(gateioOrderStatus.getStatus()))

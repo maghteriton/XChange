@@ -75,7 +75,7 @@ public class GateioTradeJsonTest {
     assertThat(orderStatus.getCurrencyPair()).isEqualTo(CurrencyPair.LTC_BTC);
     assertThat(orderStatus.getType()).isEqualTo(GateioOrderType.SELL);
     assertThat(orderStatus.getRate()).isEqualTo("0.0265");
-    assertThat(orderStatus.getAmount()).isEqualTo("0.384");
+    assertThat(orderStatus.getRemainingAmount()).isEqualTo("0.384");
     assertThat(orderStatus.getInitialRate()).isEqualTo("0.0265");
     assertThat(orderStatus.getInitialAmount()).isEqualTo("0.384");
   }

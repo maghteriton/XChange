@@ -46,9 +46,9 @@ public class GateioOrderStatus extends GateioBaseResponse {
     return orderStatusInfo.getRate();
   }
 
-  public BigDecimal getAmount() {
+  public BigDecimal getRemainingAmount() {
 
-    return orderStatusInfo.getAmount();
+    return orderStatusInfo.getRemainingAmount();
   }
 
   public BigDecimal getInitialRate() {
@@ -73,7 +73,7 @@ public class GateioOrderStatus extends GateioBaseResponse {
     private final CurrencyPair currencyPair;
     private final GateioOrderType type;
     private final BigDecimal rate;
-    private final BigDecimal amount;
+    private final BigDecimal remainingAmount;
     private final BigDecimal initialRate;
     private final BigDecimal initialAmount;
 
@@ -83,7 +83,7 @@ public class GateioOrderStatus extends GateioBaseResponse {
         @JsonProperty("currencyPair") String currencyPair,
         @JsonProperty("type") GateioOrderType type,
         @JsonProperty("rate") BigDecimal rate,
-        @JsonProperty("amount") BigDecimal amount,
+        @JsonProperty("amount") BigDecimal remainingAmount,
         @JsonProperty("initialRate") BigDecimal initialRate,
         @JsonProperty("initialAmount") BigDecimal initialAmount) {
 
@@ -92,7 +92,7 @@ public class GateioOrderStatus extends GateioBaseResponse {
       this.currencyPair = GateioAdapters.adaptCurrencyPair(currencyPair);
       this.type = type;
       this.rate = rate;
-      this.amount = amount;
+      this.remainingAmount = remainingAmount;
       this.initialRate = initialRate;
       this.initialAmount = initialAmount;
     }
@@ -122,9 +122,9 @@ public class GateioOrderStatus extends GateioBaseResponse {
       return rate;
     }
 
-    public BigDecimal getAmount() {
+    public BigDecimal getRemainingAmount() {
 
-      return amount;
+      return remainingAmount;
     }
 
     public BigDecimal getInitialRate() {
@@ -151,7 +151,7 @@ public class GateioOrderStatus extends GateioBaseResponse {
           + ", rate="
           + rate
           + ", amount="
-          + amount
+          + remainingAmount
           + ", initialRate="
           + initialRate
           + ", initialAmount="
