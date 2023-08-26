@@ -1,10 +1,7 @@
 package org.knowm.xchange.kucoin;
 
 import static java.util.stream.Collectors.toCollection;
-import static org.knowm.xchange.dto.Order.OrderStatus.CANCELED;
-import static org.knowm.xchange.dto.Order.OrderStatus.NEW;
-import static org.knowm.xchange.dto.Order.OrderStatus.PARTIALLY_FILLED;
-import static org.knowm.xchange.dto.Order.OrderStatus.UNKNOWN;
+import static org.knowm.xchange.dto.Order.OrderStatus.*;
 import static org.knowm.xchange.dto.Order.OrderType.ASK;
 import static org.knowm.xchange.dto.Order.OrderType.BID;
 import static org.knowm.xchange.kucoin.dto.KucoinOrderFlags.HIDDEN;
@@ -13,7 +10,6 @@ import static org.knowm.xchange.kucoin.dto.KucoinOrderFlags.POST_ONLY;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Ordering;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -47,8 +43,6 @@ import org.knowm.xchange.kucoin.dto.request.OrderCreateApiRequest;
 import org.knowm.xchange.kucoin.dto.response.*;
 
 public class KucoinAdapters {
-
-  private static final String TAKER_FEE_RATE = "takerFeeRate";
 
   public static String adaptCurrencyPair(CurrencyPair pair) {
     return pair == null ? null : pair.base.getCurrencyCode() + "-" + pair.counter.getCurrencyCode();
@@ -109,8 +103,7 @@ public class KucoinAdapters {
       ExchangeMetaData exchangeMetaData,
       List<CurrenciesResponse> currenciesResponse,
       List<SymbolResponse> symbolsResponse,
-      TradeFeeResponse tradeFee)
-      throws IOException {
+      TradeFeeResponse tradeFee) {
 
     Map<Instrument, InstrumentMetaData> currencyPairs = exchangeMetaData.getInstruments();
     Map<Currency, CurrencyMetaData> currencies = exchangeMetaData.getCurrencies();
@@ -222,6 +215,7 @@ public class KucoinAdapters {
         .limitPrice(priceAndSize.price)
         .originalAmount(priceAndSize.size)
         .orderStatus(NEW)
+        .timestamp(timestamp)
         .build();
   }
 
@@ -260,16 +254,20 @@ public class KucoinAdapters {
     CurrencyPair currencyPair = adaptCurrencyPair(order.getSymbol());
 
     OrderStatus status;
-    if (order.isCancelExist()) {
-      status = CANCELED;
-    } else if (order.isActive()) {
-      if (order.getDealSize().signum() == 0) {
+    if (order.isActive()) {
+      if (order.getDealSize().compareTo(BigDecimal.ZERO) == 0) {
         status = NEW;
       } else {
         status = PARTIALLY_FILLED;
       }
     } else {
-      status = UNKNOWN;
+      if (order.isCancelExist()) {
+        status = CANCELED;
+      } else if (order.getDealSize().compareTo(order.getSize()) == 0) {
+        status = FILLED;
+      } else {
+        status = UNKNOWN;
+      }
     }
 
     Order.Builder builder;
