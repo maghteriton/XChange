@@ -2,6 +2,7 @@ package org.knowm.xchange.mexc.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.knowm.xchange.Exchange;
@@ -76,17 +77,20 @@ public class MEXCTradeService extends MEXCTradeServiceRaw implements TradeServic
       List<MEXCOrder> mexcOrderList = ordersResult.getData();
       if (!mexcOrderList.isEmpty()) {
         MEXCOrder mexcOrder = mexcOrderList.get(0);
+        BigDecimal price = new BigDecimal(mexcOrder.getPrice());
+        BigDecimal cumulativeAmount = new BigDecimal(mexcOrder.getDealQuantity());
         LimitOrder limitOrder =
             new LimitOrder(
                 MEXCAdapters.adaptOrderType(mexcOrder.getType()),
-                new BigDecimal(mexcOrder.getQuantity())
-                    .multiply(new BigDecimal(mexcOrder.getPrice())),
+                new BigDecimal(mexcOrder.getQuantity()).multiply(price),
                 MEXCAdapters.adaptSymbol(mexcOrder.getSymbol()),
                 mexcOrder.getId(),
                 new Date(mexcOrder.getCreateTime()),
-                new BigDecimal(mexcOrder.getPrice()),
-                new BigDecimal(mexcOrder.getPrice()),
-                new BigDecimal(mexcOrder.getDealQuantity()),
+                price,
+                new BigDecimal(mexcOrder.getDealAmount())
+                    .divide(cumulativeAmount, RoundingMode.HALF_EVEN)
+                    .setScale(price.scale(), RoundingMode.HALF_EVEN),
+                cumulativeAmount,
                 null,
                 Order.OrderStatus.valueOf(mexcOrder.getState().toUpperCase(Locale.ENGLISH)),
                 null);
