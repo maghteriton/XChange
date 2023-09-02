@@ -1,9 +1,11 @@
 package org.knowm.xchange.huobi.service;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.knowm.xchange.Exchange;
@@ -21,7 +23,6 @@ import org.knowm.xchange.service.marketdata.MarketDataService;
 import org.knowm.xchange.service.marketdata.params.Params;
 import org.knowm.xchange.service.trade.params.CandleStickDataParams;
 import org.knowm.xchange.service.trade.params.DefaultCandleStickParam;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class HuobiMarketDataService extends HuobiMarketDataServiceRaw implements MarketDataService {
 
@@ -150,7 +151,9 @@ public class HuobiMarketDataService extends HuobiMarketDataServiceRaw implements
               currency,
               huobiChain.getChain(),
               HuobiAdapters.ONLINE.equals(huobiChain.getDepositStatus()),
-              HuobiAdapters.ONLINE.equals(huobiChain.getWithdrawStatus()));
+              HuobiAdapters.ONLINE.equals(huobiChain.getWithdrawStatus()),
+              huobiChain.getTransactFeeWithdraw(),
+              huobiChain.getTransactFeeWithdraw());
         }
       }
     }

@@ -18,6 +18,7 @@ import org.knowm.xchange.service.trade.params.DefaultCandleStickParam;
 import org.knowm.xchange.service.trade.params.DefaultCandleStickParamWithLimit;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +33,7 @@ public class OkexMarketDataService extends OkexMarketDataServiceRaw implements M
   @Override
   public OrderBook getOrderBook(CurrencyPair currencyPair, Object... args) throws IOException {
     return OkexAdapters.adaptOrderBook(
-            getOkexOrderbook(OkexAdapters.adaptInstrument(currencyPair)), currencyPair);
+        getOkexOrderbook(OkexAdapters.adaptInstrument(currencyPair)), currencyPair);
   }
 
   @Override
@@ -49,22 +50,24 @@ public class OkexMarketDataService extends OkexMarketDataServiceRaw implements M
 
   @Override
   public Ticker getTicker(Instrument instrument, Object... args) throws IOException {
-    return OkexAdapters.adaptTicker(getOkexTicker(OkexAdapters.adaptInstrument(instrument)).getData().get(0));
+    return OkexAdapters.adaptTicker(
+        getOkexTicker(OkexAdapters.adaptInstrument(instrument)).getData().get(0));
   }
 
   @Override
   public CandleStickData getCandleStickData(CurrencyPair currencyPair, CandleStickDataParams params)
-          throws IOException {
+      throws IOException {
 
     if (!(params instanceof DefaultCandleStickParam)) {
       throw new NotYetImplementedForExchangeException("Only DefaultCandleStickParam is supported");
     }
     DefaultCandleStickParam defaultCandleStickParam = (DefaultCandleStickParam) params;
     OkexCandleStickPeriodType periodType =
-            OkexCandleStickPeriodType.getPeriodTypeFromSecs(defaultCandleStickParam.getPeriodInSecs());
+        OkexCandleStickPeriodType.getPeriodTypeFromSecs(defaultCandleStickParam.getPeriodInSecs());
     if (periodType == null) {
-      throw new NotYetImplementedForExchangeException("Only discrete period values are supported;" +
-              Arrays.toString(OkexCandleStickPeriodType.getSupportedPeriodsInSecs()));
+      throw new NotYetImplementedForExchangeException(
+          "Only discrete period values are supported;"
+              + Arrays.toString(OkexCandleStickPeriodType.getSupportedPeriodsInSecs()));
     }
 
     String limit = null;
@@ -72,17 +75,20 @@ public class OkexMarketDataService extends OkexMarketDataServiceRaw implements M
       limit = String.valueOf(((DefaultCandleStickParamWithLimit) params).getLimit());
     }
 
-    OkexResponse<List<OkexCandleStick>> historyCandle = getHistoryCandle(
+    OkexResponse<List<OkexCandleStick>> historyCandle =
+        getHistoryCandle(
             OkexAdapters.adaptInstrument(currencyPair),
             String.valueOf(defaultCandleStickParam.getStartDate().getTime()),
             String.valueOf(defaultCandleStickParam.getEndDate().getTime()),
-            periodType.getFieldValue(), limit);
+            periodType.getFieldValue(),
+            limit);
     return OkexAdapters.adaptCandleStickData(historyCandle.getData(), currencyPair);
   }
 
   @Override
   public FundingRate getFundingRate(Instrument instrument) throws IOException {
-    return OkexAdapters.adaptFundingRate(getOkexFundingRate(OkexAdapters.adaptInstrument(instrument)).getData());
+    return OkexAdapters.adaptFundingRate(
+        getOkexFundingRate(OkexAdapters.adaptInstrument(instrument)).getData());
   }
 
   @Override
@@ -94,7 +100,12 @@ public class OkexMarketDataService extends OkexMarketDataServiceRaw implements M
     for (OkexCurrency okexCurrency : okexCurrencyList) {
       if (okexCurrency.getChain().equalsIgnoreCase(chain)) {
         return new CurrencyChainStatus(
-            currency, okexCurrency.getChain(), okexCurrency.isCanDep(), okexCurrency.isCanWd());
+            currency,
+            okexCurrency.getChain(),
+            okexCurrency.isCanDep(),
+            okexCurrency.isCanWd(),
+            new BigDecimal(okexCurrency.getMinFee()),
+            new BigDecimal(okexCurrency.getMaxFee()));
       }
     }
 

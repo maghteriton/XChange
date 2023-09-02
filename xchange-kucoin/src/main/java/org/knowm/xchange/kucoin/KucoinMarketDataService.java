@@ -1,6 +1,7 @@
 package org.knowm.xchange.kucoin;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import org.knowm.xchange.client.ResilienceRegistries;
@@ -102,7 +103,9 @@ public class KucoinMarketDataService extends KucoinMarketDataServiceRaw
               currency,
               kucoinChain.getChain(),
               kucoinChain.getIsDepositEnabled(),
-              kucoinChain.getIsWithdrawEnabled());
+              kucoinChain.getIsWithdrawEnabled(),
+              new BigDecimal(kucoinChain.getWithdrawalMinFee()),
+              new BigDecimal(kucoinChain.getWithdrawalMinFee()));
         }
       }
     }

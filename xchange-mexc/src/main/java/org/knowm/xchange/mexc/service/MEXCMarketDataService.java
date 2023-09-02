@@ -109,7 +109,9 @@ public class MEXCMarketDataService extends MEXCMarketDataServiceRaw implements M
               currency,
               mexcCurrency.getChain(),
               mexcCurrency.getIsDepositEnabled(),
-              mexcCurrency.getIsWithdrawEnabled());
+              mexcCurrency.getIsWithdrawEnabled(),
+              mexcCurrency.getWithdrawalFee(),
+              mexcCurrency.getWithdrawalFee());
         }
       }
     }
