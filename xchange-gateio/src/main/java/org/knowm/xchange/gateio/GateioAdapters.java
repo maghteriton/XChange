@@ -335,21 +335,21 @@ public final class GateioAdapters {
 
   public static List<DepositAddress> adaptMultiChainAddresses(
       Currency currency, GateioDepositAddress gateioDepositAddress) {
-
     List<DepositAddress> depositAddressList = new ArrayList<>();
-    gateioDepositAddress
-        .getMultiChainAddresses()
-        .forEach(
-            multiChainAddress -> {
-              DepositAddress depositAddress =
-                  new DepositAddress(
-                      currency.getCurrencyCode(),
-                      multiChainAddress.getAddress(),
-                      multiChainAddress.getPaymentId(),
-                      multiChainAddress.getChain());
-              depositAddressList.add(depositAddress);
-            });
-
+    if (gateioDepositAddress.getMultiChainAddresses() != null) {
+      gateioDepositAddress
+          .getMultiChainAddresses()
+          .forEach(
+              multiChainAddress -> {
+                DepositAddress depositAddress =
+                    new DepositAddress(
+                        currency.getCurrencyCode(),
+                        multiChainAddress.getAddress(),
+                        multiChainAddress.getPaymentId(),
+                        multiChainAddress.getChain());
+                depositAddressList.add(depositAddress);
+              });
+    }
     return depositAddressList;
   }
 
