@@ -90,7 +90,7 @@ public class MEXCTradeService extends MEXCTradeServiceRaw implements TradeServic
                 new BigDecimal(mexcOrder.getDealAmount())
                     .divide(cumulativeAmount, RoundingMode.HALF_EVEN)
                     .setScale(price.scale(), RoundingMode.HALF_EVEN),
-                cumulativeAmount,
+                new BigDecimal(mexcOrder.getDealAmount()),
                 null,
                 Order.OrderStatus.valueOf(mexcOrder.getState().toUpperCase(Locale.ENGLISH)),
                 null);
