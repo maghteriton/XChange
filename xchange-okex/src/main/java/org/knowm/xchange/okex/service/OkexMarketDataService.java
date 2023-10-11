@@ -90,25 +90,4 @@ public class OkexMarketDataService extends OkexMarketDataServiceRaw implements M
     return OkexAdapters.adaptFundingRate(
         getOkexFundingRate(OkexAdapters.adaptInstrument(instrument)).getData());
   }
-
-  @Override
-  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
-      throws IOException {
-    List<OkexCurrency> okexCurrencyList =
-        getOkexCurrencies(Collections.singletonList(currency)).getData();
-
-    for (OkexCurrency okexCurrency : okexCurrencyList) {
-      if (okexCurrency.getChain().equalsIgnoreCase(chain)) {
-        return new CurrencyChainStatus(
-            currency,
-            okexCurrency.getChain(),
-            okexCurrency.isCanDep(),
-            okexCurrency.isCanWd(),
-            new BigDecimal(okexCurrency.getMinFee()),
-            new BigDecimal(okexCurrency.getMaxFee()));
-      }
-    }
-
-    return null; // returns null if not found
-  }
 }

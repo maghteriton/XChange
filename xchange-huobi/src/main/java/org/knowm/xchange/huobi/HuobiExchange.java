@@ -8,10 +8,7 @@ import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.huobi.dto.marketdata.HuobiAsset;
 import org.knowm.xchange.huobi.dto.marketdata.HuobiAssetPair;
 import org.knowm.xchange.huobi.dto.marketdata.HuobiCurrencyWrapper;
-import org.knowm.xchange.huobi.service.HuobiAccountService;
-import org.knowm.xchange.huobi.service.HuobiMarketDataService;
-import org.knowm.xchange.huobi.service.HuobiMarketDataServiceRaw;
-import org.knowm.xchange.huobi.service.HuobiTradeService;
+import org.knowm.xchange.huobi.service.*;
 
 public class HuobiExchange extends BaseExchange implements Exchange {
 
@@ -36,11 +33,9 @@ public class HuobiExchange extends BaseExchange implements Exchange {
 
   @Override
   public void remoteInit() throws IOException, ExchangeException {
-    HuobiAssetPair[] assetPairs =
-        ((HuobiMarketDataServiceRaw) marketDataService).getHuobiAssetPairs();
+    HuobiAssetPair[] assetPairs = ((HuobiMarketDataServiceRaw) marketDataService).getHuobiAssetPairs();
     HuobiAsset[] assets = ((HuobiMarketDataServiceRaw) marketDataService).getHuobiAssets();
-    HuobiCurrencyWrapper[] huobiCurrencies =
-        ((HuobiMarketDataServiceRaw) marketDataService).getHuobiCurrencies("");
+    HuobiCurrencyWrapper[] huobiCurrencies = ((HuobiAccountServiceRaw) accountService).getHuobiCurrencies("");
     exchangeMetaData =
         HuobiAdapters.adaptToExchangeMetaData(
             assetPairs, assets, exchangeMetaData, huobiCurrencies);

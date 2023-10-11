@@ -2,21 +2,16 @@ package org.knowm.xchange.kucoin;
 
 import static org.knowm.xchange.kucoin.KucoinExceptionClassifier.classifyingExceptions;
 import static org.knowm.xchange.kucoin.KucoinResilience.PRIVATE_REST_ENDPOINT_RATE_LIMITER;
+import static org.knowm.xchange.kucoin.KucoinResilience.PUBLIC_REST_ENDPOINT_RATE_LIMITER;
 
 import java.io.IOException;
 import java.util.List;
 import org.knowm.xchange.client.ResilienceRegistries;
+import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.kucoin.dto.request.ApplyWithdrawApiRequest;
 import org.knowm.xchange.kucoin.dto.request.CreateAccountRequest;
 import org.knowm.xchange.kucoin.dto.request.InnerTransferRequest;
-import org.knowm.xchange.kucoin.dto.response.AccountBalancesResponse;
-import org.knowm.xchange.kucoin.dto.response.AccountLedgersResponse;
-import org.knowm.xchange.kucoin.dto.response.ApplyWithdrawResponse;
-import org.knowm.xchange.kucoin.dto.response.DepositAddressResponse;
-import org.knowm.xchange.kucoin.dto.response.DepositResponse;
-import org.knowm.xchange.kucoin.dto.response.InternalTransferResponse;
-import org.knowm.xchange.kucoin.dto.response.Pagination;
-import org.knowm.xchange.kucoin.dto.response.WithdrawalResponse;
+import org.knowm.xchange.kucoin.dto.response.*;
 
 public class KucoinAccountServiceRaw extends KucoinBaseService {
 
@@ -220,5 +215,15 @@ public class KucoinAccountServiceRaw extends KucoinBaseService {
                             apiKey, digest, nonceFactory, passphrase, currency))
                 .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
                 .call());
+  }
+
+  public CurrenciesV2Response getKucoinCurrency(Currency currency, String chain)
+          throws IOException {
+    return classifyingExceptions(
+            () ->
+                    decorateApiCall(() -> symbolApi.getCurrency(currency.getCurrencyCode(), chain))
+                            .withRetry(retry("currencies"))
+                            .withRateLimiter(rateLimiter(PUBLIC_REST_ENDPOINT_RATE_LIMITER))
+                            .call());
   }
 }

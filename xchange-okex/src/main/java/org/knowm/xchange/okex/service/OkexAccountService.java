@@ -5,15 +5,19 @@ import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.DepositAddress;
 import org.knowm.xchange.dto.account.FundingRecord;
+import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.okex.OkexAdapters;
 import org.knowm.xchange.okex.OkexExchange;
 import org.knowm.xchange.okex.dto.OkexException;
 import org.knowm.xchange.okex.dto.OkexResponse;
 import org.knowm.xchange.okex.dto.account.*;
+import org.knowm.xchange.okex.dto.marketdata.OkexCurrency;
 import org.knowm.xchange.service.account.AccountService;
 import org.knowm.xchange.service.trade.params.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 /** Author: Max Gao (gaamox@tutanota.com) Created: 08-06-2021 */
@@ -101,5 +105,33 @@ public class OkexAccountService extends OkexAccountServiceRaw implements Account
     OkexResponse<List<OkexDepositAddress>> okexDepositAddressResponse =
             getDepositAddress(currency.getCurrencyCode());
     return OkexAdapters.adaptOkexDepositAddresses(okexDepositAddressResponse.getData());
+  }
+
+  @Override
+  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
+      throws IOException {
+    List<OkexCurrency> okexCurrencyList =
+        getOkexCurrencies(Collections.singletonList(currency)).getData();
+    List<OkexDepositAddress> okexDepositAddressList =
+        getDepositAddress(currency.getCurrencyCode()).getData();
+
+    for (OkexCurrency okexCurrency : okexCurrencyList) {
+      if (okexCurrency.getChain().equalsIgnoreCase(chain)) {
+        for (OkexDepositAddress okexDepositAddress : okexDepositAddressList) {
+          if (okexDepositAddress.getChain().equalsIgnoreCase(chain)) {
+            return new CurrencyChainStatus(
+                currency,
+                okexCurrency.getChain(),
+                okexDepositAddress.getContactAddress(),
+                okexCurrency.isCanDep(),
+                okexCurrency.isCanWd(),
+                new BigDecimal(okexCurrency.getMinFee()),
+                new BigDecimal(okexCurrency.getMaxFee()));
+          }
+        }
+      }
+    }
+
+    return null; // returns null if not found
   }
 }

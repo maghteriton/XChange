@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.knowm.xchange.client.ResilienceRegistries;
-import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.kucoin.dto.KlineIntervalType;
 import org.knowm.xchange.kucoin.dto.response.*;
@@ -95,16 +94,6 @@ public class KucoinMarketDataServiceRaw extends KucoinBaseService {
     return classifyingExceptions(
         () ->
             decorateApiCall(symbolApi::getCurrencies)
-                .withRetry(retry("currencies"))
-                .withRateLimiter(rateLimiter(PUBLIC_REST_ENDPOINT_RATE_LIMITER))
-                .call());
-  }
-
-  public CurrenciesV2Response getKucoinCurrency(Currency currency, String chain)
-      throws IOException {
-    return classifyingExceptions(
-        () ->
-            decorateApiCall(() -> symbolApi.getCurrency(currency.getCurrencyCode(), chain))
                 .withRetry(retry("currencies"))
                 .withRateLimiter(rateLimiter(PUBLIC_REST_ENDPOINT_RATE_LIMITER))
                 .call());

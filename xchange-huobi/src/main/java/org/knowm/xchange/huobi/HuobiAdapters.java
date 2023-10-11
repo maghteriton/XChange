@@ -99,7 +99,7 @@ public class HuobiAdapters {
 
     Map<Currency, CurrencyMetaData> currencies = new HashMap<>();
     for (HuobiCurrencyWrapper huobiCurrencyWrapper : currencyWrapper) {
-      if (huobiCurrencyWrapper.getHuobiChains().length != 0) {
+      if (huobiCurrencyWrapper.getHuobiCurrencies().length != 0) {
         boolean isDelisted = DELISTED.equals(huobiCurrencyWrapper.getInstStatus());
         CurrencyMetaData currencyMetaData = adaptCurrencyMetaData(huobiCurrencyWrapper, isDelisted);
         Currency currency =
@@ -114,7 +114,7 @@ public class HuobiAdapters {
   private static CurrencyMetaData adaptCurrencyMetaData(
       HuobiCurrencyWrapper huobiCurrencyWrapper, boolean isDelisted) {
     CurrencyMetaData result = null;
-    List<HuobiCurrency> huobiCurrencies = Arrays.asList(huobiCurrencyWrapper.getHuobiChains());
+    List<HuobiCurrency> huobiCurrencies = Arrays.asList(huobiCurrencyWrapper.getHuobiCurrencies());
     if (!huobiCurrencies.isEmpty()) {
       result = getCurrencyMetaData(huobiCurrencies.get(0), isDelisted);
       for (HuobiCurrency huobiCurrency : huobiCurrencies) {
@@ -239,7 +239,7 @@ public class HuobiAdapters {
       openOrderAvgPrice =
           openOrder
               .getFieldCashAmount()
-              .divide(openOrder.getFieldAmount(), 8, RoundingMode.DOWN);
+              .divide(openOrder.getFieldAmount(), openOrder.getPrice().scale(), RoundingMode.DOWN).stripTrailingZeros();
     }
     if (openOrder.isMarket()) {
       order =

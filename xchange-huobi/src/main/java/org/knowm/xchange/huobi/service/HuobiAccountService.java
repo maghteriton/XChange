@@ -9,10 +9,16 @@ import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.AddressWithTag;
 import org.knowm.xchange.dto.account.DepositAddress;
 import org.knowm.xchange.dto.account.FundingRecord;
+import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.huobi.HuobiAdapters;
+import org.knowm.xchange.huobi.HuobiUtils;
 import org.knowm.xchange.huobi.dto.account.HuobiAccount;
 import org.knowm.xchange.huobi.dto.account.HuobiDepositAddress;
+import org.knowm.xchange.huobi.dto.marketdata.HuobiChain;
+import org.knowm.xchange.huobi.dto.marketdata.HuobiCurrency;
+import org.knowm.xchange.huobi.dto.marketdata.HuobiCurrencyWrapper;
+import org.knowm.xchange.huobi.dto.marketdata.results.HuobiCurrenciesResult;
 import org.knowm.xchange.service.account.AccountService;
 import org.knowm.xchange.service.trade.params.*;
 
@@ -27,9 +33,13 @@ public class HuobiAccountService extends HuobiAccountServiceRaw implements Accou
     if (params instanceof DefaultWithdrawFundsParams) {
       DefaultWithdrawFundsParams defaultParams = (DefaultWithdrawFundsParams) params;
       return String.valueOf(
-              createWithdraw(
-                      defaultParams.getCurrency().getCurrencyCode(), defaultParams.getAmount(), defaultParams.getCommission(),
-                      defaultParams.getAddress(), defaultParams.getAddressTag(), defaultParams.getChain()));
+          createWithdraw(
+              defaultParams.getCurrency().getCurrencyCode(),
+              defaultParams.getAmount(),
+              defaultParams.getCommission(),
+              defaultParams.getAddress(),
+              defaultParams.getAddressTag(),
+              defaultParams.getChain()));
     }
     throw new IllegalStateException("Don't know how to withdraw: " + params);
   }
@@ -39,7 +49,12 @@ public class HuobiAccountService extends HuobiAccountServiceRaw implements Accou
       throws IOException {
     return String.valueOf(
         createWithdraw(
-            currency.toString(), amount, null, address.getAddress(), address.getAddressTag(), null));
+            currency.toString(),
+            amount,
+            null,
+            address.getAddress(),
+            address.getAddressTag(),
+            null));
   }
 
   @Override
@@ -90,7 +105,7 @@ public class HuobiAccountService extends HuobiAccountServiceRaw implements Accou
     }
 
     TradeHistoryParamsSorted.Order order = null;
-    if(params instanceof TradeHistoryParamsSorted
+    if (params instanceof TradeHistoryParamsSorted
         && ((TradeHistoryParamsSorted) params).getOrder() != null) {
       order = ((TradeHistoryParamsSorted) params).getOrder();
     }
@@ -119,5 +134,34 @@ public class HuobiAccountService extends HuobiAccountServiceRaw implements Accou
   public List<DepositAddress> getDepositAddresses(Currency currency) throws IOException {
     HuobiDepositAddress[] depositAddressV2 = getDepositAddressV2(currency.getCurrencyCode());
     return HuobiAdapters.adaptDepositAddresses(depositAddressV2);
+  }
+
+  @Override
+  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
+      throws IOException {
+
+    HuobiChain[] huobiChains = getHuobiChains(currency.getCurrencyCode());
+    HuobiCurrencyWrapper huobiCurrencyWrapper = getHuobiCurrencies(currency.getCurrencyCode())[0];
+
+    for (HuobiChain huobiChain : huobiChains) {
+      // then get compare by internal huobi chain names.
+      if (huobiChain.getDisplayName().equalsIgnoreCase(chain)) {
+
+        for (HuobiCurrency huobiCurrency : huobiCurrencyWrapper.getHuobiCurrencies()) {
+          if (huobiCurrency.getDisplayName().equalsIgnoreCase(chain)) {
+            return new CurrencyChainStatus(
+                currency,
+                huobiChain.getChain(),
+                huobiChain.getContractAddress(),
+                huobiChain.isDepositEnable(),
+                huobiChain.isWithdrawEnable(),
+                huobiCurrency.getTransactFeeWithdraw(),
+               huobiCurrency.getTransactFeeWithdraw());
+          }
+        }
+      }
+    }
+
+    return null; // returns null if not found
   }
 }

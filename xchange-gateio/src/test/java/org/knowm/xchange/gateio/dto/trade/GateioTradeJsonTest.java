@@ -66,17 +66,13 @@ public class GateioTradeJsonTest {
 
     // Use Jackson to parse it
     ObjectMapper mapper = new ObjectMapper();
-    GateioOrderStatus orderStatus = mapper.readValue(is, GateioOrderStatus.class);
+    GateioClosedOrder gateioClosedOrder = mapper.readValue(is, GateioOrderStatus.class).getGateioClosedOrder();
 
-    assertThat(orderStatus.isResult()).isTrue();
-    assertThat(orderStatus.getMessage()).isEqualTo("Success");
-    assertThat(orderStatus.getOrderNumber()).isEqualTo("12942570");
-    assertThat(orderStatus.getStatus()).isEqualTo("open");
-    assertThat(orderStatus.getCurrencyPair()).isEqualTo(CurrencyPair.LTC_BTC);
-    assertThat(orderStatus.getType()).isEqualTo(GateioOrderType.SELL);
-    assertThat(orderStatus.getRate()).isEqualTo("0.0265");
-    assertThat(orderStatus.getRemainingAmount()).isEqualTo("0.384");
-    assertThat(orderStatus.getInitialRate()).isEqualTo("0.0265");
-    assertThat(orderStatus.getInitialAmount()).isEqualTo("0.384");
+    assertThat(gateioClosedOrder.getOrderNumber()).isEqualTo("12942570");
+    assertThat(gateioClosedOrder.getStatus()).isEqualTo("open");
+    assertThat(gateioClosedOrder.getCurrencyPair()).isEqualTo(CurrencyPair.LTC_BTC);
+    assertThat(gateioClosedOrder.getType()).isEqualTo(GateioOrderType.SELL);
+    assertThat(gateioClosedOrder.getInitialAmount()).isEqualTo("0.0265");
+    assertThat(gateioClosedOrder.getInitialAmount()).isEqualTo("0.384");
   }
 }

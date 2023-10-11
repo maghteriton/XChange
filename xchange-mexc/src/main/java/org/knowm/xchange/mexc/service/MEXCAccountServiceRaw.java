@@ -2,12 +2,17 @@ package org.knowm.xchange.mexc.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.dto.account.AddressWithTag;
+import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.mexc.dto.MEXCResult;
 import org.knowm.xchange.mexc.dto.account.*;
+import org.knowm.xchange.mexc.dto.market.MEXCCurrencyInfo;
+
+import javax.annotation.Nullable;
 
 public class MEXCAccountServiceRaw extends MEXCBaseService {
 
@@ -49,5 +54,16 @@ public class MEXCAccountServiceRaw extends MEXCBaseService {
     return mexcAuthenticated
         .getDepositAddressList(apiKey, nonceFactory, signatureCreator, currency.getCurrencyCode())
         .getData();
+  }
+
+  public List<MEXCCurrencyInfo> getCurrencyList(@Nullable String currency) throws IOException {
+    List<MEXCCurrencyInfo> currencyInfoList;
+    try {
+      currencyInfoList =
+              mexcAuthenticated.getCoinList(currency != null ? currency.toUpperCase() : null).getData();
+    } catch (MEXCException e) {
+      throw new ExchangeException(e);
+    }
+    return currencyInfoList;
   }
 }

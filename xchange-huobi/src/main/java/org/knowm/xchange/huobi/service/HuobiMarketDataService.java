@@ -9,11 +9,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.knowm.xchange.Exchange;
-import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order.OrderType;
 import org.knowm.xchange.dto.marketdata.*;
-import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
@@ -136,28 +134,5 @@ public class HuobiMarketDataService extends HuobiMarketDataServiceRaw implements
         getKlines(currencyPair, klineInterval, size),
         currencyPair,
         defaultCandleStickParam.getStartDate());
-  }
-
-  @Override
-  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
-      throws IOException {
-    HuobiCurrencyWrapper[] huobiCurrencyWrappers = getHuobiCurrencies(currency.getCurrencyCode());
-
-    for (HuobiCurrencyWrapper wrapper : huobiCurrencyWrappers) {
-      HuobiCurrency[] huobiChains = wrapper.getHuobiChains();
-      for (HuobiCurrency huobiChain : huobiChains) {
-        if (huobiChain.getDisplayName().equalsIgnoreCase(chain)) {
-          return new CurrencyChainStatus(
-              currency,
-              huobiChain.getChain(),
-              HuobiAdapters.ONLINE.equals(huobiChain.getDepositStatus()),
-              HuobiAdapters.ONLINE.equals(huobiChain.getWithdrawStatus()),
-              huobiChain.getTransactFeeWithdraw(),
-              huobiChain.getTransactFeeWithdraw());
-        }
-      }
-    }
-
-    return null; // returns null if not found
   }
 }

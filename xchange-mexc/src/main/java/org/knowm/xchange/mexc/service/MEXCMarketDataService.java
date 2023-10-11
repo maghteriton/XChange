@@ -56,17 +56,6 @@ public class MEXCMarketDataService extends MEXCMarketDataServiceRaw implements M
     return mexcSymbols;
   }
 
-  public List<MEXCCurrencyInfo> getCoinList(@Nullable String currency) throws IOException {
-    List<MEXCCurrencyInfo> currencyInfoList;
-    try {
-      currencyInfoList =
-          mexcAuthenticated.getCoinList(currency != null ? currency.toUpperCase() : null).getData();
-    } catch (MEXCException e) {
-      throw new ExchangeException(e);
-    }
-    return currencyInfoList;
-  }
-
   @Override
   public CandleStickData getCandleStickData(CurrencyPair currencyPair, CandleStickDataParams params)
       throws IOException {
@@ -95,27 +84,5 @@ public class MEXCMarketDataService extends MEXCMarketDataServiceRaw implements M
     }
 
     return MEXCAdapters.adaptCandleStickData(mexcCandleStickDataList, currencyPair);
-  }
-
-  @Override
-  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
-      throws IOException {
-    List<MEXCCurrencyInfo> coinList = getCoinList(currency.getCurrencyCode());
-
-    for (MEXCCurrencyInfo mexcCurrencyInfo : coinList) {
-      for (MEXCCurrency mexcCurrency : mexcCurrencyInfo.getMexcCoinList()) {
-        if (mexcCurrency.getChain().equalsIgnoreCase(chain)) {
-          return new CurrencyChainStatus(
-              currency,
-              mexcCurrency.getChain(),
-              mexcCurrency.getIsDepositEnabled(),
-              mexcCurrency.getIsWithdrawEnabled(),
-              mexcCurrency.getWithdrawalFee(),
-              mexcCurrency.getWithdrawalFee());
-        }
-      }
-    }
-
-    return null; // returns null if not found
   }
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.dto.account.*;
+import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
@@ -173,6 +174,17 @@ public interface AccountService extends BaseService {
    */
   default List<DepositAddress> getDepositAddresses(Currency currency) throws IOException {
     throw new NotYetImplementedForExchangeException("getDepositAddresses");
+  }
+
+
+  /**
+   * @param currency The digital currency.
+   * @param chain The chain name. (e.g. ERC20, BSC20, ETH, BSC...)
+   * @return Overall wallet health of the currency's chain and null if chain cannot be found.
+   * @throws IOException - Indication that a networking error occurred while fetching JSON data
+   */
+  default CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain) throws IOException {
+    throw new NotYetImplementedForExchangeException("getCurrencyChainWalletHealth");
   }
 
   /**

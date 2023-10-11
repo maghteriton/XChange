@@ -80,29 +80,6 @@ public class OkexMarketDataServiceRaw extends OkexBaseService {
     }
   }
 
-  public OkexResponse<List<OkexCurrency>> getOkexCurrencies(List<Currency> currencyList) throws OkexException, IOException {
-    try {
-      return decorateApiCall(
-              () ->
-                  okexAuthenticated.getCurrencies(currencyList,
-                      exchange.getExchangeSpecification().getApiKey(),
-                      signatureCreator,
-                      DateUtils.toUTCISODateString(new Date()),
-                      (String)
-                          exchange
-                              .getExchangeSpecification()
-                              .getExchangeSpecificParametersItem(PARAM_PASSPHRASE),
-                      (String)
-                          exchange
-                              .getExchangeSpecification()
-                              .getExchangeSpecificParametersItem(PARAM_SIMULATED)))
-          .withRateLimiter(rateLimiter(OkexAuthenticated.currenciesPath))
-          .call();
-    } catch (OkexException e) {
-      throw handleError(e);
-    }
-  }
-
   public OkexResponse<List<OkexTrade>> getOkexTrades(String instrument, int limit)
       throws OkexException, IOException {
 

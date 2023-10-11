@@ -26,7 +26,7 @@ public interface MEXCAuthenticated {
   MEXCResult<List<MEXCSymbols>> getSymbols() throws IOException, MEXCException;
 
   @GET
-  @Path("market/coin/list")
+  @Path("/market/coin/list")
   MEXCResult<List<MEXCCurrencyInfo>> getCoinList(@QueryParam("currency") String currency)
       throws IOException, MEXCException;
 

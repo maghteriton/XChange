@@ -91,25 +91,4 @@ public class KucoinMarketDataService extends KucoinMarketDataServiceRaw
     return KucoinAdapters.adaptCandleStickData(
         currencyPair, getKucoinKlines(currencyPair, startAt, endAt, interval));
   }
-
-  @Override
-  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
-      throws IOException {
-    CurrenciesV2Response currenciesV2Response = getKucoinCurrency(currency, chain.toLowerCase());
-    if (currenciesV2Response != null && currenciesV2Response.getChains() != null) {
-      for (KucoinChain kucoinChain : currenciesV2Response.getChains()) {
-        if (kucoinChain.getChain().equalsIgnoreCase(chain)) {
-          return new CurrencyChainStatus(
-              currency,
-              kucoinChain.getChain(),
-              kucoinChain.getIsDepositEnabled(),
-              kucoinChain.getIsWithdrawEnabled(),
-              new BigDecimal(kucoinChain.getWithdrawalMinFee()),
-              new BigDecimal(kucoinChain.getWithdrawalMinFee()));
-        }
-      }
-    }
-
-    return null; // returns null if not found
-  }
 }

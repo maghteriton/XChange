@@ -16,9 +16,11 @@ import org.knowm.xchange.dto.account.DepositAddress;
 import org.knowm.xchange.dto.account.FundingRecord;
 import org.knowm.xchange.dto.account.FundingRecord.Type;
 import org.knowm.xchange.dto.account.Wallet;
+import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.kucoin.dto.request.ApplyWithdrawApiRequest;
 import org.knowm.xchange.kucoin.dto.request.InnerTransferRequest;
 import org.knowm.xchange.kucoin.dto.response.AccountBalancesResponse;
+import org.knowm.xchange.kucoin.dto.response.CurrenciesV2Response;
 import org.knowm.xchange.service.account.AccountService;
 import org.knowm.xchange.service.trade.params.*;
 
@@ -134,5 +136,26 @@ public class KucoinAccountService extends KucoinAccountServiceRaw implements Acc
   @Override
   public List<DepositAddress> getDepositAddresses(Currency currency) throws IOException {
     return KucoinAdapters.adaptDepositAddresses(currency, getDepositAddresses(currency.getCurrencyCode()));
+  }
+
+  @Override
+  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
+          throws IOException {
+    CurrenciesV2Response currenciesV2Response = getKucoinCurrency(currency, chain.toLowerCase());
+    if (currenciesV2Response != null && currenciesV2Response.getChains() != null) {
+      for (KucoinChain kucoinChain : currenciesV2Response.getChains()) {
+        if (kucoinChain.getChain().equalsIgnoreCase(chain)) {
+          return new CurrencyChainStatus(
+                  currency,
+                  kucoinChain.getChain(),
+                  kucoinChain.getContractAddress(), kucoinChain.getIsDepositEnabled(),
+                  kucoinChain.getIsWithdrawEnabled(),
+                  new BigDecimal(kucoinChain.getWithdrawalMinFee()),
+                  new BigDecimal(kucoinChain.getWithdrawalMinFee()));
+        }
+      }
+    }
+
+    return null; // returns null if not found
   }
 }

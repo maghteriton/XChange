@@ -79,18 +79,22 @@ public class MEXCTradeService extends MEXCTradeServiceRaw implements TradeServic
         MEXCOrder mexcOrder = mexcOrderList.get(0);
         BigDecimal price = new BigDecimal(mexcOrder.getPrice());
         BigDecimal cumulativeAmount = new BigDecimal(mexcOrder.getDealQuantity());
+        BigDecimal averagePrice =
+            cumulativeAmount.equals(BigDecimal.ZERO)
+                ? BigDecimal.ZERO
+                : new BigDecimal(mexcOrder.getDealAmount())
+                    .divide(cumulativeAmount, RoundingMode.HALF_EVEN)
+                    .setScale(price.scale(), RoundingMode.HALF_EVEN);
         LimitOrder limitOrder =
             new LimitOrder(
                 MEXCAdapters.adaptOrderType(mexcOrder.getType()),
-                new BigDecimal(mexcOrder.getQuantity()).multiply(price),
+                new BigDecimal(mexcOrder.getQuantity()),
                 MEXCAdapters.adaptSymbol(mexcOrder.getSymbol()),
                 mexcOrder.getId(),
                 new Date(mexcOrder.getCreateTime()),
                 price,
-                new BigDecimal(mexcOrder.getDealAmount())
-                    .divide(cumulativeAmount, RoundingMode.HALF_EVEN)
-                    .setScale(price.scale(), RoundingMode.HALF_EVEN),
-                new BigDecimal(mexcOrder.getDealAmount()),
+                averagePrice,
+                cumulativeAmount,
                 null,
                 Order.OrderStatus.valueOf(mexcOrder.getState().toUpperCase(Locale.ENGLISH)),
                 null);

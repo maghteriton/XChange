@@ -2,6 +2,7 @@ package org.knowm.xchange.gateio.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.knowm.xchange.dto.trade.UserTrades;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.gateio.GateioAdapters;
+import org.knowm.xchange.gateio.dto.trade.GateioClosedOrder;
 import org.knowm.xchange.gateio.dto.trade.GateioOpenOrders;
 import org.knowm.xchange.gateio.dto.trade.GateioOrderStatus;
 import org.knowm.xchange.gateio.dto.trade.GateioTrade;
@@ -132,22 +134,24 @@ public class GateioTradeService extends GateioTradeServiceRaw implements TradeSe
         List<LimitOrder> limitOrderList = openOrders.getOpenOrders();
         orders.addAll(limitOrderList);
       } else {
-        GateioOrderStatus gateioOrderStatus = getGateioOrderStatus(orderId, currencyPair);
-        BigDecimal filledAmount =
-            gateioOrderStatus.getInitialAmount().subtract(gateioOrderStatus.getRemainingAmount());
+        GateioClosedOrder gateioClosedOrder =
+            getGateioOrderStatus(orderId, currencyPair).getGateioClosedOrder();
+        BigDecimal originalAmount = new BigDecimal(gateioClosedOrder.getInitialAmount());
+        BigDecimal cumulativeAmount = new BigDecimal(gateioClosedOrder.getFilledAmount());
+
         LimitOrder limitOrder =
             new LimitOrder.Builder(
-                    GateioAdapters.adaptOrderType(gateioOrderStatus.getType()),
-                    gateioOrderStatus.getCurrencyPair())
-                .originalAmount(gateioOrderStatus.getInitialAmount())
-                .cumulativeAmount(filledAmount)
-                .remainingAmount(gateioOrderStatus.getRemainingAmount())
-                .id(gateioOrderStatus.getOrderNumber())
-                .limitPrice(gateioOrderStatus.getInitialRate())
-                .orderStatus(GateioAdapters.adaptOrderStatus(gateioOrderStatus.getStatus()))
+                    GateioAdapters.adaptOrderType(gateioClosedOrder.getType()),
+                    gateioClosedOrder.getCurrencyPair())
+                .originalAmount(originalAmount)
+                .cumulativeAmount(cumulativeAmount)
+                .remainingAmount(originalAmount.subtract(cumulativeAmount))
+                .id(gateioClosedOrder.getOrderNumber())
+                .limitPrice(new BigDecimal(gateioClosedOrder.getInitialRate()))
+                .averagePrice(gateioClosedOrder.getFilledRate())
+                .orderStatus(GateioAdapters.adaptOrderStatus(gateioClosedOrder.getStatus()))
                 .build();
 
-        limitOrder.setAveragePrice(gateioOrderStatus.getRate());
         orders.add(limitOrder);
       }
     }

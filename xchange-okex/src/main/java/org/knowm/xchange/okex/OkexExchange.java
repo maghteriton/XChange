@@ -6,10 +6,7 @@ import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.okex.dto.account.OkexTradeFee;
 import org.knowm.xchange.okex.dto.marketdata.OkexCurrency;
 import org.knowm.xchange.okex.dto.marketdata.OkexInstrument;
-import org.knowm.xchange.okex.service.OkexAccountService;
-import org.knowm.xchange.okex.service.OkexMarketDataService;
-import org.knowm.xchange.okex.service.OkexMarketDataServiceRaw;
-import org.knowm.xchange.okex.service.OkexTradeService;
+import org.knowm.xchange.okex.service.*;
 import si.mazi.rescu.SynchronizedValueFactory;
 
 import java.io.IOException;
@@ -121,7 +118,7 @@ public class OkexExchange extends BaseExchange {
     if (exchangeSpecification.getApiKey() != null
         && exchangeSpecification.getSecretKey() != null
         && exchangeSpecification.getExchangeSpecificParametersItem("passphrase") != null) {
-      currencies = ((OkexMarketDataServiceRaw) marketDataService).getOkexCurrencies(null).getData();
+      currencies = ((OkexAccountServiceRaw) accountService).getOkexCurrencies(null).getData();
       accountLevel =
               ((OkexAccountService) accountService).getOkexAccountConfiguration().getData().get(0).getAccountLevel();
       tradeFee = ((OkexAccountService) accountService).getTradeFee(

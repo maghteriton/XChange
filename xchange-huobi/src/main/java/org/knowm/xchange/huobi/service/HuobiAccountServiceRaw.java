@@ -23,6 +23,10 @@ import org.knowm.xchange.huobi.dto.account.results.HuobiFeeRateResult;
 import org.knowm.xchange.huobi.dto.account.results.HuobiFundingHistoryResult;
 import org.knowm.xchange.huobi.dto.account.results.HuobiTransactFeeRateResult;
 import org.knowm.xchange.huobi.dto.account.results.HuobiWithdrawFeeRangeResult;
+import org.knowm.xchange.huobi.dto.marketdata.HuobiChain;
+import org.knowm.xchange.huobi.dto.marketdata.HuobiCurrencyWrapper;
+import org.knowm.xchange.huobi.dto.marketdata.results.HuobiChainsResult;
+import org.knowm.xchange.huobi.dto.marketdata.results.HuobiCurrenciesResult;
 
 public class HuobiAccountServiceRaw extends HuobiBaseService {
   private HuobiAccount[] accountCache = null;
@@ -161,5 +165,30 @@ public class HuobiAccountServiceRaw extends HuobiBaseService {
             HuobiUtils.createUTCDate(exchange.getNonceFactory()),
             signatureCreator);
     return checkResult(createWithdrawResult);
+  }
+
+  public HuobiChain[] getHuobiChains(String currency) throws IOException {
+    HuobiChainsResult chainsInformation =
+            huobi.getChainsInformation(
+                    currency.toLowerCase(),
+                    exchange.getExchangeSpecification().getApiKey(),
+                    HuobiDigest.HMAC_SHA_256,
+                    2,
+                    HuobiUtils.createUTCDate(exchange.getNonceFactory()),
+                    signatureCreator);
+    return checkResult(chainsInformation);
+  }
+
+  public HuobiCurrencyWrapper[] getHuobiCurrencies(String currency) throws IOException {
+    HuobiCurrenciesResult currenciesResult =
+            huobi.getCurrencies(
+                    currency.toLowerCase(),
+                    false,
+                    exchange.getExchangeSpecification().getApiKey(),
+                    HuobiDigest.HMAC_SHA_256,
+                    2,
+                    HuobiUtils.createUTCDate(exchange.getNonceFactory()),
+                    signatureCreator);
+    return checkResult(currenciesResult);
   }
 }

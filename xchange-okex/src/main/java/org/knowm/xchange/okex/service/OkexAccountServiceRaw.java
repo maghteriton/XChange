@@ -15,6 +15,7 @@ import org.knowm.xchange.okex.dto.account.OkexDepositAddress;
 import org.knowm.xchange.okex.dto.account.OkexTradeFee;
 import org.knowm.xchange.okex.dto.account.OkexWalletBalance;
 import org.knowm.xchange.okex.dto.account.PiggyBalance;
+import org.knowm.xchange.okex.dto.marketdata.OkexCurrency;
 import org.knowm.xchange.okex.dto.subaccount.OkexSubAccountDetails;
 import org.knowm.xchange.utils.DateUtils;
 
@@ -428,5 +429,28 @@ public class OkexAccountServiceRaw extends OkexBaseService {
                             okexDepositHistoryRequest.getLimit()))
             .withRateLimiter(rateLimiter(subAccountList))
             .call();
+  }
+
+  public OkexResponse<List<OkexCurrency>> getOkexCurrencies(List<Currency> currencyList) throws OkexException, IOException {
+    try {
+      return decorateApiCall(
+              () ->
+                      okexAuthenticated.getCurrencies(currencyList,
+                              exchange.getExchangeSpecification().getApiKey(),
+                              signatureCreator,
+                              DateUtils.toUTCISODateString(new Date()),
+                              (String)
+                                      exchange
+                                              .getExchangeSpecification()
+                                              .getExchangeSpecificParametersItem(PARAM_PASSPHRASE),
+                              (String)
+                                      exchange
+                                              .getExchangeSpecification()
+                                              .getExchangeSpecificParametersItem(PARAM_SIMULATED)))
+              .withRateLimiter(rateLimiter(OkexAuthenticated.currenciesPath))
+              .call();
+    } catch (OkexException e) {
+      throw handleError(e);
+    }
   }
 }

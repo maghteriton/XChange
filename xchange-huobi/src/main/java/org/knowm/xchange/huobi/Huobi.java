@@ -20,14 +20,7 @@ import org.knowm.xchange.huobi.dto.account.results.HuobiFeeRateResult;
 import org.knowm.xchange.huobi.dto.account.results.HuobiFundingHistoryResult;
 import org.knowm.xchange.huobi.dto.account.results.HuobiTransactFeeRateResult;
 import org.knowm.xchange.huobi.dto.account.results.HuobiWithdrawFeeRangeResult;
-import org.knowm.xchange.huobi.dto.marketdata.results.HuobiAllTickersResult;
-import org.knowm.xchange.huobi.dto.marketdata.results.HuobiAssetPairsResult;
-import org.knowm.xchange.huobi.dto.marketdata.results.HuobiAssetsResult;
-import org.knowm.xchange.huobi.dto.marketdata.results.HuobiCurrenciesResult;
-import org.knowm.xchange.huobi.dto.marketdata.results.HuobiDepthResult;
-import org.knowm.xchange.huobi.dto.marketdata.results.HuobiKlinesResult;
-import org.knowm.xchange.huobi.dto.marketdata.results.HuobiTickerResult;
-import org.knowm.xchange.huobi.dto.marketdata.results.HuobiTradesResult;
+import org.knowm.xchange.huobi.dto.marketdata.results.*;
 import org.knowm.xchange.huobi.dto.trade.HuobiCreateOrderRequest;
 import org.knowm.xchange.huobi.dto.trade.results.HuobiCancelOrderResult;
 import org.knowm.xchange.huobi.dto.trade.results.HuobiMatchesResult;
@@ -84,6 +77,18 @@ public interface Huobi {
       @QueryParam("Timestamp") String nonce,
       @QueryParam("Signature") ParamsDigest signature)
       throws IOException;
+
+
+  @GET
+  @Path("v1/settings/common/chains")
+  HuobiChainsResult getChainsInformation(
+          @QueryParam("currency") String currency,
+          @QueryParam("AccessKeyId") String apiKey,
+          @QueryParam("SignatureMethod") String signatureMethod,
+          @QueryParam("SignatureVersion") int signatureVersion,
+          @QueryParam("Timestamp") String nonce,
+          @QueryParam("Signature") ParamsDigest signature)
+          throws IOException;
 
   @GET
   @Path("v2/reference/currencies")
