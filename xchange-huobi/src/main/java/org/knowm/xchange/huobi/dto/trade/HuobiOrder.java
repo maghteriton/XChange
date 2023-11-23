@@ -10,9 +10,9 @@ public class HuobiOrder {
   private final BigDecimal amount;
   private final Date canceledAt;
   private final Date createdAt;
-  private final BigDecimal fieldAmount;
-  private final BigDecimal fieldCashAmount;
-  private final BigDecimal fieldFees;
+  private final BigDecimal filledAmount;
+  private final BigDecimal filledCashAmount;
+  private final BigDecimal filledFees;
   private final Date finishedAt;
   private final long id;
   private final BigDecimal price;
@@ -29,9 +29,9 @@ public class HuobiOrder {
       @JsonProperty("amount") BigDecimal amount,
       @JsonProperty("canceled-at") Date canceledAt,
       @JsonProperty("created-at") Date createdAt,
-      @JsonProperty("field-amount") BigDecimal fieldAmount,
-      @JsonProperty("field-cash-amount") BigDecimal fieldCashAmount,
-      @JsonProperty("field-fees") BigDecimal fieldFees,
+      @JsonProperty("field-amount") BigDecimal filledAmount,
+      @JsonProperty("field-cash-amount") BigDecimal filledCashAmount,
+      @JsonProperty("field-fees") BigDecimal filledFees,
       @JsonProperty("finished-at") Date finishedAt,
       @JsonProperty("id") long id,
       @JsonProperty("price") BigDecimal price,
@@ -46,9 +46,9 @@ public class HuobiOrder {
     this.amount = amount;
     this.canceledAt = canceledAt != null && canceledAt.getTime() != 0 ? canceledAt : null;
     this.createdAt = createdAt;
-    this.fieldAmount = fieldAmount;
-    this.fieldCashAmount = fieldCashAmount;
-    this.fieldFees = fieldFees;
+    this.filledAmount = filledAmount;
+    this.filledCashAmount = filledCashAmount;
+    this.filledFees = filledFees;
     this.finishedAt = finishedAt != null && finishedAt.getTime() != 0 ? finishedAt : null;
     this.id = id;
     this.price = price;
@@ -77,16 +77,16 @@ public class HuobiOrder {
     return createdAt;
   }
 
-  public BigDecimal getFieldAmount() {
-    return fieldAmount;
+  public BigDecimal getFilledAmount() {
+    return filledAmount;
   }
 
-  public BigDecimal getFieldCashAmount() {
-    return fieldCashAmount;
+  public BigDecimal getFilledCashAmount() {
+    return filledCashAmount;
   }
 
-  public BigDecimal getFieldFees() {
-    return fieldFees;
+  public BigDecimal getFilledFees() {
+    return filledFees;
   }
 
   public Date getFinishedAt() {
@@ -152,12 +152,12 @@ public class HuobiOrder {
         + canceledAt
         + ", createdAt="
         + createdAt
-        + ", fieldAmount="
-        + fieldAmount
-        + ", fieldCashAmount="
-        + fieldCashAmount
-        + ", fieldFees="
-        + fieldFees
+        + ", filledAmount="
+        + filledAmount
+        + ", filledCashAmount="
+        + filledCashAmount
+        + ", filledFees="
+        + filledFees
         + ", finishedAt="
         + finishedAt
         + ", id="

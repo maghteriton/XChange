@@ -14,6 +14,7 @@ import org.knowm.xchange.dto.meta.ExchangeMetaData;
 import org.knowm.xchange.dto.meta.InstrumentMetaData;
 import org.knowm.xchange.dto.meta.WalletHealth;
 import org.knowm.xchange.dto.trade.*;
+import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.okex.dto.OkexInstType;
 import org.knowm.xchange.okex.dto.account.*;
@@ -281,11 +282,7 @@ public class OkexAdapters {
     Map<Instrument, InstrumentMetaData> instrumentMetaData = new HashMap<>();
     Map<Currency, CurrencyMetaData> currencies = new HashMap<>();
 
-    String makerFee = "0.5";
-    if (tradeFee != null && !tradeFee.isEmpty()) {
-      makerFee = tradeFee.get(0).getMaker();
-    }
-
+    String takerFee = tradeFee.get(0).getTaker();
     for (OkexInstrument instrument : instruments) {
       if (!"live".equals(instrument.getState())) {
         continue;
@@ -307,7 +304,7 @@ public class OkexAdapters {
       instrumentMetaData.put(
           pair,
           new InstrumentMetaData.Builder()
-                  .tradingFee(new BigDecimal(makerFee).negate())
+                  .tradingFee(new BigDecimal(takerFee).negate())
                   .minimumAmount((instrument.getInstrumentType().equals(OkexInstType.SWAP.name()))
                           ? convertContractSizeToVolume(instrument.getMinSize(), pair, new BigDecimal(instrument.getContractValue()))
                           : new BigDecimal(instrument.getMinSize()))

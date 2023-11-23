@@ -12,6 +12,7 @@ import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.UserTrades;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
+import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.mexc.MEXCAdapters;
 import org.knowm.xchange.mexc.dto.MEXCResult;
 import org.knowm.xchange.mexc.dto.trade.MEXCDeal;
@@ -85,17 +86,27 @@ public class MEXCTradeService extends MEXCTradeServiceRaw implements TradeServic
                 : new BigDecimal(mexcOrder.getDealAmount())
                     .divide(cumulativeAmount, RoundingMode.HALF_EVEN)
                     .setScale(price.scale(), RoundingMode.HALF_EVEN);
+
+        BigDecimal fee = BigDecimal.ZERO;
+        Instrument instrument = MEXCAdapters.adaptSymbol(mexcOrder.getSymbol());
+        MEXCResult<List<MEXCDeal>> tradeHistory = getTradeHistory((CurrencyPair) instrument);
+        for (MEXCDeal deals : tradeHistory.getData()) {
+          if (deals.getOrderId().equals(mexcOrder.getId())) {
+            fee = fee.add(new BigDecimal(deals.getFee()));
+          }
+        }
+
         LimitOrder limitOrder =
             new LimitOrder(
                 MEXCAdapters.adaptOrderType(mexcOrder.getType()),
                 new BigDecimal(mexcOrder.getQuantity()),
-                MEXCAdapters.adaptSymbol(mexcOrder.getSymbol()),
+                instrument,
                 mexcOrder.getId(),
                 new Date(mexcOrder.getCreateTime()),
                 price,
                 averagePrice,
                 cumulativeAmount,
-                null,
+                fee,
                 Order.OrderStatus.valueOf(mexcOrder.getState().toUpperCase(Locale.ENGLISH)),
                 null);
 

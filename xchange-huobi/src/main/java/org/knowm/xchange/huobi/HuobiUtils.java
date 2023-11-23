@@ -2,13 +2,12 @@ package org.knowm.xchange.huobi;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
+
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.exceptions.ExchangeException;
+import org.knowm.xchange.huobi.dto.account.HuobiTransactFeeRate;
 import org.knowm.xchange.huobi.dto.marketdata.HuobiAsset;
 import org.knowm.xchange.huobi.dto.marketdata.HuobiAssetPair;
 import org.slf4j.Logger;
@@ -17,12 +16,12 @@ import si.mazi.rescu.SynchronizedValueFactory;
 
 public class HuobiUtils {
   private static Logger logger = LoggerFactory.getLogger(HuobiUtils.class);
+  private static Map<String, CurrencyPair> assetPairMap = new HashMap<>();
 
-  private static Map<String, CurrencyPair> assetPairMap = new HashMap<String, CurrencyPair>();
-  private static Map<CurrencyPair, String> assetPairMapReverse =
-      new HashMap<CurrencyPair, String>();
-  private static Map<String, Currency> assetMap = new HashMap<String, Currency>();
-  private static Map<Currency, String> assetMapReverse = new HashMap<Currency, String>();
+  private static Map<String, HuobiTransactFeeRate> huobiTransactFeeRateMap = new HashMap<>();
+  private static Map<CurrencyPair, String> assetPairMapReverse = new HashMap<>();
+  private static Map<String, Currency> assetMap = new HashMap<>();
+  private static Map<Currency, String> assetMapReverse = new HashMap<>();
 
   private HuobiUtils() {}
 
@@ -33,6 +32,13 @@ public class HuobiUtils {
           String.format("Huobi doesn't support currency pair %s", currencyPair.toString()));
     }
     return pair;
+  }
+
+  public static String getHuobiCurrencyPairString(CurrencyPair currencyPair) {
+    return String.format(
+        "%s%s",
+        currencyPair.base.getCurrencyCode().toLowerCase(),
+        currencyPair.counter.getCurrencyCode().toLowerCase());
   }
 
   public static String createUTCDate(SynchronizedValueFactory<Long> nonce) {
@@ -66,6 +72,12 @@ public class HuobiUtils {
         assetPairMap.put(entry.getKey(), pair);
         assetPairMapReverse.put(pair, entry.getKey());
       }
+    }
+  }
+
+  public static void setFeeData(List<HuobiTransactFeeRate> transactFeeRate) {
+    for (HuobiTransactFeeRate huobiTransactFeeRate : transactFeeRate) {
+      huobiTransactFeeRateMap.put(huobiTransactFeeRate.getSymbol(), huobiTransactFeeRate);
     }
   }
 
@@ -104,5 +116,9 @@ public class HuobiUtils {
       }
     }
     return pair;
+  }
+
+  public static HuobiTransactFeeRate getFeeRate(String symbol) {
+    return huobiTransactFeeRateMap.get(symbol);
   }
 }

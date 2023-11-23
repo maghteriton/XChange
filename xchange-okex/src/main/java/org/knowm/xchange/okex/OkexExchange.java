@@ -3,6 +3,7 @@ package org.knowm.xchange.okex;
 import org.knowm.xchange.BaseExchange;
 import org.knowm.xchange.ExchangeSpecification;
 import org.knowm.xchange.client.ResilienceRegistries;
+import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.okex.dto.account.OkexTradeFee;
 import org.knowm.xchange.okex.dto.marketdata.OkexCurrency;
 import org.knowm.xchange.okex.dto.marketdata.OkexInstrument;
@@ -123,6 +124,10 @@ public class OkexExchange extends BaseExchange {
               ((OkexAccountService) accountService).getOkexAccountConfiguration().getData().get(0).getAccountLevel();
       tradeFee = ((OkexAccountService) accountService).getTradeFee(
               SPOT, null, null, accountLevel).getData();
+    }
+
+    if(tradeFee == null) {
+      throw new ExchangeException("Fee cannot be null");
     }
 
     exchangeMetaData = OkexAdapters.adaptToExchangeMetaData(instruments, currencies, tradeFee);

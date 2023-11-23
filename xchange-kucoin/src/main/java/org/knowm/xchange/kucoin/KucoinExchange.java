@@ -5,16 +5,15 @@ import static org.knowm.xchange.kucoin.KucoinExceptionClassifier.classifyingExce
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
+import java.util.*;
+
 import org.knowm.xchange.BaseExchange;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.ExchangeSpecification;
 import org.knowm.xchange.client.ResilienceRegistries;
+import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.exceptions.ExchangeException;
-import org.knowm.xchange.kucoin.dto.response.CurrenciesResponse;
-import org.knowm.xchange.kucoin.dto.response.SymbolResponse;
-import org.knowm.xchange.kucoin.dto.response.TradeFeeResponse;
-import org.knowm.xchange.kucoin.dto.response.WebsocketResponse;
+import org.knowm.xchange.kucoin.dto.response.*;
 
 public class KucoinExchange extends BaseExchange implements Exchange {
 
@@ -65,6 +64,8 @@ public class KucoinExchange extends BaseExchange implements Exchange {
     } catch (MalformedURLException exception) {
       logger.error("Kucoin host exception: {}", exception.getMessage());
     }
+
+    exchangeSpecification.getResilience().setRateLimiterEnabled(true);
     exchangeSpecification.setPort(80);
     exchangeSpecification.setExchangeName("Kucoin");
     exchangeSpecification.setExchangeDescription("Kucoin is a bitcoin and altcoin exchange.");
@@ -91,9 +92,19 @@ public class KucoinExchange extends BaseExchange implements Exchange {
     List<CurrenciesResponse> currenciesResponses = getMarketDataService().getKucoinCurrencies();
     List<SymbolResponse> symbolsResponse = getMarketDataService().getKucoinSymbols();
 
+    Map<String, SymbolTickResponse> kucoin24hrStatsMap = new HashMap<>();
+    for (SymbolResponse symbolResponse : symbolsResponse) {
+      String symbol = symbolResponse.getSymbol();
+      if (symbol.contains(Currency.USDT.getCurrencyCode())) {
+        kucoin24hrStatsMap.put(
+            symbol,
+            getMarketDataService().getKucoin24hrStats(KucoinAdapters.adaptCurrencyPair(symbol)));
+      }
+    }
+
     this.exchangeMetaData =
         KucoinAdapters.adaptMetadata(
-            this.exchangeMetaData, currenciesResponses, symbolsResponse, fee);
+            this.exchangeMetaData, currenciesResponses, symbolsResponse, kucoin24hrStatsMap);
   }
 
   @Override

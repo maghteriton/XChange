@@ -21,8 +21,8 @@ public class KucoinResilience {
         .rateLimiter(
             PUBLIC_REST_ENDPOINT_RATE_LIMITER,
             RateLimiterConfig.from(registries.rateLimiters().getDefaultConfig())
-                .limitRefreshPeriod(Duration.ofSeconds(10))
-                .limitForPeriod(30)
+                .limitRefreshPeriod(Duration.ofSeconds(30))
+                .limitForPeriod(80)
                 .drainPermissionsOnResult(
                     e -> ResilienceUtils.matchesHttpCode(e, TOO_MANY_REQUESTS))
                 .build());

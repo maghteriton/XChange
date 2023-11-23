@@ -38,4 +38,12 @@ public class SymbolTickResponse {
   private BigDecimal sell;
 
   private long time;
+
+  private BigDecimal takerFeeRate;
+
+  private BigDecimal makerFeeRate;
+
+  private BigDecimal takerCoefficient;
+
+  private BigDecimal makerCoefficient;
 }

@@ -101,7 +101,9 @@ public class HuobiTradeService extends HuobiTradeServiceRaw implements TradeServ
   public OpenOrders getOpenOrders(OpenOrdersParams openOrdersParams) throws IOException {
     if (!(openOrdersParams instanceof CurrencyPairParam)) throw new IllegalArgumentException();
 
-    HuobiOrder[] openOrders = getHuobiOpenOrders((CurrencyPairParam) openOrdersParams);
+    CurrencyPair currencyPair = ((CurrencyPairParam) openOrdersParams).getCurrencyPair();
+    HuobiOrder[] openOrders =
+        getHuobiOpenOrders(currencyPair == null ? null : (CurrencyPairParam) openOrdersParams);
     return HuobiAdapters.adaptOpenOrders(openOrders);
   }
 

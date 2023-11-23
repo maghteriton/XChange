@@ -150,6 +150,10 @@ public class GateioTradeService extends GateioTradeServiceRaw implements TradeSe
                 .limitPrice(new BigDecimal(gateioClosedOrder.getInitialRate()))
                 .averagePrice(gateioClosedOrder.getFilledRate())
                 .orderStatus(GateioAdapters.adaptOrderStatus(gateioClosedOrder.getStatus()))
+                .fee(
+                    gateioClosedOrder
+                        .getFilledRate()
+                        .multiply(new BigDecimal(gateioClosedOrder.getFeeValue())))
                 .build();
 
         orders.add(limitOrder);

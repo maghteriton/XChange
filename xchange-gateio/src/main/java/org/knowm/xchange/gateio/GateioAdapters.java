@@ -237,7 +237,7 @@ public final class GateioAdapters {
       currencyPairs.put(
           currencyPair,
           new InstrumentMetaData.Builder()
-              .tradingFee(btermarketInfo.getFee())
+              .tradingFee(btermarketInfo.getFee().multiply(new BigDecimal("0.01")))
               .minimumAmount(btermarketInfo.getMinAmount())
               .priceScale(btermarketInfo.getDecimalPlaces())
               .build());

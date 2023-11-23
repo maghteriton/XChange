@@ -96,55 +96,61 @@ public class KucoinAdapters {
    * @param exchangeMetaData The static exchange metadata.
    * @param currenciesResponse Kucoin currencies
    * @param symbolsResponse Kucoin symbols
-   * @param tradeFee Kucoin trade fee (optional)
+   * @param tradeFeeMap Kucoin trade fee
    * @return Exchange metadata.
    */
   public static ExchangeMetaData adaptMetadata(
-      ExchangeMetaData exchangeMetaData,
-      List<CurrenciesResponse> currenciesResponse,
-      List<SymbolResponse> symbolsResponse,
-      TradeFeeResponse tradeFee) {
+          ExchangeMetaData exchangeMetaData,
+          List<CurrenciesResponse> currenciesResponse,
+          List<SymbolResponse> symbolsResponse,
+          Map<String, SymbolTickResponse> tradeFeeMap) {
 
     Map<Instrument, InstrumentMetaData> currencyPairs = exchangeMetaData.getInstruments();
     Map<Currency, CurrencyMetaData> currencies = exchangeMetaData.getCurrencies();
     Map<String, CurrencyMetaData> stringCurrencyMetaDataMap =
         adaptCurrencyMetaData(currenciesResponse);
 
-    BigDecimal takerTradingFee = tradeFee != null ? tradeFee.getTakerFeeRate() : null;
 
     for (SymbolResponse symbol : symbolsResponse) {
+      SymbolTickResponse symbolTickResponse = tradeFeeMap.get(symbol.getSymbol());
 
-      CurrencyPair pair = adaptCurrencyPair(symbol.getSymbol());
-      InstrumentMetaData staticMetaData = exchangeMetaData.getInstruments().get(pair);
+      if(symbolTickResponse != null && symbolTickResponse.getTakerCoefficient() != null && symbolTickResponse.getTakerFeeRate() != null) {
+        BigDecimal takerCoefficient = symbolTickResponse.getTakerCoefficient();
+        BigDecimal takerFeeRate = symbolTickResponse.getTakerFeeRate();
+        BigDecimal takerTradingFee = takerCoefficient.multiply(takerFeeRate);
 
-      BigDecimal minSize = symbol.getBaseMinSize();
-      BigDecimal maxSize = symbol.getBaseMaxSize();
-      BigDecimal minQuoteSize = symbol.getQuoteMinSize();
-      BigDecimal maxQuoteSize = symbol.getQuoteMaxSize();
-      int baseScale = symbol.getBaseIncrement().stripTrailingZeros().scale();
-      int priceScale = symbol.getQuoteIncrement().stripTrailingZeros().scale();
-      FeeTier[] feeTiers = staticMetaData != null ? staticMetaData.getFeeTiers() : null;
-      Currency feeCurrency = new Currency(symbol.getFeeCurrency());
+        CurrencyPair pair = adaptCurrencyPair(symbol.getSymbol());
+        InstrumentMetaData staticMetaData = exchangeMetaData.getInstruments().get(pair);
 
-      currencyPairs.put(
-          pair,
-          new InstrumentMetaData.Builder()
-              .tradingFee(takerTradingFee)
-              .minimumAmount(minSize)
-              .maximumAmount(maxSize)
-              .counterMinimumAmount(minQuoteSize)
-              .counterMaximumAmount(maxQuoteSize)
-              .volumeScale(baseScale)
-              .priceScale(priceScale)
-              .feeTiers(feeTiers)
-              .tradingFeeCurrency(feeCurrency)
-              .marketOrderEnabled(true)
-              .build());
+        BigDecimal minSize = symbol.getBaseMinSize();
+        BigDecimal maxSize = symbol.getBaseMaxSize();
+        BigDecimal minQuoteSize = symbol.getQuoteMinSize();
+        BigDecimal maxQuoteSize = symbol.getQuoteMaxSize();
+        int baseScale = symbol.getBaseIncrement().stripTrailingZeros().scale();
+        int priceScale = symbol.getQuoteIncrement().stripTrailingZeros().scale();
+        FeeTier[] feeTiers = staticMetaData != null ? staticMetaData.getFeeTiers() : null;
+        Currency feeCurrency = new Currency(symbol.getFeeCurrency());
 
-      if (!currencies.containsKey(pair.base))
-        currencies.put(pair.base, stringCurrencyMetaDataMap.get(pair.base.getCurrencyCode()));
-      if (!currencies.containsKey(pair.counter))
-        currencies.put(pair.counter, stringCurrencyMetaDataMap.get(pair.counter.getCurrencyCode()));
+        currencyPairs.put(
+                pair,
+                new InstrumentMetaData.Builder()
+                        .tradingFee(takerTradingFee)
+                        .minimumAmount(minSize)
+                        .maximumAmount(maxSize)
+                        .counterMinimumAmount(minQuoteSize)
+                        .counterMaximumAmount(maxQuoteSize)
+                        .volumeScale(baseScale)
+                        .priceScale(priceScale)
+                        .feeTiers(feeTiers)
+                        .tradingFeeCurrency(feeCurrency)
+                        .marketOrderEnabled(true)
+                        .build());
+
+        if (!currencies.containsKey(pair.base))
+          currencies.put(pair.base, stringCurrencyMetaDataMap.get(pair.base.getCurrencyCode()));
+        if (!currencies.containsKey(pair.counter))
+          currencies.put(pair.counter, stringCurrencyMetaDataMap.get(pair.counter.getCurrencyCode()));
+      }
     }
 
     return new ExchangeMetaData(
