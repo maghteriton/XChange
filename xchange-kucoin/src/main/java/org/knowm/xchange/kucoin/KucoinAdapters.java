@@ -294,7 +294,7 @@ public class KucoinAdapters {
             .averagePrice(
                 order.getDealSize().compareTo(BigDecimal.ZERO) == 0
                     ? MoreObjects.firstNonNull(order.getPrice(), order.getStopPrice())
-                    : order.getDealFunds().divide(order.getDealSize(), RoundingMode.HALF_UP))
+                    : order.getDealFunds().divide(order.getDealSize(), order.getPrice().scale(), RoundingMode.HALF_EVEN))
             .cumulativeAmount(order.getDealSize())
             .fee(order.getFee())
             .id(order.getId())
