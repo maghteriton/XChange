@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.Currency;
+import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.account.*;
 import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.exceptions.ExchangeException;
@@ -220,5 +221,9 @@ public interface AccountService extends BaseService {
       Wallet.WalletFeature toWallet)
       throws IOException {
     throw new NotYetImplementedForExchangeException("fundsTransfer");
+  }
+
+  default Map<Instrument, Boolean> getSupportedInstruments(Instrument... instruments) throws IOException{
+    throw new NotYetImplementedForExchangeException("getSupportedCurrencies");
   }
 }

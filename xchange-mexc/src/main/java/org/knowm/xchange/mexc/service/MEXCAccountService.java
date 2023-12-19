@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Map;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.Currency;
+import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.AddressWithTag;
 import org.knowm.xchange.dto.account.DepositAddress;
 import org.knowm.xchange.dto.account.FundingRecord;
 import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.exceptions.ExchangeException;
+import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.mexc.MEXCAdapters;
 import org.knowm.xchange.mexc.dto.MEXCResult;
 import org.knowm.xchange.mexc.dto.account.MEXCBalance;
@@ -124,5 +126,10 @@ public class MEXCAccountService extends MEXCAccountServiceRaw implements Account
     }
 
     return null; // returns null if not found
+  }
+
+  @Override
+  public Map<Instrument, Boolean> getSupportedInstruments(Instrument... instruments) throws IOException {
+    return ((MEXCAccountServiceV3) exchangeV3.getAccountService()).getSymbols();
   }
 }

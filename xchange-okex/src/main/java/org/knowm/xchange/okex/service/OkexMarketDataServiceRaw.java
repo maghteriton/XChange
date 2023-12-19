@@ -19,7 +19,7 @@ import static org.knowm.xchange.okex.OkexExchange.PARAM_SIMULATED;
 /** Author: Max Gao (gaamox@tutanota.com) Created: 08-06-2021 */
 public class OkexMarketDataServiceRaw extends OkexBaseService {
   public OkexMarketDataServiceRaw(
-          OkexExchange exchange, ResilienceRegistries resilienceRegistries) {
+      OkexExchange exchange, ResilienceRegistries resilienceRegistries) {
     super(exchange, resilienceRegistries);
   }
 
@@ -45,36 +45,36 @@ public class OkexMarketDataServiceRaw extends OkexBaseService {
   }
 
   public OkexResponse<List<OkexTicker>> getOkexTicker(String instrumentId)
-          throws OkexException, IOException {
+      throws OkexException, IOException {
     try {
       return decorateApiCall(
               () ->
-                      okex.getTicker(
-                              instrumentId,
-                              (String)
-                                      exchange
-                                              .getExchangeSpecification()
-                                              .getExchangeSpecificParametersItem(PARAM_SIMULATED)))
-              .withRateLimiter(rateLimiter(Okex.instrumentsPath))
-              .call();
+                  okex.getTicker(
+                      instrumentId,
+                      (String)
+                          exchange
+                              .getExchangeSpecification()
+                              .getExchangeSpecificParametersItem(PARAM_SIMULATED)))
+          .withRateLimiter(rateLimiter(Okex.instrumentsPath))
+          .call();
     } catch (OkexException e) {
       throw handleError(e);
     }
   }
 
   public OkexResponse<List<OkexFundingRate>> getOkexFundingRate(String instrumentId)
-          throws OkexException, IOException {
+      throws OkexException, IOException {
     try {
       return decorateApiCall(
               () ->
-                      okex.getFundingRate(
-                              instrumentId,
-                              (String)
-                                      exchange
-                                              .getExchangeSpecification()
-                                              .getExchangeSpecificParametersItem(PARAM_SIMULATED)))
-              .withRateLimiter(rateLimiter(Okex.instrumentsPath))
-              .call();
+                  okex.getFundingRate(
+                      instrumentId,
+                      (String)
+                          exchange
+                              .getExchangeSpecification()
+                              .getExchangeSpecificParametersItem(PARAM_SIMULATED)))
+          .withRateLimiter(rateLimiter(Okex.instrumentsPath))
+          .call();
     } catch (OkexException e) {
       throw handleError(e);
     }
@@ -92,11 +92,17 @@ public class OkexMarketDataServiceRaw extends OkexBaseService {
 
   public OkexResponse<List<OkexOrderbook>> getOkexOrderbook(String instrument)
       throws OkexException, IOException {
-    return okex.getOrderbook(
-        instrument,
-        50,
-        (String)
-            exchange.getExchangeSpecification().getExchangeSpecificParametersItem(PARAM_SIMULATED));
+    return decorateApiCall(
+            () ->
+                okex.getOrderbook(
+                    instrument,
+                    50,
+                    (String)
+                        exchange
+                            .getExchangeSpecification()
+                            .getExchangeSpecificParametersItem(PARAM_SIMULATED)))
+        .withRateLimiter(rateLimiter(Okex.orderBookPath))
+        .call();
   }
 
   public OkexResponse<List<OkexCandleStick>> getHistoryCandle(

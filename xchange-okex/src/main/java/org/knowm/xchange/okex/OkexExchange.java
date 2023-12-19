@@ -75,6 +75,7 @@ public class OkexExchange extends BaseExchange {
     exchangeSpecification.setPort(80);
     exchangeSpecification.setExchangeName("Okex");
     exchangeSpecification.setExchangeDescription("Okx Exchange");
+    exchangeSpecification.getResilience().setRateLimiterEnabled(true);
 
     exchangeSpecification.setExchangeSpecificParametersItem(PARAM_USE_AWS, false);
     exchangeSpecification.setExchangeSpecificParametersItem(
