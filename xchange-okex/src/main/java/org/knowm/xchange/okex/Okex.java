@@ -28,7 +28,7 @@ public interface Okex {
       new HashMap<String, List<Integer>>() {
         {
           put(instrumentsPath, Arrays.asList(8, 1));
-          put(orderBookPath, Arrays.asList(30, 2));
+          put(orderBookPath, Arrays.asList(25, 2));
         }
       };
 
