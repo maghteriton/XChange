@@ -10,6 +10,7 @@ import org.knowm.xchange.bingx.dto.BingxOrderDTO;
 import org.knowm.xchange.bingx.dto.TradeCommissionRateDTO;
 import org.knowm.xchange.bingx.dto.wrapper.BingxCancelLimitOrderWrapper;
 import org.knowm.xchange.bingx.dto.wrapper.BingxCreateLimitOrderWrapper;
+import org.knowm.xchange.bingx.model.BingxOrderType;
 import org.knowm.xchange.bingx.service.BingxBaseService;
 import org.knowm.xchange.client.ResilienceRegistries;
 
@@ -55,7 +56,7 @@ public class BingxTradeServiceRaw extends BingxBaseService {
                             signatureCreator,
                             symbol,
                             side,
-                            "LIMIT",
+                            BingxOrderType.LIMIT.value(),
                             quantity,
                             price))
                 .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))

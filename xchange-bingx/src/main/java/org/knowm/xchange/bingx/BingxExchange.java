@@ -1,12 +1,15 @@
 package org.knowm.xchange.bingx;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.knowm.xchange.BaseExchange;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.ExchangeSpecification;
 import org.knowm.xchange.bingx.dto.*;
+import org.knowm.xchange.bingx.dto.wrapper.*;
+import org.knowm.xchange.bingx.model.KLineInterval;
 import org.knowm.xchange.bingx.service.account.BingxAccountService;
 import org.knowm.xchange.bingx.service.market.BingxMarketDataService;
 import org.knowm.xchange.bingx.service.trade.BingxTradeService;
@@ -58,9 +61,9 @@ public class BingxExchange extends BaseExchange implements Exchange {
     this.exchangeMetaData = BingxAdapter.adaptToExchangeMetaData(this.exchangeMetaData, symbols, wallets, commissionRate);
   }
 
-  public void test() {
-/*    TradeCommissionRateDTO btcUsdt = ((BingxTradeService) tradeService).getCommissionRate("BTC-USDT");
-    List<BingxDepositAddressesDTO> usdt = ((BingxAccountService) accountService).getDepositAddresses("USDT");
+  public void test() throws IOException {
+    TradeCommissionRateDTO btcUsdt = ((BingxTradeService) tradeService).getCommissionRate("BTC-USDT");
+    ((BingxAccountService) accountService).getDepositAddresses("USDT");
 
     BingxWithdrawWrapper withdraw = ((BingxAccountService) accountService).withdraw("THA9VH9ebtpWcJykNCEhHqiV8ExcCvgiMN",
             null,
@@ -74,12 +77,12 @@ public class BingxExchange extends BaseExchange implements Exchange {
     BingxOrderDTO bingxOrderDTO = ((BingxTradeService) tradeService).queryOrder("XRP-USDT", String.valueOf(buy.getOrderId()));
     BingxCancelLimitOrderWrapper bingxCancelLimitOrderWrapper = ((BingxTradeService) tradeService).cancelLimitOrder("XRP-USDT", String.valueOf(buy.getOrderId()));
 
-    List<BingxSymbolDTO> symbols = ((BingxMarketDataService) marketDataService).getSymbols();
+    BingxSymbolWrapper symbols = ((BingxMarketDataService) marketDataService).getSymbols();
     BingxMarketDepthDTO marketDepth = ((BingxMarketDataService) marketDataService).getMarketDepth("BTC-USDT");
     List<List<String>> kLineData = ((BingxMarketDataService) marketDataService).getKLineData("BTC-USDT", KLineInterval.min30, 5, null, null);
-    List<BingxBalanceDTO> balances = ((BingxAccountService) accountService).getBalances();
+    BingxBalancesWrapper balances = ((BingxAccountService) accountService).getBalances();
     List<BingxDepositDTO> depositHistory = ((BingxAccountService) accountService).getDepositHistory(null);
-    List<BingxWalletDTO> wallets = ((BingxAccountService) accountService).getWallets(null);*/
+    List<BingxWalletDTO> wallets = ((BingxAccountService) accountService).getWallets(null);
   }
 
 }
