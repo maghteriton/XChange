@@ -21,7 +21,7 @@ public class BingxMarketDataService extends BingxMarketDataServiceRaw implements
   @Override
   public OrderBook getOrderBook(CurrencyPair currencyPair, Object... args) throws IOException {
     return BingxAdapter.adaptOrderBook(
-        currencyPair, getMarketDepth(currencyPair.getBase().getCurrencyCode()));
+        currencyPair, getMarketDepth(BingxAdapter.adaptToBingxSymbol(currencyPair)));
   }
 
   @Override

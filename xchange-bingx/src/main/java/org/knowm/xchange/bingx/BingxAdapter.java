@@ -107,13 +107,13 @@ public class BingxAdapter {
     List<LimitOrder> asks =
         marketDepth.getAsks().stream()
             .map(PriceAndSize::new)
-            .sorted(Ordering.natural().onResultOf((PriceAndSize s) -> s.price).reversed())
+            .sorted(Ordering.natural().onResultOf((PriceAndSize s) -> s.price))
             .map(s -> adaptLimitOrder(currencyPair, ASK, s, marketDepth.getTs()))
             .collect(toCollection(LinkedList::new));
     List<LimitOrder> bids =
         marketDepth.getBids().stream()
             .map(PriceAndSize::new)
-            .sorted(Ordering.natural().onResultOf((PriceAndSize s) -> s.price))
+            .sorted(Ordering.natural().onResultOf((PriceAndSize s) -> s.price).reversed())
             .map(s -> adaptLimitOrder(currencyPair, BID, s, marketDepth.getTs()))
             .collect(toCollection(LinkedList::new));
 

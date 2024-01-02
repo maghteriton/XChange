@@ -7,7 +7,8 @@ import java.util.Date;
 
 public class BingxResultDTO<T> {
 
-  private static final int SUCCESS_CODE = 200;
+  private static final int SUCCESS_CODE_200 = 200;
+  private static final int SUCCESS_CODE_0 = 0;
   private final Integer code;
   private final Date timestamp;
   private final String msg;
@@ -29,7 +30,7 @@ public class BingxResultDTO<T> {
   }
 
   public boolean isSuccessful() {
-    return SUCCESS_CODE == this.code;
+    return SUCCESS_CODE_200 == this.code || SUCCESS_CODE_0 == this.code;
   }
 
   public Integer getCode() {

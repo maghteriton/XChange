@@ -59,18 +59,20 @@ public class BingxExchange extends BaseExchange implements Exchange {
     List<BingxWalletDTO> wallets = ((BingxAccountService) accountService).getWallets(null);
 
     this.exchangeMetaData = BingxAdapter.adaptToExchangeMetaData(this.exchangeMetaData, symbols, wallets, commissionRate);
+
+    test();
   }
 
   public void test() throws IOException {
     TradeCommissionRateDTO btcUsdt = ((BingxTradeService) tradeService).getCommissionRate("BTC-USDT");
     ((BingxAccountService) accountService).getDepositAddresses("USDT");
 
-    BingxWithdrawWrapper withdraw = ((BingxAccountService) accountService).withdraw("THA9VH9ebtpWcJykNCEhHqiV8ExcCvgiMN",
+/*    BingxWithdrawWrapper withdraw = ((BingxAccountService) accountService).withdraw("THA9VH9ebtpWcJykNCEhHqiV8ExcCvgiMN",
             null,
             new BigDecimal(8),
             "USDT",
             "TRC20",
-            "1");
+            "1");*/
 
 
     BingxCreateLimitOrderWrapper buy = ((BingxTradeService) tradeService).createLimitOrder("XRP-USDT", "BUY", new BigDecimal("10"), new BigDecimal("0.59"));
