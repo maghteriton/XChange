@@ -10,6 +10,7 @@ import org.knowm.xchange.ExchangeSpecification;
 import org.knowm.xchange.bingx.dto.*;
 import org.knowm.xchange.bingx.dto.wrapper.BingxCancelLimitOrderWrapper;
 import org.knowm.xchange.bingx.dto.wrapper.BingxCreateLimitOrderWrapper;
+import org.knowm.xchange.bingx.model.KLineInterval;
 import org.knowm.xchange.bingx.service.account.BingxAccountService;
 import org.knowm.xchange.bingx.service.market.BingxMarketDataService;
 import org.knowm.xchange.bingx.service.trade.BingxTradeService;

@@ -4,44 +4,40 @@ import java.io.IOException;
 import java.util.List;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.bingx.BingxAdapter;
-import org.knowm.xchange.bingx.BingxException;
 import org.knowm.xchange.bingx.dto.*;
-import org.knowm.xchange.bingx.dto.wrapper.BingxBalancesWrapper;
 import org.knowm.xchange.currency.Currency;
+import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.DepositAddress;
+import org.knowm.xchange.dto.account.FundingRecord;
 import org.knowm.xchange.dto.meta.CurrencyChainStatus;
-import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.service.account.AccountService;
-import org.knowm.xchange.service.trade.params.DefaultWithdrawFundsParams;
-import org.knowm.xchange.service.trade.params.WithdrawFundsParams;
+import org.knowm.xchange.service.trade.params.*;
 
 public class BingxAccountService extends BingxAccountServiceRaw implements AccountService {
 
   public static final String CONTRACT_ADDRESS_NOT_SUPPORTED = "notSupportedByAPI";
+  public static final String FUNDING_WALLET = "1";
 
   public BingxAccountService(Exchange exchange) {
     super(exchange);
   }
 
-  public List<BingxBalanceDTO> getBalances() throws IOException {
-    BingxResultDTO<BingxBalancesWrapper> symbols;
-    try {
-      symbols = accountAPI.getBalances(apiKey, nonceFactory, 5000, signatureCreator);
-    } catch (BingxException e) {
-      throw new ExchangeException(e);
-    }
-    return symbols.getData().getBalances();
+  @Override
+  public AccountInfo getAccountInfo() throws IOException {
+    return new AccountInfo(BingxAdapter.adaptWallet(getBalances()));
   }
 
-  public List<BingxDepositDTO> getDepositHistory(String coin) throws IOException {
-    List<BingxDepositDTO> depositHistory;
-    try {
-      depositHistory =
-          accountAPI.getDepositHistory(apiKey, nonceFactory, 5000, signatureCreator, coin);
-    } catch (BingxException e) {
-      throw new ExchangeException(e);
+  @Override
+  public List<FundingRecord> getFundingHistory(TradeHistoryParams params) throws IOException {
+    Currency currency = new Currency("");
+
+    if (params instanceof TradeHistoryParamCurrencyPair) {
+      TradeHistoryParamCurrencyPair tradeHistoryParamCurrencyPair =
+          (TradeHistoryParamCurrencyPair) params;
+      currency = tradeHistoryParamCurrencyPair.getCurrencyPair().getBase();
     }
-    return depositHistory;
+
+    return BingxAdapter.adaptFundingHistory(getDepositHistory(currency.getCurrencyCode()));
   }
 
   @Override
@@ -63,7 +59,7 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
             defaultParams.getAmount(),
             defaultParams.getCurrency().getCurrencyCode(),
             defaultParams.getChain(),
-            "1")
+            FUNDING_WALLET)
         .getData()
         .getId();
   }

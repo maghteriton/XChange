@@ -1,56 +1,55 @@
 package org.knowm.xchange.bingx.service.market;
 
-import org.knowm.xchange.Exchange;
-import org.knowm.xchange.bingx.BingxException;
-import org.knowm.xchange.bingx.KLineInterval;
-import org.knowm.xchange.bingx.dto.BingxMarketDepthDTO;
-import org.knowm.xchange.bingx.dto.BingxResultDTO;
-import org.knowm.xchange.bingx.dto.wrapper.BingxSymbolWrapper;
-import org.knowm.xchange.bingx.dto.BingxSymbolDTO;
-import org.knowm.xchange.exceptions.ExchangeException;
-import org.knowm.xchange.service.marketdata.MarketDataService;
-
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
+import org.knowm.xchange.Exchange;
+import org.knowm.xchange.bingx.BingxAdapter;
+import org.knowm.xchange.bingx.model.KLineInterval;
+import org.knowm.xchange.currency.CurrencyPair;
+import org.knowm.xchange.dto.marketdata.CandleStickData;
+import org.knowm.xchange.dto.marketdata.OrderBook;
+import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
+import org.knowm.xchange.service.marketdata.MarketDataService;
+import org.knowm.xchange.service.trade.params.CandleStickDataParams;
+import org.knowm.xchange.service.trade.params.DefaultCandleStickParamWithLimit;
 
 public class BingxMarketDataService extends BingxMarketDataServiceRaw implements MarketDataService {
   public BingxMarketDataService(Exchange exchange) {
     super(exchange);
   }
 
-  public List<BingxSymbolDTO> getSymbols() throws IOException {
-    BingxResultDTO<BingxSymbolWrapper> symbols;
-    try {
-      symbols = marketAPI.getSymbols();
-    } catch (BingxException e) {
-      throw new ExchangeException(e);
-    }
-    return symbols.getData().getSymbols();
+  @Override
+  public OrderBook getOrderBook(CurrencyPair currencyPair, Object... args) throws IOException {
+    return BingxAdapter.adaptOrderBook(
+        currencyPair, getMarketDepth(currencyPair.getBase().getCurrencyCode()));
   }
 
-  public BingxMarketDepthDTO getMarketDepth(String symbol) throws IOException {
-    BingxResultDTO<BingxMarketDepthDTO> marketDepths;
-    try {
-      marketDepths = marketAPI.getMarketDepth(symbol, nonceFactory);
-    } catch (BingxException e) {
-      throw new ExchangeException(e);
-    }
-    return marketDepths.getData();
-  }
-
-  public List<List<String>> getKLineData(
-      String symbol, KLineInterval interval, Integer limit, Date startTime, Date endTime)
+  @Override
+  public CandleStickData getCandleStickData(CurrencyPair currencyPair, CandleStickDataParams params)
       throws IOException {
-    BingxResultDTO<List<List<String>>> kLineData;
-    try {
-      Long startTimeAsMs = startTime != null ? startTime.getTime() : null;
-      Long endTimeAsMs = endTime != null ? endTime.getTime() : null;
 
-      kLineData = marketAPI.getKLineData(symbol, interval.code(), limit, startTimeAsMs, endTimeAsMs, nonceFactory);
-    } catch (BingxException e) {
-      throw new ExchangeException(e);
+    if (!(params instanceof DefaultCandleStickParamWithLimit)) {
+      throw new NotYetImplementedForExchangeException(
+          "Only DefaultCandleStickParamWithLimit is supported");
     }
-    return kLineData.getData();
+
+    DefaultCandleStickParamWithLimit defaultCandleStickParam =
+        (DefaultCandleStickParamWithLimit) params;
+    long periodInSecs = defaultCandleStickParam.getPeriodInSecs();
+    KLineInterval interval = KLineInterval.min30;
+    for (KLineInterval bingxInterval : KLineInterval.values()) {
+      if (bingxInterval.getSeconds() == periodInSecs) {
+        interval = bingxInterval;
+        break;
+      }
+    }
+
+    return BingxAdapter.adaptCandleStickData(
+        currencyPair,
+        getKLineData(
+            currencyPair.getBase().getCurrencyCode(),
+            interval,
+            defaultCandleStickParam.getLimit(),
+            defaultCandleStickParam.getStartDate(),
+            defaultCandleStickParam.getEndDate()));
   }
 }

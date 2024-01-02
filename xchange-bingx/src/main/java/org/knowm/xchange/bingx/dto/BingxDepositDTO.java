@@ -3,11 +3,12 @@ package org.knowm.xchange.bingx.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class BingxDepositDTO {
 
-  private final String amount;
+  private final BigDecimal amount;
 
   private final String coin;
 
@@ -29,7 +30,7 @@ public class BingxDepositDTO {
 
   @JsonCreator
   public BingxDepositDTO(
-      @JsonProperty("amount") String amount,
+      @JsonProperty("amount") BigDecimal amount,
       @JsonProperty("coin") String coin,
       @JsonProperty("network") String network,
       @JsonProperty("status") Integer status,
@@ -51,7 +52,7 @@ public class BingxDepositDTO {
     this.confirmTimes = confirmTimes;
   }
 
-  public String getAmount() {
+  public BigDecimal getAmount() {
     return amount;
   }
 

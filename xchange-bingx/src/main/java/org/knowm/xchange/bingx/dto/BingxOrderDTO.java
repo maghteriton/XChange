@@ -3,42 +3,43 @@ package org.knowm.xchange.bingx.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class BingxOrderDTO {
 
   private final String symbol;
   private final Long orderId;
-  private final String price;
-  private final String stopPrice;
-  private final String origQty;
-  private final String executedQty;
-  private final String cummulativeQuoteQty;
+  private final BigDecimal price;
+  private final BigDecimal stopPrice;
+  private final BigDecimal origQty;
+  private final BigDecimal executedQty;
+  private final BigDecimal cummulativeQuoteQty;
   private final String status;
   private final String type;
   private final String side;
   private final Date time;
   private final Date updateTime;
-  private final String origQuoteOrderQty;
-  private final String fee;
+  private final BigDecimal origQuoteOrderQty;
+  private final BigDecimal fee;
   private final String feeAsset;
 
   @JsonCreator
   public BingxOrderDTO(
       @JsonProperty("symbol") String symbol,
       @JsonProperty("orderId") Long orderId,
-      @JsonProperty("price") String price,
-      @JsonProperty("StopPrice") String stopPrice,
-      @JsonProperty("origQty") String origQty,
-      @JsonProperty("executedQty") String executedQty,
-      @JsonProperty("cummulativeQuoteQty") String cummulativeQuoteQty,
+      @JsonProperty("price") BigDecimal price,
+      @JsonProperty("StopPrice") BigDecimal stopPrice,
+      @JsonProperty("origQty") BigDecimal origQty,
+      @JsonProperty("executedQty") BigDecimal executedQty,
+      @JsonProperty("cummulativeQuoteQty") BigDecimal cummulativeQuoteQty,
       @JsonProperty("status") String status,
       @JsonProperty("type") String type,
       @JsonProperty("side") String side,
       @JsonProperty("time") Date time,
       @JsonProperty("updateTime") Date updateTime,
-      @JsonProperty("origQuoteOrderQty") String origQuoteOrderQty,
-      @JsonProperty("fee") String fee,
+      @JsonProperty("origQuoteOrderQty") BigDecimal origQuoteOrderQty,
+      @JsonProperty("fee") BigDecimal fee,
       @JsonProperty("feeAsset") String feeAsset) {
     this.symbol = symbol;
     this.orderId = orderId;
@@ -65,23 +66,23 @@ public class BingxOrderDTO {
     return orderId;
   }
 
-  public String getPrice() {
+  public BigDecimal getPrice() {
     return price;
   }
 
-  public String getStopPrice() {
+  public BigDecimal getStopPrice() {
     return stopPrice;
   }
 
-  public String getOrigQty() {
+  public BigDecimal getOrigQty() {
     return origQty;
   }
 
-  public String getExecutedQty() {
+  public BigDecimal getExecutedQty() {
     return executedQty;
   }
 
-  public String getCummulativeQuoteQty() {
+  public BigDecimal getCummulativeQuoteQty() {
     return cummulativeQuoteQty;
   }
 
@@ -105,11 +106,11 @@ public class BingxOrderDTO {
     return updateTime;
   }
 
-  public String getOrigQuoteOrderQty() {
+  public BigDecimal getOrigQuoteOrderQty() {
     return origQuoteOrderQty;
   }
 
-  public String getFee() {
+  public BigDecimal getFee() {
     return fee;
   }
 
