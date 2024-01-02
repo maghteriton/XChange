@@ -50,6 +50,7 @@ public class BingxExchange extends BaseExchange implements Exchange {
 
   @Override
   public void remoteInit() throws IOException, ExchangeException {
+    //single commission rate for all currencies
     TradeCommissionRateDTO commissionRate = ((BingxTradeService) tradeService).getCommissionRate("BTC-USDT");
     List<BingxSymbolDTO> symbols = ((BingxMarketDataService) marketDataService).getSymbols().getSymbols();
     List<BingxWalletDTO> wallets = ((BingxAccountService) accountService).getWallets(null);
