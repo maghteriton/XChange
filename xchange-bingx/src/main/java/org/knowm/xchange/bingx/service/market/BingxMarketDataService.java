@@ -1,9 +1,10 @@
 package org.knowm.xchange.bingx.service.market;
 
 import java.io.IOException;
-import org.knowm.xchange.Exchange;
 import org.knowm.xchange.bingx.BingxAdapter;
+import org.knowm.xchange.bingx.BingxExchange;
 import org.knowm.xchange.bingx.model.KLineInterval;
+import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.marketdata.CandleStickData;
 import org.knowm.xchange.dto.marketdata.OrderBook;
@@ -13,8 +14,8 @@ import org.knowm.xchange.service.trade.params.CandleStickDataParams;
 import org.knowm.xchange.service.trade.params.DefaultCandleStickParamWithLimit;
 
 public class BingxMarketDataService extends BingxMarketDataServiceRaw implements MarketDataService {
-  public BingxMarketDataService(Exchange exchange) {
-    super(exchange);
+  public BingxMarketDataService(BingxExchange exchange, ResilienceRegistries resilienceRegistries) {
+    super(exchange, resilienceRegistries);
   }
 
   @Override

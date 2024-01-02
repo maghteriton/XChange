@@ -7,7 +7,8 @@ import java.util.Date;
 
 public class BingxResultDTO<T> {
 
-  private final int code;
+  private static final int SUCCESS_CODE = 200;
+  private final Integer code;
   private final Date timestamp;
   private final String msg;
   private final String debugMsg;
@@ -15,7 +16,7 @@ public class BingxResultDTO<T> {
 
   @JsonCreator
   public BingxResultDTO(
-      @JsonProperty("code") int code,
+      @JsonProperty("code") Integer code,
       @JsonProperty("timestamp") Date timestamp,
       @JsonProperty("msg") String msg,
       @JsonProperty("debugMsg") String debugMsg,
@@ -27,7 +28,11 @@ public class BingxResultDTO<T> {
     this.data = data;
   }
 
-  public int getCode() {
+  public boolean isSuccessful() {
+    return SUCCESS_CODE == this.code;
+  }
+
+  public Integer getCode() {
     return code;
   }
 

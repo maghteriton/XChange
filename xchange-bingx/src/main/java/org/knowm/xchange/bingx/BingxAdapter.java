@@ -15,15 +15,17 @@ import org.knowm.xchange.dto.account.Wallet;
 import org.knowm.xchange.dto.marketdata.CandleStick;
 import org.knowm.xchange.dto.marketdata.CandleStickData;
 import org.knowm.xchange.dto.marketdata.OrderBook;
+import org.knowm.xchange.dto.meta.CurrencyMetaData;
+import org.knowm.xchange.dto.meta.ExchangeMetaData;
+import org.knowm.xchange.dto.meta.InstrumentMetaData;
+import org.knowm.xchange.dto.meta.WalletHealth;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.exceptions.ExchangeException;
+import org.knowm.xchange.instrument.Instrument;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
@@ -32,6 +34,8 @@ import static org.knowm.xchange.dto.Order.OrderType.ASK;
 import static org.knowm.xchange.dto.Order.OrderType.BID;
 
 public class BingxAdapter {
+
+  public static final int ONLINE = 1;
 
   public static List<DepositAddress> adaptDepositAddresses(
       List<BingxDepositAddressesDTO> depositAddresses) {
@@ -158,6 +162,53 @@ public class BingxAdapter {
         .build();
   }
 
+  public static ExchangeMetaData adaptToExchangeMetaData(
+      ExchangeMetaData exchangeMetaData,
+      List<BingxSymbolDTO> symbols,
+      List<BingxWalletDTO> wallets,
+      TradeCommissionRateDTO commissionRate) {
+    Map<Instrument, InstrumentMetaData> pairs = new HashMap<>();
+    for (BingxSymbolDTO bingxSymbol : symbols) {
+      if (bingxSymbol.getStatus() == ONLINE
+          && bingxSymbol.isApiStateBuy()
+          && bingxSymbol.isApiStateSell()) {
+        CurrencyPair currencyPair = BingxAdapter.adaptFromBingxSymbol(bingxSymbol.getSymbol());
+        pairs.put(currencyPair, BingxAdapter.adaptCurrencyMetaData(bingxSymbol, commissionRate));
+      }
+    }
+
+    Map<Currency, CurrencyMetaData> currencies = new HashMap<>();
+    for (BingxWalletDTO wallet : wallets) {
+
+      BingxNetworkDTO bingxNetwork = wallet.getNetworkList().get(0);
+      CurrencyMetaData currencyMetaData =
+          new CurrencyMetaData(
+              bingxNetwork.getDepositMin().scale(),
+              bingxNetwork.getWithdrawFee(),
+              bingxNetwork.getWithdrawMin(),
+              BingxAdapter.getWalletHealthStatus(bingxNetwork));
+      currencies.put(new Currency(wallet.getCoin()), currencyMetaData);
+    }
+
+    return new ExchangeMetaData(
+        pairs,
+        currencies,
+        exchangeMetaData.getPublicRateLimits(),
+        exchangeMetaData.getPrivateRateLimits(),
+        true);
+  }
+
+  private static InstrumentMetaData adaptCurrencyMetaData(
+      BingxSymbolDTO bingxSymbol, TradeCommissionRateDTO commissionRate) {
+    return new InstrumentMetaData.Builder()
+        .tradingFee(commissionRate.getTakerCommissionRate())
+        .minimumAmount(bingxSymbol.getMinimumQuantity())
+        .maximumAmount(bingxSymbol.getMaximumQuantity())
+        .amountStepSize(bingxSymbol.getStepSize())
+        .volumeScale(bingxSymbol.getMinimumQuantity().scale())
+        .build();
+  }
+
   public static String adaptToBingxSide(OrderType type) {
     return type == ASK ? "SELL" : "BUY";
   }
@@ -201,6 +252,18 @@ public class BingxAdapter {
       default:
         throw new ExchangeException("Not supported status: " + depHis);
     }
+  }
+
+  private static WalletHealth getWalletHealthStatus(BingxNetworkDTO bingxNetwork) {
+    WalletHealth walletHealth = WalletHealth.ONLINE;
+    if (!bingxNetwork.isDepositEnable() && !bingxNetwork.isWithdrawEnable()) {
+      walletHealth = WalletHealth.OFFLINE;
+    } else if (!bingxNetwork.isDepositEnable()) {
+      walletHealth = WalletHealth.DEPOSITS_DISABLED;
+    } else if (!bingxNetwork.isWithdrawEnable()) {
+      walletHealth = WalletHealth.WITHDRAWALS_DISABLED;
+    }
+    return walletHealth;
   }
 
   private static final class PriceAndSize {

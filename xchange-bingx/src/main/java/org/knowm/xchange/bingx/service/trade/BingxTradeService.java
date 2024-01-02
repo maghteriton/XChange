@@ -6,10 +6,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.knowm.xchange.Exchange;
 import org.knowm.xchange.bingx.BingxAdapter;
+import org.knowm.xchange.bingx.BingxExchange;
 import org.knowm.xchange.bingx.dto.BingxOrderDTO;
 import org.knowm.xchange.bingx.dto.wrapper.BingxCreateLimitOrderWrapper;
+import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
 import org.knowm.xchange.dto.trade.LimitOrder;
@@ -22,8 +23,8 @@ import org.knowm.xchange.service.trade.params.orders.DefaultQueryOrderParamCurre
 import org.knowm.xchange.service.trade.params.orders.OrderQueryParams;
 
 public class BingxTradeService extends BingxTradeServiceRaw implements TradeService {
-  public BingxTradeService(Exchange exchange) {
-    super(exchange);
+  public BingxTradeService(BingxExchange exchange, ResilienceRegistries resilienceRegistries) {
+    super(exchange, resilienceRegistries);
   }
 
   @Override

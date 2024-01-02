@@ -2,9 +2,11 @@ package org.knowm.xchange.bingx.service.account;
 
 import java.io.IOException;
 import java.util.List;
-import org.knowm.xchange.Exchange;
 import org.knowm.xchange.bingx.BingxAdapter;
+import org.knowm.xchange.bingx.BingxExchange;
 import org.knowm.xchange.bingx.dto.*;
+import org.knowm.xchange.bingx.dto.wrapper.BingxBalancesWrapper;
+import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.DepositAddress;
@@ -18,13 +20,14 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
   public static final String CONTRACT_ADDRESS_NOT_SUPPORTED = "notSupportedByAPI";
   public static final String FUNDING_WALLET = "1";
 
-  public BingxAccountService(Exchange exchange) {
-    super(exchange);
+  public BingxAccountService(BingxExchange exchange, ResilienceRegistries resilienceRegistries) {
+    super(exchange, resilienceRegistries);
   }
 
   @Override
   public AccountInfo getAccountInfo() throws IOException {
-    return new AccountInfo(BingxAdapter.adaptWallet(getBalances()));
+    BingxBalancesWrapper balances = getBalances();
+    return new AccountInfo(BingxAdapter.adaptWallet(balances.getBalances()));
   }
 
   @Override
@@ -66,7 +69,8 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
 
   @Override
   public List<DepositAddress> getDepositAddresses(Currency currency) throws IOException {
-    return BingxAdapter.adaptDepositAddresses(getDepositAddresses(currency.getCurrencyCode()));
+    return BingxAdapter.adaptDepositAddresses(
+        getDepositAddresses(currency.getCurrencyCode()).getData());
   }
 
   @Override
