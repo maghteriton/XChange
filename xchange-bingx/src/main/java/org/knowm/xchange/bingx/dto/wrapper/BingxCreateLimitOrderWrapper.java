@@ -3,13 +3,15 @@ package org.knowm.xchange.bingx.dto.wrapper;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Date;
+
 public class BingxCreateLimitOrderWrapper {
 
   private final String symbol;
 
-  private final Long orderId;
+  private final String orderId;
 
-  private final Long transactTime;
+  private final Date transactTime;
 
   private final String price;
 
@@ -28,8 +30,8 @@ public class BingxCreateLimitOrderWrapper {
   @JsonCreator
   public BingxCreateLimitOrderWrapper(
       @JsonProperty("symbol") String symbol,
-      @JsonProperty("orderId") long orderId,
-      @JsonProperty("transactTime") long transactTime,
+      @JsonProperty("orderId") String orderId,
+      @JsonProperty("transactTime") Date transactTime,
       @JsonProperty("price") String price,
       @JsonProperty("origQty") String origQty,
       @JsonProperty("executedQty") String executedQty,
@@ -53,11 +55,11 @@ public class BingxCreateLimitOrderWrapper {
     return symbol;
   }
 
-  public Long getOrderId() {
+  public String getOrderId() {
     return orderId;
   }
 
-  public Long getTransactTime() {
+  public Date getTransactTime() {
     return transactTime;
   }
 

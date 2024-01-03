@@ -10,6 +10,7 @@ import org.knowm.xchange.bingx.BingxAdapter;
 import org.knowm.xchange.bingx.BingxExchange;
 import org.knowm.xchange.bingx.dto.BingxOrderDTO;
 import org.knowm.xchange.bingx.dto.wrapper.BingxCreateLimitOrderWrapper;
+import org.knowm.xchange.bingx.dto.wrapper.BingxOrderHistoryWrapper;
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
@@ -44,14 +45,22 @@ public class BingxTradeService extends BingxTradeServiceRaw implements TradeServ
         throw new NotAvailableFromExchangeException(
             "getOrder in bingx needs orderId and currency pair");
       }
-
       DefaultQueryOrderParamCurrencyPair queryOrderParamCurrencyPair =
           (DefaultQueryOrderParamCurrencyPair) param;
       String orderId = queryOrderParamCurrencyPair.getOrderId();
-      String symbol = BingxAdapter.adaptToBingxSymbol(queryOrderParamCurrencyPair.getCurrencyPair());
+      String symbol =
+          BingxAdapter.adaptToBingxSymbol(queryOrderParamCurrencyPair.getCurrencyPair());
 
-      BingxOrderDTO bingxOrderDTO = queryOrder(symbol, orderId);
-      Order order = BingxAdapter.adaptOrder(bingxOrderDTO);
+      // check order history first
+      BingxOrderHistoryWrapper bingxOrderHistoryWrapper = queryOrderHistory(symbol, orderId);
+      List<BingxOrderDTO> orderHistory = bingxOrderHistoryWrapper.getOrders();
+      if (!orderHistory.isEmpty()) {
+        orders.add(BingxAdapter.adaptOrder(orderHistory.get(0)));
+      } else {
+        // check order history for given orderId is empty, so it must be still open
+        BingxOrderDTO bingxOrderDTO = queryOrder(symbol, orderId);
+        orders.add(BingxAdapter.adaptOrder(bingxOrderDTO));
+      }
     }
 
     return orders;

@@ -50,8 +50,8 @@ public class BingxMarketDataServiceRaw extends BingxBaseService {
                             symbol,
                             interval.code(),
                             limit,
-                            startTimeAsMs,
                             endTimeAsMs,
+                            startTimeAsMs,
                             nonceFactory))
                 .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
                 .call());

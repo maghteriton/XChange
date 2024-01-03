@@ -11,7 +11,7 @@ import org.knowm.xchange.dto.marketdata.OrderBook;
 import org.knowm.xchange.exceptions.NotYetImplementedForExchangeException;
 import org.knowm.xchange.service.marketdata.MarketDataService;
 import org.knowm.xchange.service.trade.params.CandleStickDataParams;
-import org.knowm.xchange.service.trade.params.DefaultCandleStickParamWithLimit;
+import org.knowm.xchange.service.trade.params.DefaultCandleStickParam;
 
 public class BingxMarketDataService extends BingxMarketDataServiceRaw implements MarketDataService {
   public BingxMarketDataService(BingxExchange exchange, ResilienceRegistries resilienceRegistries) {
@@ -28,13 +28,12 @@ public class BingxMarketDataService extends BingxMarketDataServiceRaw implements
   public CandleStickData getCandleStickData(CurrencyPair currencyPair, CandleStickDataParams params)
       throws IOException {
 
-    if (!(params instanceof DefaultCandleStickParamWithLimit)) {
+    if (!(params instanceof DefaultCandleStickParam)) {
       throw new NotYetImplementedForExchangeException(
           "Only DefaultCandleStickParamWithLimit is supported");
     }
 
-    DefaultCandleStickParamWithLimit defaultCandleStickParam =
-        (DefaultCandleStickParamWithLimit) params;
+    DefaultCandleStickParam defaultCandleStickParam = (DefaultCandleStickParam) params;
     long periodInSecs = defaultCandleStickParam.getPeriodInSecs();
     KLineInterval interval = KLineInterval.min30;
     for (KLineInterval bingxInterval : KLineInterval.values()) {
@@ -47,9 +46,9 @@ public class BingxMarketDataService extends BingxMarketDataServiceRaw implements
     return BingxAdapter.adaptCandleStickData(
         currencyPair,
         getKLineData(
-            currencyPair.getBase().getCurrencyCode(),
+            BingxAdapter.adaptToBingxSymbol(currencyPair),
             interval,
-            defaultCandleStickParam.getLimit(),
+            null,
             defaultCandleStickParam.getStartDate(),
             defaultCandleStickParam.getEndDate()));
   }

@@ -7,6 +7,7 @@ import org.knowm.xchange.bingx.dto.BingxResultDTO;
 import org.knowm.xchange.bingx.dto.TradeCommissionRateDTO;
 import org.knowm.xchange.bingx.dto.wrapper.BingxCancelLimitOrderWrapper;
 import org.knowm.xchange.bingx.dto.wrapper.BingxCreateLimitOrderWrapper;
+import org.knowm.xchange.bingx.dto.wrapper.BingxOrderHistoryWrapper;
 import si.mazi.rescu.ParamsDigest;
 import si.mazi.rescu.SynchronizedValueFactory;
 
@@ -32,6 +33,17 @@ public interface TradeAPI {
   @GET
   @Path("/v1/trade/query")
   BingxResultDTO<BingxOrderDTO> queryOrder(
+      @HeaderParam(APIConstants.API_HEADER_KEY) String apiKey,
+      @QueryParam("timestamp") SynchronizedValueFactory<Long> timestamp,
+      @QueryParam("recvWindow") Integer recvWindow,
+      @QueryParam("signature") ParamsDigest signature,
+      @QueryParam("symbol") String symbol,
+      @QueryParam("orderId") String orderId)
+      throws IOException, BingxException;
+
+  @GET
+  @Path("/v1/trade/historyOrders")
+  BingxResultDTO<BingxOrderHistoryWrapper> queryOrderHistory(
       @HeaderParam(APIConstants.API_HEADER_KEY) String apiKey,
       @QueryParam("timestamp") SynchronizedValueFactory<Long> timestamp,
       @QueryParam("recvWindow") Integer recvWindow,

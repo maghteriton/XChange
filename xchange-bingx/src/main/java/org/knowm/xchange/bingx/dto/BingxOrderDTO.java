@@ -1,6 +1,7 @@
 package org.knowm.xchange.bingx.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
@@ -9,7 +10,7 @@ import java.util.Date;
 public class BingxOrderDTO {
 
   private final String symbol;
-  private final Long orderId;
+  private final String orderId;
   private final BigDecimal price;
   private final BigDecimal stopPrice;
   private final BigDecimal origQty;
@@ -22,12 +23,13 @@ public class BingxOrderDTO {
   private final Date updateTime;
   private final BigDecimal origQuoteOrderQty;
   private final BigDecimal fee;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private final String feeAsset;
 
   @JsonCreator
   public BingxOrderDTO(
       @JsonProperty("symbol") String symbol,
-      @JsonProperty("orderId") Long orderId,
+      @JsonProperty("orderId") String orderId,
       @JsonProperty("price") BigDecimal price,
       @JsonProperty("StopPrice") BigDecimal stopPrice,
       @JsonProperty("origQty") BigDecimal origQty,
@@ -62,7 +64,7 @@ public class BingxOrderDTO {
     return symbol;
   }
 
-  public Long getOrderId() {
+  public String getOrderId() {
     return orderId;
   }
 

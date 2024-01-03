@@ -10,6 +10,7 @@ import org.knowm.xchange.bingx.dto.BingxOrderDTO;
 import org.knowm.xchange.bingx.dto.TradeCommissionRateDTO;
 import org.knowm.xchange.bingx.dto.wrapper.BingxCancelLimitOrderWrapper;
 import org.knowm.xchange.bingx.dto.wrapper.BingxCreateLimitOrderWrapper;
+import org.knowm.xchange.bingx.dto.wrapper.BingxOrderHistoryWrapper;
 import org.knowm.xchange.bingx.model.BingxOrderType;
 import org.knowm.xchange.bingx.service.BingxBaseService;
 import org.knowm.xchange.client.ResilienceRegistries;
@@ -37,6 +38,19 @@ public class BingxTradeServiceRaw extends BingxBaseService {
             decorateApiCall(
                     () ->
                         tradeAPI.queryOrder(
+                            apiKey, nonceFactory, 5000, signatureCreator, symbol, orderId))
+                .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
+                .call());
+  }
+
+  public BingxOrderHistoryWrapper queryOrderHistory(String symbol, String orderId)
+      throws IOException {
+
+    return classifyingExceptions(
+        () ->
+            decorateApiCall(
+                    () ->
+                        tradeAPI.queryOrderHistory(
                             apiKey, nonceFactory, 5000, signatureCreator, symbol, orderId))
                 .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
                 .call());
