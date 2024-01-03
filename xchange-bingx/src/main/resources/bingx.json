@@ -4,14 +4,14 @@
   "share_rate_limits": true,
   "public_rate_limits": [
     {
-      "calls": 490,
+      "calls": 350,
       "time_span": 60,
       "time_unit": "SECONDS"
     }
   ],
   "private_rate_limits": [
     {
-      "calls": 490,
+      "calls": 350,
       "time_span": 60,
       "time_unit": "SECONDS"
     }
