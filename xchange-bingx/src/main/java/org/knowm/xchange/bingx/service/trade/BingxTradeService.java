@@ -5,12 +5,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.knowm.xchange.bingx.BingxAdapter;
 import org.knowm.xchange.bingx.BingxExchange;
-import org.knowm.xchange.bingx.dto.BingxOrderDTO;
 import org.knowm.xchange.bingx.dto.wrapper.BingxCreateLimitOrderWrapper;
-import org.knowm.xchange.bingx.dto.wrapper.BingxOrderHistoryWrapper;
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
@@ -50,17 +47,7 @@ public class BingxTradeService extends BingxTradeServiceRaw implements TradeServ
       String orderId = queryOrderParamCurrencyPair.getOrderId();
       String symbol =
           BingxAdapter.adaptToBingxSymbol(queryOrderParamCurrencyPair.getCurrencyPair());
-
-      // check order history first
-      BingxOrderHistoryWrapper bingxOrderHistoryWrapper = queryOrderHistory(symbol, orderId);
-      List<BingxOrderDTO> orderHistory = bingxOrderHistoryWrapper.getOrders();
-      if (!orderHistory.isEmpty()) {
-        orders.add(BingxAdapter.adaptOrder(orderHistory.get(0)));
-      } else {
-        // check order history for given orderId is empty, so it must be still open
-        BingxOrderDTO bingxOrderDTO = queryOrder(symbol, orderId);
-        orders.add(BingxAdapter.adaptOrder(bingxOrderDTO));
-      }
+      orders.add(BingxAdapter.adaptOrder(queryOrder(symbol, orderId)));
     }
 
     return orders;

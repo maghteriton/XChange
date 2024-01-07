@@ -1,5 +1,10 @@
 package org.knowm.xchange.okex;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
@@ -14,19 +19,12 @@ import org.knowm.xchange.dto.meta.ExchangeMetaData;
 import org.knowm.xchange.dto.meta.InstrumentMetaData;
 import org.knowm.xchange.dto.meta.WalletHealth;
 import org.knowm.xchange.dto.trade.*;
-import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.okex.dto.OkexInstType;
+import org.knowm.xchange.okex.dto.OkexResponse;
 import org.knowm.xchange.okex.dto.account.*;
 import org.knowm.xchange.okex.dto.marketdata.*;
-import org.knowm.xchange.okex.dto.OkexResponse;
 import org.knowm.xchange.okex.dto.trade.*;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /** Author: Max Gao (gaamox@tutanota.com) Created: 08-06-2021 */
 public class OkexAdapters {
@@ -68,6 +66,16 @@ public class OkexAdapters {
 
   public static LimitOrder adaptOrder(OkexOrderDetails order, ExchangeMetaData exchangeMetaData) {
     Instrument instrument = adaptOkexInstrumentId(order.getInstrumentId());
+
+    BigDecimal averagePrice = order.getAverageFilledPrice().isEmpty()
+            ? BigDecimal.ZERO
+            : new BigDecimal(order.getAverageFilledPrice());
+
+    BigDecimal fee = new BigDecimal(order.getFee()).abs();
+    if(!order.getFeeCurrency().equals(Currency.USDT.getCurrencyCode())) {
+      fee = fee.multiply(averagePrice);
+    }
+
     return new LimitOrder(
         "buy".equals(order.getSide()) ? Order.OrderType.BID : Order.OrderType.ASK,
         convertContractSizeToVolume(order.getAmount(), instrument, exchangeMetaData.getInstruments().get(instrument).getContractValue()),
@@ -75,11 +83,9 @@ public class OkexAdapters {
         order.getOrderId(),
         new Date(Long.parseLong(order.getCreationTime())),
         new BigDecimal(order.getPrice()),
-        order.getAverageFilledPrice().isEmpty()
-            ? BigDecimal.ZERO
-            : new BigDecimal(order.getAverageFilledPrice()),
+            averagePrice,
         new BigDecimal(order.getAccumulatedFill()),
-        new BigDecimal(order.getFee()),
+            fee,
         "live".equals(order.getState())
             ? Order.OrderStatus.OPEN
             : Order.OrderStatus.valueOf(order.getState().toUpperCase(Locale.ENGLISH)),

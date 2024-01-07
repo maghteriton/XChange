@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.knowm.xchange.Exchange;
+import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
 import org.knowm.xchange.dto.trade.LimitOrder;
@@ -83,8 +84,7 @@ public class MEXCTradeService extends MEXCTradeServiceRaw implements TradeServic
         BigDecimal averagePrice =
             cumulativeAmount.equals(BigDecimal.ZERO)
                 ? BigDecimal.ZERO
-                : new BigDecimal(mexcOrder.getDealAmount())
-                    .divide(cumulativeAmount, RoundingMode.HALF_EVEN)
+                : BigDecimal.valueOf(Double.parseDouble(mexcOrder.getDealAmount()) / cumulativeAmount.doubleValue())
                     .setScale(price.scale(), RoundingMode.HALF_EVEN);
 
         BigDecimal fee = BigDecimal.ZERO;
@@ -92,7 +92,11 @@ public class MEXCTradeService extends MEXCTradeServiceRaw implements TradeServic
         MEXCResult<List<MEXCDeal>> tradeHistory = getTradeHistory((CurrencyPair) instrument);
         for (MEXCDeal deals : tradeHistory.getData()) {
           if (deals.getOrderId().equals(mexcOrder.getId())) {
-            fee = fee.add(new BigDecimal(deals.getFee()));
+            if(deals.getFeeCurrency().equals(Currency.USDT.getCurrencyCode())) {
+              fee = fee.add(new BigDecimal(deals.getFee()));
+            } else {
+              fee = fee.add(new BigDecimal(deals.getFee()).multiply(averagePrice));
+            }
           }
         }
 

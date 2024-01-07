@@ -8,7 +8,6 @@ import static org.knowm.xchange.kucoin.dto.KucoinOrderFlags.HIDDEN;
 import static org.knowm.xchange.kucoin.dto.KucoinOrderFlags.ICEBERG;
 import static org.knowm.xchange.kucoin.dto.KucoinOrderFlags.POST_ONLY;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.Ordering;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -293,14 +292,23 @@ public class KucoinAdapters {
     } else {
       builder = new LimitOrder.Builder(orderType, currencyPair).limitPrice(order.getPrice());
     }
+    BigDecimal averagePrice =
+        order.getDealSize().compareTo(BigDecimal.ZERO) == 0
+            ? BigDecimal.ZERO
+            : BigDecimal.valueOf(
+                    order.getDealFunds().doubleValue() / order.getDealSize().doubleValue())
+                .setScale(order.getPrice().scale(), RoundingMode.HALF_EVEN);
+
+    BigDecimal fee = order.getFee();
+    if (!order.getFeeCurrency().equals(Currency.USDT.getCurrencyCode())) {
+      fee = fee.multiply(averagePrice);
+    }
+
     builder =
         builder
-            .averagePrice(
-                order.getDealSize().compareTo(BigDecimal.ZERO) == 0
-                    ? MoreObjects.firstNonNull(order.getPrice(), order.getStopPrice())
-                    : order.getDealFunds().divide(order.getDealSize(), order.getPrice().scale(), RoundingMode.HALF_EVEN))
+            .averagePrice(averagePrice)
             .cumulativeAmount(order.getDealSize())
-            .fee(order.getFee())
+            .fee(fee)
             .id(order.getId())
             .orderStatus(status)
             .originalAmount(order.getSize())

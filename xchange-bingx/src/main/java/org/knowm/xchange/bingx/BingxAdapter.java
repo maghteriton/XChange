@@ -143,10 +143,15 @@ public class BingxAdapter {
     BigDecimal averagePrice =
         bingxOrderDTO.getExecutedQty().equals(BigDecimal.ZERO)
             ? BigDecimal.ZERO
-            : bingxOrderDTO
-                .getCummulativeQuoteQty()
-                .divide(bingxOrderDTO.getExecutedQty(), RoundingMode.HALF_EVEN)
+            : BigDecimal.valueOf(
+                    bingxOrderDTO.getCummulativeQuoteQty().doubleValue()
+                        / bingxOrderDTO.getExecutedQty().doubleValue())
                 .setScale(bingxOrderDTO.getPrice().scale(), RoundingMode.HALF_EVEN);
+
+    BigDecimal fee = bingxOrderDTO.getFee().abs();
+    if(!bingxOrderDTO.getFeeAsset().equals(Currency.USDT.getCurrencyCode())) {
+      fee = fee.multiply(averagePrice);
+    }
 
     return new LimitOrder.Builder(
             BingxAdapter.adaptFromBingxSide(bingxOrderDTO.getSide()),
@@ -158,7 +163,7 @@ public class BingxAdapter {
         .limitPrice(bingxOrderDTO.getPrice())
         .averagePrice(averagePrice)
         .orderStatus(BingxAdapter.adaptOrderStatus(bingxOrderDTO.getStatus()))
-        .fee(bingxOrderDTO.getFee())
+        .fee(fee)
         .build();
   }
 

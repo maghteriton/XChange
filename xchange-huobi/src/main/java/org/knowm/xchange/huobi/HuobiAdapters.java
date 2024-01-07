@@ -232,12 +232,15 @@ public class HuobiAdapters {
     Order order = null;
     OrderType orderType = adaptOrderType(openOrder.getType());
     CurrencyPair currencyPair = adaptCurrencyPair(openOrder.getSymbol());
-    BigDecimal openOrderAvgPrice;
+    BigDecimal averagePrice;
     if (openOrder.getFilledAmount() == null || openOrder.getFilledAmount().compareTo(BigDecimal.ZERO) == 0) {
-      openOrderAvgPrice = BigDecimal.ZERO;
+      averagePrice = BigDecimal.ZERO;
     } else {
-      openOrderAvgPrice = openOrder.getFilledCashAmount().divide(openOrder.getFilledAmount(), openOrder.getPrice().scale(), RoundingMode.DOWN).stripTrailingZeros();
+      averagePrice = BigDecimal.valueOf(openOrder.getFilledCashAmount().doubleValue() / openOrder.getFilledAmount().doubleValue()).setScale(openOrder.getPrice().scale(),RoundingMode.HALF_EVEN).stripTrailingZeros();
     }
+    //fee ass usdt
+    BigDecimal filledFees = openOrder.getFilledFees().multiply(averagePrice);
+
     if (openOrder.isMarket()) {
       order =
           new MarketOrder(
@@ -246,9 +249,9 @@ public class HuobiAdapters {
               currencyPair,
               String.valueOf(openOrder.getId()),
               openOrder.getCreatedAt(),
-              openOrderAvgPrice,
+              averagePrice,
               openOrder.getFilledAmount(),
-              openOrder.getFilledFees(),
+                  filledFees,
               adaptOrderStatus(openOrder.getState()),
               openOrder.getClOrdId());
     }
@@ -261,9 +264,9 @@ public class HuobiAdapters {
               String.valueOf(openOrder.getId()),
               openOrder.getCreatedAt(),
               openOrder.getPrice(),
-              openOrderAvgPrice,
+              averagePrice,
               openOrder.getFilledAmount(),
-              openOrder.getFilledFees(),
+                  filledFees,
               adaptOrderStatus(openOrder.getState()),
               openOrder.getClOrdId());
     }
@@ -275,16 +278,15 @@ public class HuobiAdapters {
                   .timestamp(openOrder.getCreatedAt())
                   .stopPrice(openOrder.getStopPrice())
                   .limitPrice(openOrder.getPrice())
-                  .averagePrice(openOrderAvgPrice)
+                  .averagePrice(averagePrice)
                   .cumulativeAmount(openOrder.getFilledAmount())
-                  .fee(openOrder.getFilledFees())
+                  .fee(filledFees)
                   .orderStatus(adaptOrderStatus(openOrder.getState()))
                   .userReference(openOrder.getClOrdId())
                   .intention(openOrder.getOperator().equals("lte") ? Intention.STOP_LOSS : Intention.TAKE_PROFIT)
                   .build();
     }
 
-    order.setAveragePrice(openOrderAvgPrice);
     return order;
   }
 

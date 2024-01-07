@@ -2,7 +2,6 @@ package org.knowm.xchange.gateio.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +18,6 @@ import org.knowm.xchange.exceptions.NotAvailableFromExchangeException;
 import org.knowm.xchange.gateio.GateioAdapters;
 import org.knowm.xchange.gateio.dto.trade.GateioClosedOrder;
 import org.knowm.xchange.gateio.dto.trade.GateioOpenOrders;
-import org.knowm.xchange.gateio.dto.trade.GateioOrderStatus;
 import org.knowm.xchange.gateio.dto.trade.GateioTrade;
 import org.knowm.xchange.service.trade.TradeService;
 import org.knowm.xchange.service.trade.params.*;
@@ -140,11 +138,9 @@ public class GateioTradeService extends GateioTradeServiceRaw implements TradeSe
         BigDecimal originalAmount = new BigDecimal(gateioClosedOrder.getInitialAmount());
         BigDecimal cumulativeAmount = new BigDecimal(gateioClosedOrder.getFilledAmount());
 
-        BigDecimal fee;
-        if(gateioClosedOrder.getFeeCurrency().equals(Currency.USDT.getCurrencyCode())) {
-          fee = new BigDecimal(gateioClosedOrder.getFeeValue());
-        } else {
-          fee = new BigDecimal(gateioClosedOrder.getFeeValue()).multiply(gateioClosedOrder.getFilledRate());
+        BigDecimal fee = new BigDecimal(gateioClosedOrder.getFeeValue());
+        if (!gateioClosedOrder.getFeeCurrency().equals(Currency.USDT.getCurrencyCode())) {
+          fee = fee.multiply(gateioClosedOrder.getFilledRate());
         }
 
         LimitOrder limitOrder =

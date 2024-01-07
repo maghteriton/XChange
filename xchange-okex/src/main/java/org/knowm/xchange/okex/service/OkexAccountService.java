@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** Author: Max Gao (gaamox@tutanota.com) Created: 08-06-2021 */
 public class OkexAccountService extends OkexAccountServiceRaw implements AccountService {
@@ -112,8 +114,15 @@ public class OkexAccountService extends OkexAccountServiceRaw implements Account
       throws IOException {
     List<OkexCurrency> okexCurrencyList =
         getOkexCurrencies(Collections.singletonList(currency)).getData();
-    List<OkexDepositAddress> okexDepositAddressList =
-        getDepositAddress(currency.getCurrencyCode()).getData();
+    List<OkexDepositAddress> okexDepositAddressList = null;
+    try {
+      okexDepositAddressList = getDepositAddress(currency.getCurrencyCode()).getData();
+    } catch (OkexException e) {
+      // do nothing
+      Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "OkexException at getCurrencyChainStatus : ",  e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
 
     for (OkexCurrency okexCurrency : okexCurrencyList) {
       if (okexCurrency.getChain().equalsIgnoreCase(chain)) {
