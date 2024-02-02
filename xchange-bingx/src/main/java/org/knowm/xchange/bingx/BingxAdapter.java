@@ -203,6 +203,20 @@ public class BingxAdapter {
         true);
   }
 
+  public static Map<Instrument, Boolean> adaptSupportedInstruments(List<BingxSymbolDTO> symbols) {
+    Map<Instrument, Boolean> supportedInstrumentMap = new HashMap<>();
+    for (BingxSymbolDTO symbol : symbols) {
+      CurrencyPair currencyPair = adaptFromBingxSymbol(symbol.getSymbol());
+      if(symbol.isApiStateBuy() && symbol.isApiStateSell()) {
+        supportedInstrumentMap.put(currencyPair, true);
+      } else {
+        supportedInstrumentMap.put(currencyPair, false);
+      }
+    }
+
+    return supportedInstrumentMap;
+  }
+
   private static InstrumentMetaData adaptCurrencyMetaData(
       BingxSymbolDTO bingxSymbol, TradeCommissionRateDTO commissionRate) {
     return new InstrumentMetaData.Builder()

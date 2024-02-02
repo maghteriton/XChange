@@ -154,23 +154,15 @@ public class OkexAdapters {
     }
   }
 
-  public static OkexOrderRequest adaptOrder(LimitOrder order, ExchangeMetaData exchangeMetaData, String accountLevel) {
+  public static OkexOrderRequest adaptOrder(LimitOrder order) {
     return OkexOrderRequest.builder()
         .instrumentId(adaptInstrument(order.getInstrument()))
-        .tradeMode(adaptTradeMode(order.getInstrument(), accountLevel))
-        .side(order.getType() == Order.OrderType.BID ? "buy" : "sell")
-        .posSide(null) // PosSide should come as a input from an extended LimitOrder class to
-        // support Futures/Swap capabilities of Okex, till then it should be null to
-        // perform "net" orders
+        .tradeMode("cash")
         .clientOrderId(order.getUserReference())
-        .reducePosition(order.hasFlag(OkexOrderFlags.REDUCE_ONLY))
-        .orderType((order.hasFlag(OkexOrderFlags.POST_ONLY))
-              ? OkexOrderType.post_only.name()
-              : (order.hasFlag(OkexOrderFlags.OPTIMAL_LIMIT_IOC) && order.getInstrument() instanceof FuturesContract)
-                ? OkexOrderType.optimal_limit_ioc.name()
-                : OkexOrderType.limit.name())
-        .amount(convertVolumeToContractSize(order, exchangeMetaData))
-        .price(order.getLimitPrice().toString())
+        .side(order.getType() == Order.OrderType.BID ? "buy" : "sell")
+        .orderType(OkexOrderType.limit.name())
+        .price(order.getLimitPrice().toPlainString())
+        .amount(order.getOriginalAmount().toPlainString())
         .build();
   }
 

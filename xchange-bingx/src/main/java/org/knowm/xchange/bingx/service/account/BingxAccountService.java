@@ -2,6 +2,8 @@ package org.knowm.xchange.bingx.service.account;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+
 import org.knowm.xchange.bingx.BingxAdapter;
 import org.knowm.xchange.bingx.BingxExchange;
 import org.knowm.xchange.bingx.dto.*;
@@ -12,6 +14,7 @@ import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.DepositAddress;
 import org.knowm.xchange.dto.account.FundingRecord;
 import org.knowm.xchange.dto.meta.CurrencyChainStatus;
+import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.service.account.AccountService;
 import org.knowm.xchange.service.trade.params.*;
 
@@ -19,6 +22,7 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
 
   public static final String CONTRACT_ADDRESS_NOT_SUPPORTED = "notSupportedByAPI";
   public static final String FUNDING_WALLET = "1";
+  private Map<Instrument, Boolean> supportedInstrumentMap;
 
   public BingxAccountService(BingxExchange exchange, ResilienceRegistries resilienceRegistries) {
     super(exchange, resilienceRegistries);
@@ -101,5 +105,14 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
     }
 
     return null; // returns null if not found
+  }
+
+  @Override
+  public Map<Instrument, Boolean> getSupportedInstruments(Instrument... instruments) throws IOException {
+    return supportedInstrumentMap;
+  }
+
+  public void setSupportedInstruments(Map<Instrument, Boolean> supportedInstruments) {
+    this.supportedInstrumentMap = supportedInstruments;
   }
 }

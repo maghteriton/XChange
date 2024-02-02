@@ -83,12 +83,6 @@ public class KucoinExchange extends BaseExchange implements Exchange {
   @Override
   public void remoteInit() throws IOException, ExchangeException {
 
-    // fetch fee only if authenticated
-    TradeFeeResponse fee = null;
-    if (exchangeSpecification.getApiKey() != null) {
-      fee = getMarketDataService().getKucoinBaseFee();
-    }
-
     List<CurrenciesResponse> currenciesResponses = getMarketDataService().getKucoinCurrencies();
     List<SymbolResponse> symbolsResponse = getMarketDataService().getKucoinSymbols();
 

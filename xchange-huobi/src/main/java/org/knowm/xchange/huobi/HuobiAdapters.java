@@ -250,7 +250,7 @@ public class HuobiAdapters {
               String.valueOf(openOrder.getId()),
               openOrder.getCreatedAt(),
               averagePrice,
-              openOrder.getFilledAmount(),
+                  openOrder.getFilledAmount().subtract(filledFees),
                   filledFees,
               adaptOrderStatus(openOrder.getState()),
               openOrder.getClOrdId());
@@ -265,7 +265,7 @@ public class HuobiAdapters {
               openOrder.getCreatedAt(),
               openOrder.getPrice(),
               averagePrice,
-              openOrder.getFilledAmount(),
+              openOrder.getFilledAmount().subtract(filledFees),
                   filledFees,
               adaptOrderStatus(openOrder.getState()),
               openOrder.getClOrdId());
@@ -279,7 +279,7 @@ public class HuobiAdapters {
                   .stopPrice(openOrder.getStopPrice())
                   .limitPrice(openOrder.getPrice())
                   .averagePrice(averagePrice)
-                  .cumulativeAmount(openOrder.getFilledAmount())
+                  .cumulativeAmount(openOrder.getFilledAmount().subtract(filledFees))
                   .fee(filledFees)
                   .orderStatus(adaptOrderStatus(openOrder.getState()))
                   .userReference(openOrder.getClOrdId())
