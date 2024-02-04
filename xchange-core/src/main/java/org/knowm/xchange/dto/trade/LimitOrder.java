@@ -162,7 +162,9 @@ public class LimitOrder extends Order implements Comparable<LimitOrder> {
     this.limitPrice = limitPrice;
   }
 
-  /** @return The limit price */
+  /**
+   * @return The limit price
+   */
   public BigDecimal getLimitPrice() {
 
     return limitPrice;
@@ -357,9 +359,7 @@ public class LimitOrder extends Order implements Comparable<LimitOrder> {
               timestamp,
               limitPrice,
               averagePrice,
-              useCumulativeAmount()
-                  ? cumulativeAmount
-                  : originalAmount.subtract(remainingAmount),
+              useCumulativeAmount() ? cumulativeAmount : originalAmount.subtract(remainingAmount),
               fee,
               status,
               userReference);
@@ -369,7 +369,10 @@ public class LimitOrder extends Order implements Comparable<LimitOrder> {
     }
 
     private boolean useCumulativeAmount() {
-      return originalAmount == null || originalAmount.doubleValue() == 0 || remainingAmount == null || remainingAmount.doubleValue() == 0;
+      return originalAmount == null
+          || originalAmount.doubleValue() == 0
+          || remainingAmount == null
+          || remainingAmount.doubleValue() == 0;
     }
   }
 }
