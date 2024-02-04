@@ -61,6 +61,7 @@ public class BingxAdapter {
                     .setDate(depHis.getInsertTime())
                     .setBlockchainTransactionHash(depHis.getTxId())
                     .setAmount(depHis.getAmount())
+                    .setType(FundingRecord.Type.DEPOSIT)
                     .setStatus(adaptDepositStatus(depHis.getStatus()))
                     .build())
         .collect(Collectors.toList());
@@ -157,7 +158,7 @@ public class BingxAdapter {
             BingxAdapter.adaptFromBingxSide(bingxOrderDTO.getSide()),
             BingxAdapter.adaptFromBingxSymbol(bingxOrderDTO.getSymbol()))
         .originalAmount(bingxOrderDTO.getOrigQty())
-        .cumulativeAmount(bingxOrderDTO.getExecutedQty())
+        .cumulativeAmount(bingxOrderDTO.getExecutedQty().add(bingxOrderDTO.getFee()))
         .remainingAmount(bingxOrderDTO.getOrigQty().subtract(bingxOrderDTO.getExecutedQty()))
         .id(String.valueOf(bingxOrderDTO.getOrderId()))
         .limitPrice(bingxOrderDTO.getPrice())

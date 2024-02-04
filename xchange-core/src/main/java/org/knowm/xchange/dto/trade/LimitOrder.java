@@ -357,7 +357,7 @@ public class LimitOrder extends Order implements Comparable<LimitOrder> {
               timestamp,
               limitPrice,
               averagePrice,
-              originalAmount == null || remainingAmount == null
+              useCumulativeAmount()
                   ? cumulativeAmount
                   : originalAmount.subtract(remainingAmount),
               fee,
@@ -366,6 +366,10 @@ public class LimitOrder extends Order implements Comparable<LimitOrder> {
       order.setOrderFlags(flags);
       order.setLeverage(leverage);
       return order;
+    }
+
+    private boolean useCumulativeAmount() {
+      return originalAmount == null || originalAmount.doubleValue() == 0 || remainingAmount == null || remainingAmount.doubleValue() == 0;
     }
   }
 }

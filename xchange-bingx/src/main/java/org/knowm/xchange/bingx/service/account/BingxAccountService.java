@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.knowm.xchange.bingx.BingxAdapter;
+import org.knowm.xchange.bingx.BingxException;
 import org.knowm.xchange.bingx.BingxExchange;
 import org.knowm.xchange.bingx.dto.*;
 import org.knowm.xchange.bingx.dto.wrapper.BingxBalancesWrapper;
+import org.knowm.xchange.bingx.dto.wrapper.BingxWithdrawWrapper;
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.dto.account.AccountInfo;
@@ -55,8 +57,8 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
 
     DefaultWithdrawFundsParams defaultParams = (DefaultWithdrawFundsParams) params;
 
-    return accountAPI
-        .withdraw(
+    BingxResultDTO<BingxWithdrawWrapper> withdraw =
+        accountAPI.withdraw(
             apiKey,
             nonceFactory,
             5000,
@@ -66,19 +68,35 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
             defaultParams.getAmount(),
             defaultParams.getCurrency().getCurrencyCode(),
             defaultParams.getChain(),
-            FUNDING_WALLET)
-        .getData()
-        .getId();
+            FUNDING_WALLET);
+
+    if (!withdraw.isSuccessful()) {
+      throw new BingxException(
+          "Bingx Withdrawal failed!"
+              + System.lineSeparator()
+              + "Code : "
+              + withdraw.getCode()
+              + " Reason : "
+              + withdraw.getMsg());
+    }
+
+    return withdraw.getData().getId();
   }
 
   @Override
   public List<DepositAddress> getDepositAddresses(Currency currency) throws IOException {
-    List<DepositAddress> depositAddresses = BingxAdapter.adaptDepositAddresses(getDepositAddresses(currency.getCurrencyCode()).getData());
+    List<DepositAddress> depositAddresses =
+        BingxAdapter.adaptDepositAddresses(
+            getDepositAddresses(currency.getCurrencyCode()).getData());
     // if address is not created, just return network information
-    if(depositAddresses.isEmpty()) {
+    if (depositAddresses.isEmpty()) {
       List<BingxWalletDTO> wallets = getWallets(currency.getCurrencyCode());
       List<BingxNetworkDTO> networkList = wallets.get(0).getNetworkList();
-      networkList.forEach(network -> depositAddresses.add(new DepositAddress(currency.getCurrencyCode(), null, null, network.getNetwork())));
+      networkList.forEach(
+          network ->
+              depositAddresses.add(
+                  new DepositAddress(
+                      currency.getCurrencyCode(), null, null, network.getNetwork())));
     }
     return depositAddresses;
   }
@@ -108,7 +126,8 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
   }
 
   @Override
-  public Map<Instrument, Boolean> getSupportedInstruments(Instrument... instruments) throws IOException {
+  public Map<Instrument, Boolean> getSupportedInstruments(Instrument... instruments)
+      throws IOException {
     return supportedInstrumentMap;
   }
 
