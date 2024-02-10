@@ -84,7 +84,7 @@ public class OkexAdapters {
         new Date(Long.parseLong(order.getCreationTime())),
         new BigDecimal(order.getPrice()),
             averagePrice,
-        new BigDecimal(order.getAccumulatedFill()),
+        new BigDecimal(order.getAccumulatedFill()).add(new BigDecimal(order.getFee())),
             fee,
         "live".equals(order.getState())
             ? Order.OrderStatus.OPEN
