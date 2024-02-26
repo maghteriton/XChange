@@ -238,8 +238,8 @@ public class HuobiAdapters {
     } else {
       averagePrice = BigDecimal.valueOf(openOrder.getFilledCashAmount().doubleValue() / openOrder.getFilledAmount().doubleValue()).setScale(openOrder.getPrice().scale(),RoundingMode.HALF_EVEN).stripTrailingZeros();
     }
-    //fee ass usdt
-    BigDecimal filledFees = openOrder.getFilledFees().multiply(averagePrice);
+    //fee as usdt coin amount
+    BigDecimal filledFeesAsCoinAmount = openOrder.getFilledFees().divide(averagePrice, RoundingMode.HALF_EVEN);
 
     if (openOrder.isMarket()) {
       order =
@@ -250,8 +250,8 @@ public class HuobiAdapters {
               String.valueOf(openOrder.getId()),
               openOrder.getCreatedAt(),
               averagePrice,
-                  openOrder.getFilledAmount().subtract(filledFees),
-                  filledFees,
+                  openOrder.getFilledAmount().subtract(filledFeesAsCoinAmount),
+                  openOrder.getFilledFees(),
               adaptOrderStatus(openOrder.getState()),
               openOrder.getClOrdId());
     }
@@ -265,8 +265,8 @@ public class HuobiAdapters {
               openOrder.getCreatedAt(),
               openOrder.getPrice(),
               averagePrice,
-              openOrder.getFilledAmount().subtract(filledFees),
-                  filledFees,
+              openOrder.getFilledAmount().subtract(filledFeesAsCoinAmount),
+                  openOrder.getFilledFees(),
               adaptOrderStatus(openOrder.getState()),
               openOrder.getClOrdId());
     }
@@ -279,8 +279,8 @@ public class HuobiAdapters {
                   .stopPrice(openOrder.getStopPrice())
                   .limitPrice(openOrder.getPrice())
                   .averagePrice(averagePrice)
-                  .cumulativeAmount(openOrder.getFilledAmount().subtract(filledFees))
-                  .fee(filledFees)
+                  .cumulativeAmount(openOrder.getFilledAmount().subtract(filledFeesAsCoinAmount))
+                  .fee(openOrder.getFilledFees())
                   .orderStatus(adaptOrderStatus(openOrder.getState()))
                   .userReference(openOrder.getClOrdId())
                   .intention(openOrder.getOperator().equals("lte") ? Intention.STOP_LOSS : Intention.TAKE_PROFIT)
