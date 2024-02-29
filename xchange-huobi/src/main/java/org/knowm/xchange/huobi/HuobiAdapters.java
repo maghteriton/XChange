@@ -37,6 +37,7 @@ public class HuobiAdapters {
   public static final String ONLINE = "allowed";
   private static final String DELISTED = "delisted";
   private static final String TARGET_NETWORK = "ERC20";
+  private static final String BUY_LIMIT = "buy-limit";
 
   public static Ticker adaptTicker(HuobiTicker huobiTicker, CurrencyPair currencyPair) {
     Ticker.Builder builder = new Ticker.Builder();
@@ -238,23 +239,18 @@ public class HuobiAdapters {
     } else {
       averagePrice = BigDecimal.valueOf(openOrder.getFilledCashAmount().doubleValue() / openOrder.getFilledAmount().doubleValue()).setScale(openOrder.getPrice().scale(),RoundingMode.HALF_EVEN).stripTrailingZeros();
     }
-    //fee as usdt coin amount
-    BigDecimal filledFeesAsCoinAmount = openOrder.getFilledFees().divide(averagePrice, RoundingMode.HALF_EVEN);
 
-    if (openOrder.isMarket()) {
-      order =
-          new MarketOrder(
-              orderType,
-              openOrder.getAmount(),
-              currencyPair,
-              String.valueOf(openOrder.getId()),
-              openOrder.getCreatedAt(),
-              averagePrice,
-                  openOrder.getFilledAmount().subtract(filledFeesAsCoinAmount),
-                  openOrder.getFilledFees(),
-              adaptOrderStatus(openOrder.getState()),
-              openOrder.getClOrdId());
+    BigDecimal filledFeesAsCoinAmount;
+    BigDecimal filledFeesAsUSDT;
+    //buy order fee is coin, sell order fee is USDT
+    if(openOrder.getType().equals(BUY_LIMIT)) {
+      filledFeesAsCoinAmount = openOrder.getFilledFees();
+      filledFeesAsUSDT = openOrder.getFilledFees().multiply(averagePrice);
+    } else {
+      filledFeesAsCoinAmount = openOrder.getFilledFees().divide(averagePrice, RoundingMode.HALF_EVEN);
+      filledFeesAsUSDT = openOrder.getFilledFees();
     }
+
     if (openOrder.isLimit()) {
       order =
           new LimitOrder(
@@ -266,25 +262,9 @@ public class HuobiAdapters {
               openOrder.getPrice(),
               averagePrice,
               openOrder.getFilledAmount().subtract(filledFeesAsCoinAmount),
-                  openOrder.getFilledFees(),
+                  filledFeesAsUSDT,
               adaptOrderStatus(openOrder.getState()),
               openOrder.getClOrdId());
-    }
-    if (openOrder.isStop()) {
-      order =
-          new StopOrder.Builder(orderType, currencyPair)
-                  .originalAmount(openOrder.getAmount())
-                  .id(String.valueOf(openOrder.getId()))
-                  .timestamp(openOrder.getCreatedAt())
-                  .stopPrice(openOrder.getStopPrice())
-                  .limitPrice(openOrder.getPrice())
-                  .averagePrice(averagePrice)
-                  .cumulativeAmount(openOrder.getFilledAmount().subtract(filledFeesAsCoinAmount))
-                  .fee(openOrder.getFilledFees())
-                  .orderStatus(adaptOrderStatus(openOrder.getState()))
-                  .userReference(openOrder.getClOrdId())
-                  .intention(openOrder.getOperator().equals("lte") ? Intention.STOP_LOSS : Intention.TAKE_PROFIT)
-                  .build();
     }
 
     return order;
