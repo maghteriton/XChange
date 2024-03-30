@@ -31,6 +31,8 @@ public class BingxNetworkDTO {
 
   private final Long depositPrecision;
 
+  private final String contractAddress;
+
   @JsonCreator
   public BingxNetworkDTO(
       @JsonProperty("name") String name,
@@ -44,7 +46,8 @@ public class BingxNetworkDTO {
       @JsonProperty("withdrawMin") BigDecimal withdrawMin,
       @JsonProperty("depositMin") BigDecimal depositMin,
       @JsonProperty("withdrawPrecision") Long withdrawPrecision,
-      @JsonProperty("depositPrecision") Long depositPrecision) {
+      @JsonProperty("depositPrecision") Long depositPrecision,
+      @JsonProperty("contractAddress") String contractAddress) {
     this.name = name;
     this.network = network;
     this.isDefault = isDefault;
@@ -57,6 +60,7 @@ public class BingxNetworkDTO {
     this.depositMin = depositMin;
     this.withdrawPrecision = withdrawPrecision;
     this.depositPrecision = depositPrecision;
+    this.contractAddress = contractAddress;
   }
 
   public String getName() {
@@ -105,5 +109,9 @@ public class BingxNetworkDTO {
 
   public Long getDepositPrecision() {
     return depositPrecision;
+  }
+
+  public String getContractAddress() {
+    return contractAddress;
   }
 }

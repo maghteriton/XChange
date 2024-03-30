@@ -22,7 +22,6 @@ import org.knowm.xchange.service.trade.params.*;
 
 public class BingxAccountService extends BingxAccountServiceRaw implements AccountService {
 
-  public static final String CONTRACT_ADDRESS_NOT_SUPPORTED = "notSupportedByAPI";
   public static final String FUNDING_WALLET = "1";
   private Map<Instrument, Boolean> supportedInstrumentMap;
 
@@ -113,7 +112,7 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
           return new CurrencyChainStatus(
               currency,
               bingxNetwork.getNetwork(),
-              CONTRACT_ADDRESS_NOT_SUPPORTED,
+              bingxNetwork.getContractAddress(),
               bingxNetwork.isDepositEnable(),
               bingxNetwork.isWithdrawEnable(),
               bingxNetwork.getWithdrawFee(),
