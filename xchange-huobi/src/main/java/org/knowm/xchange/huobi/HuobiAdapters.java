@@ -96,6 +96,9 @@ public class HuobiAdapters {
 
       if(feeRate != null) {
         pairs.put(pair, adaptPair(assetPair, pairsMetaData.getOrDefault(pair, null), feeRate.getTakerFeeRate()));
+      }else {
+        pairs.put(
+            pair, adaptPair(assetPair, pairsMetaData.getOrDefault(pair, null), new BigDecimal("0.0015")));
       }
     }
 

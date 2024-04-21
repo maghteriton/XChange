@@ -46,9 +46,8 @@ public class HuobiExchange extends BaseExchange implements Exchange {
     HuobiAsset[] assets = ((HuobiMarketDataServiceRaw) marketDataService).getHuobiAssets();
     HuobiCurrencyWrapper[] huobiCurrencies =
         ((HuobiAccountServiceRaw) accountService).getHuobiCurrencies("");
-    List<HuobiTransactFeeRate> huobiTransactFeeRateList = new ArrayList<>();
-
-    List<HuobiAssetPair> usdtAssetPairs =
+    //List<HuobiTransactFeeRate> huobiTransactFeeRateList = new ArrayList<>();
+/*    List<HuobiAssetPair> usdtAssetPairs =
         Arrays.stream(assetPairs)
             .filter(huobiAssetPair -> huobiAssetPair.getSymbol().contains("usdt"))
             .collect(Collectors.toList());
@@ -63,10 +62,10 @@ public class HuobiExchange extends BaseExchange implements Exchange {
       } catch (Exception e) {
         // do nothing, its invalid symbol returned by Huobi
       }
-    }
+    }*/
 
     exchangeMetaData =
         HuobiAdapters.adaptToExchangeMetaData(
-            assetPairs, assets, exchangeMetaData, huobiCurrencies, huobiTransactFeeRateList);
+            assetPairs, assets, exchangeMetaData, huobiCurrencies, new ArrayList<>());
   }
 }

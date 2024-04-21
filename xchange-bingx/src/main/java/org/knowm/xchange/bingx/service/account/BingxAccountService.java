@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.knowm.xchange.bingx.BingxAdapter;
-import org.knowm.xchange.bingx.BingxException;
 import org.knowm.xchange.bingx.BingxExchange;
 import org.knowm.xchange.bingx.dto.*;
 import org.knowm.xchange.bingx.dto.wrapper.BingxBalancesWrapper;
@@ -56,12 +55,7 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
 
     DefaultWithdrawFundsParams defaultParams = (DefaultWithdrawFundsParams) params;
 
-    BingxResultDTO<BingxWithdrawWrapper> withdraw =
-        accountAPI.withdraw(
-            apiKey,
-            nonceFactory,
-            5000,
-            signatureCreator,
+    BingxWithdrawWrapper withdraw = withdraw(
             defaultParams.getAddress(),
             defaultParams.getAddressTag(),
             defaultParams.getAmount(),
@@ -69,17 +63,7 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
             defaultParams.getChain(),
             FUNDING_WALLET);
 
-    if (!withdraw.isSuccessful()) {
-      throw new BingxException(
-          "Bingx Withdrawal failed!"
-              + System.lineSeparator()
-              + "Code : "
-              + withdraw.getCode()
-              + " Reason : "
-              + withdraw.getMsg());
-    }
-
-    return withdraw.getData().getId();
+    return withdraw.getId();
   }
 
   @Override
@@ -104,23 +88,24 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
   public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
       throws IOException {
     List<BingxWalletDTO> wallets = getWallets(currency.getCurrencyCode());
-    List<BingxNetworkDTO> networkList = wallets.get(0).getNetworkList();
 
-    if (!wallets.isEmpty() && !networkList.isEmpty()) {
-      for (BingxNetworkDTO bingxNetwork : networkList) {
-        if (bingxNetwork.getNetwork().equalsIgnoreCase(chain)) {
-          return new CurrencyChainStatus(
-              currency,
-              bingxNetwork.getNetwork(),
-              bingxNetwork.getContractAddress(),
-              bingxNetwork.isDepositEnable(),
-              bingxNetwork.isWithdrawEnable(),
-              bingxNetwork.getWithdrawFee(),
-              bingxNetwork.getWithdrawFee());
+    if (!wallets.isEmpty()) {
+      List<BingxNetworkDTO> networkList = wallets.get(0).getNetworkList();
+      if (!networkList.isEmpty()) {
+        for (BingxNetworkDTO bingxNetwork : networkList) {
+          if (bingxNetwork.getNetwork().equalsIgnoreCase(chain)) {
+            return new CurrencyChainStatus(
+                currency,
+                bingxNetwork.getNetwork(),
+                bingxNetwork.getContractAddress(),
+                bingxNetwork.isDepositEnable(),
+                bingxNetwork.isWithdrawEnable(),
+                bingxNetwork.getWithdrawFee(),
+                bingxNetwork.getWithdrawFee());
+          }
         }
       }
     }
-
     return null; // returns null if not found
   }
 

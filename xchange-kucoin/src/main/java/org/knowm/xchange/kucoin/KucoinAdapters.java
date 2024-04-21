@@ -120,7 +120,7 @@ public class KucoinAdapters {
         BigDecimal takerFeeRate = symbolTickResponse.getTakerFeeRate();
         takerTradingFee = takerCoefficient.multiply(takerFeeRate);
       } else {
-        takerTradingFee = new BigDecimal("0.001");
+        takerTradingFee = new BigDecimal("0.003");
       }
 
       CurrencyPair pair = adaptCurrencyPair(symbol.getSymbol());

@@ -86,7 +86,7 @@ public class KucoinExchange extends BaseExchange implements Exchange {
     List<CurrenciesResponse> currenciesResponses = getMarketDataService().getKucoinCurrencies();
     List<SymbolResponse> symbolsResponse = getMarketDataService().getKucoinSymbols();
 
-    Map<String, SymbolTickResponse> kucoin24hrStatsMap = new HashMap<>();
+/*    Map<String, SymbolTickResponse> kucoin24hrStatsMap = new HashMap<>();
     for (SymbolResponse symbolResponse : symbolsResponse) {
       String symbol = symbolResponse.getSymbol();
       if (symbol.contains(Currency.USDT.getCurrencyCode())) {
@@ -94,11 +94,11 @@ public class KucoinExchange extends BaseExchange implements Exchange {
             symbol,
             getMarketDataService().getKucoin24hrStats(KucoinAdapters.adaptCurrencyPair(symbol)));
       }
-    }
+    }*/
 
     this.exchangeMetaData =
         KucoinAdapters.adaptMetadata(
-            this.exchangeMetaData, currenciesResponses, symbolsResponse, kucoin24hrStatsMap);
+            this.exchangeMetaData, currenciesResponses, symbolsResponse, new HashMap<>());
   }
 
   @Override

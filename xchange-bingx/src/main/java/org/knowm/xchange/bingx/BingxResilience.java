@@ -22,8 +22,8 @@ public class BingxResilience {
         .rateLimiter(
             PUBLIC_REST_ENDPOINT_RATE_LIMITER,
             RateLimiterConfig.from(registries.rateLimiters().getDefaultConfig())
-                .limitRefreshPeriod(Duration.ofSeconds(60))
-                .limitForPeriod(350)
+                .limitRefreshPeriod(Duration.ofSeconds(10))
+                .limitForPeriod(90)
                 .drainPermissionsOnResult(
                     e -> ResilienceUtils.matchesHttpCode(e, TOO_MANY_REQUESTS))
                 .build());
@@ -33,8 +33,8 @@ public class BingxResilience {
         .rateLimiter(
             PRIVATE_REST_ENDPOINT_RATE_LIMITER,
             RateLimiterConfig.from(registries.rateLimiters().getDefaultConfig())
-                .limitRefreshPeriod(Duration.ofSeconds(60))
-                .limitForPeriod(350)
+                .limitRefreshPeriod(Duration.ofSeconds(10))
+                .limitForPeriod(90)
                 .drainPermissionsOnResult(
                     e -> ResilienceUtils.matchesHttpCode(e, TOO_MANY_REQUESTS))
                 .build());
