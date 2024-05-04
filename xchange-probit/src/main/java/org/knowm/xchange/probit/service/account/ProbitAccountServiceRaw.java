@@ -4,6 +4,7 @@ import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.probit.ProbitAdapter;
 import org.knowm.xchange.probit.ProbitExchange;
+import org.knowm.xchange.probit.dto.request.ProbitWithdrawalRequestDTO;
 import org.knowm.xchange.probit.dto.response.*;
 import org.knowm.xchange.probit.model.ProbitStatus;
 import org.knowm.xchange.probit.model.ProbitTransferType;
@@ -65,18 +66,10 @@ public class ProbitAccountServiceRaw extends ProbitBaseService {
   }
 
   public ProbitResultDTO<ProbitWithdrawalDTO> withdrawal(
-      Currency currency, String platform, String address, String addressTag, String amount)
-      throws IOException {
+      ProbitWithdrawalRequestDTO probitWithdrawalRequestDTO) throws IOException {
 
     return decorateApiCall(
-            () ->
-                accountAPI.withdrawal(
-                    signatureCreator,
-                    currency.getCurrencyCode(),
-                    platform,
-                    address,
-                    addressTag,
-                    amount))
+            () -> accountAPI.withdrawal(signatureCreator, probitWithdrawalRequestDTO))
         .withRateLimiter(rateLimiter(GROUP_1_ENDPOINT_RATE_LIMITER))
         .call();
   }

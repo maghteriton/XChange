@@ -6,6 +6,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import org.knowm.xchange.probit.APIConstants;
 import org.knowm.xchange.probit.ProbitException;
+import org.knowm.xchange.probit.dto.request.ProbitWithdrawalRequestDTO;
 import org.knowm.xchange.probit.dto.response.*;
 import si.mazi.rescu.ParamsDigest;
 
@@ -33,19 +34,16 @@ public interface AccountAPI {
 
   @POST
   @Path("/withdrawal")
+  @Consumes(MediaType.APPLICATION_JSON)
   ProbitResultDTO<ProbitWithdrawalDTO> withdrawal(
       @HeaderParam(APIConstants.AUTH_KEY) ParamsDigest authorization,
-      @QueryParam("currency_id") String currency,
-      @QueryParam("platform_id") String platform,
-      @QueryParam("address") String address,
-      @QueryParam("destination_tag") String addressTag,
-      @QueryParam("amount") String amount)
+      ProbitWithdrawalRequestDTO probitWithdrawalRequestDTO)
       throws IOException, ProbitException;
 
   @GET
   @Path("/deposit_address")
   ProbitResultDTO<List<ProbitDepositAddressDTO>> depositAddress(
-          @HeaderParam(APIConstants.AUTH_KEY) ParamsDigest authorization,
-          @QueryParam("currency_id") String currency)
-          throws IOException, ProbitException;
+      @HeaderParam(APIConstants.AUTH_KEY) ParamsDigest authorization,
+      @QueryParam("currency_id") String currency)
+      throws IOException, ProbitException;
 }

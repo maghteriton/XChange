@@ -11,6 +11,7 @@ import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.probit.ProbitAdapter;
 import org.knowm.xchange.probit.ProbitException;
 import org.knowm.xchange.probit.ProbitExchange;
+import org.knowm.xchange.probit.dto.request.ProbitWithdrawalRequestDTO;
 import org.knowm.xchange.probit.dto.response.*;
 import org.knowm.xchange.probit.model.ProbitTransferType;
 import org.knowm.xchange.probit.service.market.ProbitMarketDataService;
@@ -80,16 +81,19 @@ public class ProbitAccountService extends ProbitAccountServiceRaw implements Acc
     }
 
     DefaultWithdrawFundsParams defaultParams = (DefaultWithdrawFundsParams) params;
+
+    ProbitWithdrawalRequestDTO probitWithdrawalRequestDTO =
+        ProbitWithdrawalRequestDTO.builder()
+            .currency_id(defaultParams.getCurrency().getCurrencyCode())
+            .platform_id(defaultParams.getChain())
+            .address(defaultParams.getAddress())
+            .destination_tag(defaultParams.getAddressTag())
+            .amount(defaultParams.getAmount().toPlainString())
+            .build();
+
     ProbitWithdrawalDTO withdraw;
     try {
-      withdraw =
-          withdrawal(
-                  defaultParams.getCurrency(),
-                  defaultParams.getChain(),
-                  defaultParams.getAddress(),
-                  defaultParams.getAddressTag(),
-                  defaultParams.getAmount().toPlainString())
-              .getData();
+      withdraw = withdrawal(probitWithdrawalRequestDTO).getData();
     } catch (ProbitException e) {
       throw new ExchangeException(
           String.format(
