@@ -177,6 +177,15 @@ public interface AccountService extends BaseService {
     throw new NotYetImplementedForExchangeException("getDepositAddresses");
   }
 
+  /**
+   * @return deposit addres. This should never return null.
+   * @param currency The digital currency that corresponds to the desired deposit address.
+   * @throws IOException - Indication that a networking error occurred while fetching JSON data
+   */
+  default DepositAddress getDepositAddress(Currency currency, String chain)
+      throws IOException {
+    throw new NotYetImplementedForExchangeException("getDepositAddresses");
+  }
 
   /**
    * @param currency The digital currency.
@@ -223,7 +232,8 @@ public interface AccountService extends BaseService {
     throw new NotYetImplementedForExchangeException("fundsTransfer");
   }
 
-  default Map<Instrument, Boolean> getSupportedInstruments(Instrument... instruments) throws IOException{
+  default Map<Instrument, Boolean> getSupportedInstruments(Instrument... instruments)
+      throws IOException {
     throw new NotYetImplementedForExchangeException("getSupportedCurrencies");
   }
 }
