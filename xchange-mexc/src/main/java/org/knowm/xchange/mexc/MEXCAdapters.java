@@ -168,7 +168,7 @@ public class MEXCAdapters {
               FundingRecord fundingRecord =
                   new FundingRecord(
                       mexcRecord.getAddress(),
-                      convertToDate(mexcRecord.getUpdateTime()),
+                      convertToDate(mexcRecord.getCreateTime()),
                       Currency.getInstance(mexcRecord.getCurrency()),
                       mexcRecord.getAmount(),
                       mexcRecord.getTxId(),
@@ -188,7 +188,7 @@ public class MEXCAdapters {
               FundingRecord fundingRecord =
                   new FundingRecord(
                       mexcRecord.getAddress(),
-                      convertToDate(mexcRecord.getUpdateTime()),
+                      convertToDate(mexcRecord.getCreateTime()),
                       Currency.getInstance(mexcRecord.getCurrency()),
                       mexcRecord.getAmount(),
                       mexcRecord.getId(),
@@ -207,6 +207,7 @@ public class MEXCAdapters {
   private static FundingRecord.Status getStatus(String gateioStatus) {
     switch (gateioStatus) {
       case "SUCCESS":
+      case "PRE_SUCCESS":
         return FundingRecord.Status.COMPLETE;
       case "CANCEL":
         return FundingRecord.Status.CANCELLED;
