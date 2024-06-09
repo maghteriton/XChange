@@ -16,4 +16,5 @@ public class ProbitWithdrawalRequestDTO {
   private String address;
   private String destination_tag;
   private String amount;
+  private String fee_currency_id;
 }

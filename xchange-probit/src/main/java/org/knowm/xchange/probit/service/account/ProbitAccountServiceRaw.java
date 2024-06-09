@@ -55,11 +55,11 @@ public class ProbitAccountServiceRaw extends ProbitBaseService {
         .call();
   }
 
-  public ProbitResultDTO<List<ProbitDepositAddressDTO>> getDepositAddress(Currency currency)
+  public ProbitResultDTO<List<ProbitDepositAddressDTO>> getPlatformDepositAddress(Currency currency, String platform)
       throws IOException {
 
     return decorateApiCall(
-            () -> accountAPI.depositAddress(signatureCreator, currency.getCurrencyCode()))
+            () -> accountAPI.depositAddress(signatureCreator, currency.getCurrencyCode(), platform))
         .withRetry(retry("getDepositAddress"))
         .withRateLimiter(rateLimiter(GROUP_3_ENDPOINT_RATE_LIMITER))
         .call();

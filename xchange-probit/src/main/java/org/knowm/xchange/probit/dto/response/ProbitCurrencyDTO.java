@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -17,7 +18,7 @@ public class ProbitCurrencyDTO {
   private final Integer displayPrecision;
   private final Integer minConfirmationCount;
   private final BigDecimal minWithdrawalAmount;
-  private final BigDecimal withdrawalFee;
+  private final List<ProbitWithdrawalFeeDTO> withdrawalFeeList;
   private final Boolean depositSuspended;
   private final Boolean withdrawalSuspended;
   private final Integer internalPrecision;
@@ -35,7 +36,7 @@ public class ProbitCurrencyDTO {
       @JsonProperty("display_precision") Integer displayPrecision,
       @JsonProperty("min_confirmation_count") Integer minConfirmationCount,
       @JsonProperty("min_withdrawal_amount") BigDecimal minWithdrawalAmount,
-      @JsonProperty("withdrawal_fee") BigDecimal withdrawalFee,
+      @JsonProperty("withdrawal_fee") List<ProbitWithdrawalFeeDTO> withdrawalFeeList,
       @JsonProperty("deposit_suspended") Boolean depositSuspended,
       @JsonProperty("withdrawal_suspended") Boolean withdrawalSuspended,
       @JsonProperty("internal_precision") Integer internalPrecision,
@@ -50,7 +51,7 @@ public class ProbitCurrencyDTO {
     this.displayPrecision = displayPrecision;
     this.minConfirmationCount = minConfirmationCount;
     this.minWithdrawalAmount = minWithdrawalAmount;
-    this.withdrawalFee = withdrawalFee;
+    this.withdrawalFeeList = withdrawalFeeList;
     this.depositSuspended = depositSuspended;
     this.withdrawalSuspended = withdrawalSuspended;
     this.internalPrecision = internalPrecision;

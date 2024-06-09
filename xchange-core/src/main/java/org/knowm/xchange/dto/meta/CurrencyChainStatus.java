@@ -11,6 +11,7 @@ public class CurrencyChainStatus {
   private final String contractAddress;
   private final Boolean isDepositEnabled;
   private final Boolean isWithdrawalEnabled;
+  private final Currency withdrawalFeeCurrency;
   private final BigDecimal minWithdrawalFee;
   private final BigDecimal maxWithdrawalFee;
 
@@ -20,6 +21,7 @@ public class CurrencyChainStatus {
       String contractAddress,
       Boolean isDepositEnabled,
       Boolean isWithdrawalEnabled,
+      Currency withdrawalFeeCurrency,
       BigDecimal minWithdrawalFee,
       BigDecimal maxWithdrawalFee) {
     this.currency = currency;
@@ -27,6 +29,25 @@ public class CurrencyChainStatus {
     this.contractAddress = contractAddress;
     this.isDepositEnabled = isDepositEnabled;
     this.isWithdrawalEnabled = isWithdrawalEnabled;
+    this.withdrawalFeeCurrency = withdrawalFeeCurrency == null ? currency : withdrawalFeeCurrency;
+    this.minWithdrawalFee = minWithdrawalFee;
+    this.maxWithdrawalFee = maxWithdrawalFee;
+  }
+
+  public CurrencyChainStatus(
+          Currency currency,
+          String chain,
+          String contractAddress,
+          Boolean isDepositEnabled,
+          Boolean isWithdrawalEnabled,
+          BigDecimal minWithdrawalFee,
+          BigDecimal maxWithdrawalFee) {
+    this.currency = currency;
+    this.chain = chain;
+    this.contractAddress = contractAddress;
+    this.isDepositEnabled = isDepositEnabled;
+    this.isWithdrawalEnabled = isWithdrawalEnabled;
+    this.withdrawalFeeCurrency = currency;
     this.minWithdrawalFee = minWithdrawalFee;
     this.maxWithdrawalFee = maxWithdrawalFee;
   }
@@ -49,6 +70,10 @@ public class CurrencyChainStatus {
 
   public Boolean isWithdrawalEnabled() {
     return isWithdrawalEnabled;
+  }
+
+  public Currency getWithdrawalFeeCurrency() {
+    return withdrawalFeeCurrency;
   }
 
   public BigDecimal getMinWithdrawalFee() {

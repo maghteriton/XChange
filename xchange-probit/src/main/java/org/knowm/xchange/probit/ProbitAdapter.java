@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
 import static org.knowm.xchange.dto.Order.OrderStatus.*;
-import static org.knowm.xchange.dto.Order.OrderStatus.REJECTED;
 import static org.knowm.xchange.dto.Order.OrderType.ASK;
 import static org.knowm.xchange.dto.Order.OrderType.BID;
 
@@ -42,6 +41,8 @@ public class ProbitAdapter {
   private static final String ORDER_TYPE_SELL = "sell";
   private static final String ORDER_TYPE_BUY = "buy";
   private static final String DEFAULT_TRADE_FEE = "0.002";
+  private static final String BSC = "BSC";
+  private static final String BNB = "BNB";
 
   private ProbitAdapter() {
     // hides the public one
@@ -103,10 +104,12 @@ public class ProbitAdapter {
 
     Map<Currency, CurrencyMetaData> currencies = new HashMap<>();
     for (ProbitCurrencyDTO currencyDatum : currencyData) {
+      List<ProbitWithdrawalFeeDTO> withdrawalFeeList = currencyDatum.getWithdrawalFeeList();
+
       CurrencyMetaData currencyMetaData =
           new CurrencyMetaData(
               currencyDatum.getPrecision(),
-              currencyDatum.getWithdrawalFee(),
+              withdrawalFeeList.get(0).getAmount(),
               currencyDatum.getMinWithdrawalAmount(),
               getWalletHealthStatus(currencyDatum));
       currencies.put(new Currency(currencyDatum.getId()), currencyMetaData);
@@ -118,6 +121,22 @@ public class ProbitAdapter {
         exchangeMetaData.getPublicRateLimits(),
         exchangeMetaData.getPrivateRateLimits(),
         true);
+  }
+
+  public static ProbitWithdrawalFeeDTO getPlatformWithdrawalFee(
+      ProbitCurrencyDTO probitCurrencyDTO) {
+    ProbitWithdrawalFeeDTO withdrawalFeeDTO = null;
+    for (ProbitWithdrawalFeeDTO probitWithdrawalFeeDTO : probitCurrencyDTO.getWithdrawalFeeList()) {
+      String platformCurrency = getPlatformCurrency(probitCurrencyDTO.getPlatform());
+      if (probitWithdrawalFeeDTO.getCurrencyId().equals(platformCurrency) || probitWithdrawalFeeDTO.getCurrencyId().equals(probitCurrencyDTO.getId())) {
+        withdrawalFeeDTO = probitWithdrawalFeeDTO;
+      }
+    }
+    return withdrawalFeeDTO;
+  }
+
+  public static String getPlatformCurrency(String probitPlatform) {
+    return BSC.equals(probitPlatform) ? BNB : probitPlatform;
   }
 
   private static WalletHealth getWalletHealthStatus(ProbitCurrencyDTO currencyDatum) {
@@ -297,15 +316,15 @@ public class ProbitAdapter {
 
   public static Order adaptOrder(ProbitLimitOrderDTO probitLimitOrderDTO, BigDecimal tradingFee) {
     BigDecimal averagePrice =
-            probitLimitOrderDTO.getFilledCost().equals(BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : BigDecimal.valueOf(
-                            probitLimitOrderDTO.getFilledCost().doubleValue()
-                                    / probitLimitOrderDTO.getFilledQuantity().doubleValue())
-                    .setScale(probitLimitOrderDTO.getLimitPrice().scale(), RoundingMode.HALF_EVEN);
+        probitLimitOrderDTO.getFilledCost().equals(BigDecimal.ZERO)
+            ? BigDecimal.ZERO
+            : BigDecimal.valueOf(
+                    probitLimitOrderDTO.getFilledCost().doubleValue()
+                        / probitLimitOrderDTO.getFilledQuantity().doubleValue())
+                .setScale(probitLimitOrderDTO.getLimitPrice().scale(), RoundingMode.HALF_EVEN);
 
     BigDecimal usdtFee;
-    if(tradingFee != null && tradingFee.doubleValue() == 0.0) {
+    if (tradingFee != null && tradingFee.doubleValue() == 0.0) {
       usdtFee = probitLimitOrderDTO.getFilledCost().multiply(tradingFee);
     } else {
       usdtFee = probitLimitOrderDTO.getFilledCost().multiply(new BigDecimal(DEFAULT_TRADE_FEE));
@@ -314,14 +333,14 @@ public class ProbitAdapter {
     return new LimitOrder.Builder(
             ProbitAdapter.adaptFromProbitSide(probitLimitOrderDTO.getSide()),
             ProbitAdapter.adaptFromProbitSymbol(probitLimitOrderDTO.getMarketId()))
-            .originalAmount(probitLimitOrderDTO.getQuantity())
-            .cumulativeAmount(probitLimitOrderDTO.getFilledQuantity())
-            .id(String.valueOf(probitLimitOrderDTO.getId()))
-            .limitPrice(probitLimitOrderDTO.getLimitPrice())
-            .averagePrice(averagePrice)
-            .orderStatus(ProbitAdapter.adaptFromProbitOrderStatus(probitLimitOrderDTO.getStatus()))
-            .fee(usdtFee)
-            .build();
+        .originalAmount(probitLimitOrderDTO.getQuantity())
+        .cumulativeAmount(probitLimitOrderDTO.getFilledQuantity())
+        .id(String.valueOf(probitLimitOrderDTO.getId()))
+        .limitPrice(probitLimitOrderDTO.getLimitPrice())
+        .averagePrice(averagePrice)
+        .orderStatus(ProbitAdapter.adaptFromProbitOrderStatus(probitLimitOrderDTO.getStatus()))
+        .fee(usdtFee)
+        .build();
   }
 
   private static Order.OrderStatus adaptFromProbitOrderStatus(String orderStatus) {

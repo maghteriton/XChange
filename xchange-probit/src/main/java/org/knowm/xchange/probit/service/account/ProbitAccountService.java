@@ -89,6 +89,7 @@ public class ProbitAccountService extends ProbitAccountServiceRaw implements Acc
             .address(defaultParams.getAddress())
             .destination_tag(defaultParams.getAddressTag())
             .amount(defaultParams.getAmount().toPlainString())
+            .fee_currency_id(ProbitAdapter.getPlatformCurrency(defaultParams.getChain()))
             .build();
 
     ProbitWithdrawalDTO withdraw;
@@ -109,7 +110,7 @@ public class ProbitAccountService extends ProbitAccountServiceRaw implements Acc
     List<DepositAddress> depositAddressesWithoutNetwork;
     try {
       depositAddressesWithoutNetwork =
-          ProbitAdapter.adaptDepositAddresses(getDepositAddress(currency).getData());
+          ProbitAdapter.adaptDepositAddresses(getPlatformDepositAddress(currency, null).getData());
     } catch (ProbitException e) {
       throw new ExchangeException(
           String.format(
@@ -148,14 +149,21 @@ public class ProbitAccountService extends ProbitAccountServiceRaw implements Acc
       for (ProbitCurrencyDTO probitCurrencyDTO : currencyList) {
         if (probitCurrencyDTO.getId().equals(currency.getCurrencyCode())) {
           if (probitCurrencyDTO.getPlatform().equalsIgnoreCase(chain)) {
-            return new CurrencyChainStatus(
-                currency,
-                probitCurrencyDTO.getPlatform(),
-                CONTRACT_ADDR_NOT_SUPPORTED_BY_API,
-                !probitCurrencyDTO.getDepositSuspended(),
-                !probitCurrencyDTO.getWithdrawalSuspended(),
-                probitCurrencyDTO.getWithdrawalFee(),
-                probitCurrencyDTO.getWithdrawalFee());
+
+            ProbitWithdrawalFeeDTO platformWithdrawalFee =
+                ProbitAdapter.getPlatformWithdrawalFee(probitCurrencyDTO);
+
+            if (platformWithdrawalFee != null) {
+              return new CurrencyChainStatus(
+                  currency,
+                  probitCurrencyDTO.getPlatform(),
+                  CONTRACT_ADDR_NOT_SUPPORTED_BY_API,
+                  !probitCurrencyDTO.getDepositSuspended(),
+                  !probitCurrencyDTO.getWithdrawalSuspended(),
+                  new Currency(platformWithdrawalFee.getCurrencyId()),
+                  platformWithdrawalFee.getAmount(),
+                  platformWithdrawalFee.getAmount());
+            }
           }
         }
       }

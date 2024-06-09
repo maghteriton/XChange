@@ -44,6 +44,7 @@ public interface AccountAPI {
   @Path("/deposit_address")
   ProbitResultDTO<List<ProbitDepositAddressDTO>> depositAddress(
       @HeaderParam(APIConstants.AUTH_KEY) ParamsDigest authorization,
-      @QueryParam("currency_id") String currency)
+      @QueryParam("currency_id") String currency,
+      @QueryParam("platform_id") String platform)
       throws IOException, ProbitException;
 }

@@ -243,14 +243,16 @@ public class HuobiAdapters {
       averagePrice = BigDecimal.valueOf(openOrder.getFilledCashAmount().doubleValue() / openOrder.getFilledAmount().doubleValue()).setScale(openOrder.getPrice().scale(),RoundingMode.HALF_EVEN).stripTrailingZeros();
     }
 
-    BigDecimal filledFeesAsCoinAmount;
+    BigDecimal filledFeesAsCoinAmount = BigDecimal.ZERO;
     BigDecimal filledFeesAsUSDT;
     //buy order fee is coin, sell order fee is USDT
     if(openOrder.getType().equals(BUY_LIMIT)) {
       filledFeesAsCoinAmount = openOrder.getFilledFees();
       filledFeesAsUSDT = openOrder.getFilledFees().multiply(averagePrice);
     } else {
-      filledFeesAsCoinAmount = openOrder.getFilledFees().divide(averagePrice, RoundingMode.HALF_EVEN);
+      if(averagePrice.doubleValue() != 0.0) {
+        filledFeesAsCoinAmount = openOrder.getFilledFees().divide(averagePrice, RoundingMode.HALF_EVEN);
+      }
       filledFeesAsUSDT = openOrder.getFilledFees();
     }
 
