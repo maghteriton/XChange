@@ -25,6 +25,10 @@ import org.knowm.xchange.probit.model.ProbitTransferType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,6 +47,7 @@ public class ProbitAdapter {
   private static final String DEFAULT_TRADE_FEE = "0.002";
   private static final String BSC = "BSC";
   private static final String BNB = "BNB";
+  private static final String UTC = "UTC";
 
   private ProbitAdapter() {
     // hides the public one
@@ -357,5 +362,22 @@ public class ProbitAdapter {
       default:
         throw new ExchangeException("Not supported status: " + orderStatus);
     }
+  }
+
+  public static String convertToUtcString(Date date) {
+    // Convert Date to Instant
+    Instant instant = date.toInstant();
+
+    // Get the system default time zone
+    ZoneId systemZone = ZoneId.systemDefault();
+
+    // Create a ZonedDateTime with the system default time zone
+    ZonedDateTime dateTimeWithZone = instant.atZone(systemZone);
+
+    // Convert to UTC
+    ZonedDateTime utcDateTime = dateTimeWithZone.withZoneSameInstant(ZoneId.of(UTC));
+
+    // Convert ZonedDateTime back to Date
+    return utcDateTime.toLocalDateTime().toInstant(ZoneOffset.UTC).toString();
   }
 }

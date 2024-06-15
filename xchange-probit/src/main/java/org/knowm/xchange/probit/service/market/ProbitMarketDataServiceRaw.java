@@ -51,8 +51,8 @@ public class ProbitMarketDataServiceRaw extends ProbitBaseService {
             () ->
                 marketAPI.getCandle(
                     ProbitAdapter.adaptCurrencyPair(currencyPair),
-                    ProbitAdapter.formatDate(startTime),
-                    ProbitAdapter.formatDate(endTime),
+                    ProbitAdapter.convertToUtcString(startTime),
+                    ProbitAdapter.convertToUtcString(endTime),
                     interval,
                     DEFAULT_ORDER,
                     DEFAULT_LIMIT))

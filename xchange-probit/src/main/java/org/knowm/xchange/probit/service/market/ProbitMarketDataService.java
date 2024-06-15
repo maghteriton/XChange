@@ -91,8 +91,8 @@ public class ProbitMarketDataService extends ProbitMarketDataServiceRaw
     ProbitResultDTO<List<ProbitCandleDTO>> candleData =
         getCandleData(
             currencyPair,
-            defaultCandleStickParam.getStartDate(),
             defaultCandleStickParam.getEndDate(),
+            defaultCandleStickParam.getStartDate(),
             interval.code());
     return ProbitAdapter.adaptCandleStickData(currencyPair, candleData.getData());
   }
