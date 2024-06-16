@@ -45,8 +45,10 @@ public class ProbitAdapter {
   private static final String ORDER_TYPE_SELL = "sell";
   private static final String ORDER_TYPE_BUY = "buy";
   private static final String DEFAULT_TRADE_FEE = "0.002";
-  private static final String BSC = "BSC";
-  private static final String BNB = "BNB";
+  private static final String BSC_PLATFORM = "BSC";
+  private static final String BNB_CURRENCY = "BNB";
+  private static final String TRON_PLATFORM = "TRON";
+  private static final String TRX_CURRENCY = "TRX";
   private static final String UTC = "UTC";
 
   private ProbitAdapter() {
@@ -133,7 +135,8 @@ public class ProbitAdapter {
     ProbitWithdrawalFeeDTO withdrawalFeeDTO = null;
     for (ProbitWithdrawalFeeDTO probitWithdrawalFeeDTO : probitCurrencyDTO.getWithdrawalFeeList()) {
       String platformCurrency = getPlatformCurrency(probitCurrencyDTO.getPlatform());
-      if (probitWithdrawalFeeDTO.getCurrencyId().equals(platformCurrency) || probitWithdrawalFeeDTO.getCurrencyId().equals(probitCurrencyDTO.getId())) {
+      if (probitWithdrawalFeeDTO.getCurrencyId().equals(platformCurrency)
+          || probitWithdrawalFeeDTO.getCurrencyId().equals(probitCurrencyDTO.getId())) {
         withdrawalFeeDTO = probitWithdrawalFeeDTO;
       }
     }
@@ -141,7 +144,14 @@ public class ProbitAdapter {
   }
 
   public static String getPlatformCurrency(String probitPlatform) {
-    return BSC.equals(probitPlatform) ? BNB : probitPlatform;
+    switch (probitPlatform) {
+      case BSC_PLATFORM:
+        return BNB_CURRENCY;
+      case TRON_PLATFORM:
+        return TRX_CURRENCY;
+      default:
+        return probitPlatform;
+    }
   }
 
   private static WalletHealth getWalletHealthStatus(ProbitCurrencyDTO currencyDatum) {
