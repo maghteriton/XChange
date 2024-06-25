@@ -168,7 +168,7 @@ public class ProbitAdapter {
 
   private static InstrumentMetaData adaptCurrencyMetaData(ProbitMarketDTO marketDatum) {
     return new InstrumentMetaData.Builder()
-        .tradingFee(marketDatum.getTakerFeeRate())
+        .tradingFee(marketDatum.getTakerFeeRate().multiply(new BigDecimal("0.01")))
         .minimumAmount(marketDatum.getMinQuantity())
         .maximumAmount(marketDatum.getMaxQuantity())
         .amountStepSize(new BigDecimal("1").movePointLeft(marketDatum.getQuantityPrecision()))
