@@ -65,60 +65,10 @@ public class BitgetExchange extends BaseExchange implements Exchange {
 
   @Override
   public void remoteInit() throws IOException, ExchangeException {
-
-    try {
-      List<BitgetCoinsResponse> bitgetCoins = getMarketDataService().getBitgetCoins(null);
-      List<BitgetSymbolsResponse> bitgetSymbols = getMarketDataService().getBitgetSymbols(null);
-      CandleStickDataParams candleStickDataParams =
-          new DefaultCandleStickParam(
-              DateTime.now().plusMinutes(30).toDate(), DateTime.now().minusHours(3).toDate(), 1800);
-
-      CandleStickData candleStickData =
-          marketDataService.getCandleStickData(
-              new CurrencyPair("XLM", "USDT"), candleStickDataParams);
-
-      OrderBook orderBook = marketDataService.getOrderBook(new CurrencyPair("XLM", "USDT"));
-
-      CurrencyChainStatus currencyChainStatus =
-          accountService.getCurrencyChainStatus(new Currency("XLM"), "StellarLumens");
-
-      ((BitgetAccountService) accountService).setBitgetCoinInformation(bitgetCoins);
-      this.exchangeMetaData = BitgetAdapter.adaptMetadata(bitgetCoins, bitgetSymbols);
-
-      accountService.getDepositAddresses(new Currency("USDT"));
-
-      TradeHistoryParamsAll defaultWithdrawFundsParams = new TradeHistoryParamsAll();
-      defaultWithdrawFundsParams.setCurrencyPair(new CurrencyPair("USDT", "trc20"));
-      defaultWithdrawFundsParams.setStartTime(new DateTime().minusDays(2).toDate());
-      defaultWithdrawFundsParams.setEndTime(new Date());
-      defaultWithdrawFundsParams.setType(FundingRecord.Type.DEPOSIT);
-      defaultWithdrawFundsParams.setOrder(TradeHistoryParamsSorted.Order.desc);
-      defaultWithdrawFundsParams.setLimit(100);
-      accountService.getFundingHistory(defaultWithdrawFundsParams);
-
-      CurrencyPair currencyPair = new CurrencyPair("XLM", "USDT");
-
-      /*      LimitOrder makerLimitOrder =
-          new LimitOrder(
-              Order.OrderType.ASK,
-              new BigDecimal("99.90"),
-              currencyPair,
-              UUID.randomUUID().toString(),
-              null,
-              new BigDecimal("0.09164"));
-      String orderId = tradeService.placeLimitOrder(makerLimitOrder);
-
-      CancelOrderParams cancelParam =
-          new DefaultCancelOrderByCurrencyPairAndIdParams(currencyPair, orderId);
-      boolean b = tradeService.cancelOrder(cancelParam);*/
-
-      OrderQueryParams queryParams =
-          new DefaultQueryOrderParamCurrencyPair(currencyPair, "1188713239045120006");
-      Collection<Order> order = tradeService.getOrder(queryParams);
-
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    List<BitgetCoinsResponse> bitgetCoins = getMarketDataService().getBitgetCoins(null);
+    List<BitgetSymbolsResponse> bitgetSymbols = getMarketDataService().getBitgetSymbols(null);
+    ((BitgetAccountService) accountService).setBitgetCoinInformation(bitgetCoins);
+    this.exchangeMetaData = BitgetAdapter.adaptMetadata(bitgetCoins, bitgetSymbols);
   }
 
   @Override
