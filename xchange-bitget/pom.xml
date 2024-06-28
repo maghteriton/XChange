@@ -11,7 +11,7 @@
 
     <artifactId>xchange-bitget</artifactId>
 
-    <name>XChange Kucoin</name>
+    <name>XChange Bitget</name>
     <description>XChange implementation for the Bitget Exchange</description>
 
     <url>http://knowm.org/open-source/xchange/</url>
