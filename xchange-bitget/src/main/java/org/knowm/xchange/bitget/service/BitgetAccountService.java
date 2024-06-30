@@ -2,7 +2,6 @@ package org.knowm.xchange.bitget.service;
 
 import org.knowm.xchange.bitget.BitgetAdapter;
 import org.knowm.xchange.bitget.BitgetExchange;
-import org.knowm.xchange.bitget.model.BitgetResponse;
 import org.knowm.xchange.bitget.model.dto.response.BitgetCoinsResponse;
 import org.knowm.xchange.bitget.model.dto.response.BitgetOrderIdResponse;
 import org.knowm.xchange.bitget.service.exception.BitgetApiException;
@@ -19,10 +18,12 @@ import org.knowm.xchange.service.trade.params.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class BitgetAccountService extends BitgetAccountServiceRaw implements AccountService {
   private List<BitgetCoinsResponse> bitgetCoin;
+  private BitgetMarketDataServiceRaw bitgetMarketDataServiceRaw;
 
   public BitgetAccountService(
       BitgetExchange bitgetExchange, ResilienceRegistries resilienceRegistries) {
@@ -112,26 +113,30 @@ public class BitgetAccountService extends BitgetAccountServiceRaw implements Acc
   public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
       throws IOException {
 
-    List<BitgetCoinsResponse> coinChainList = null;
+    List<BitgetCoinsResponse> bitgetCoins = null;
     if (marketAPI != null) {
-      BitgetResponse<List<BitgetCoinsResponse>> bitgetCoinResponse =
-          marketAPI.getCoins(currency.getCurrencyCode());
-      coinChainList = bitgetCoinResponse.getData();
+        try {
+            bitgetCoins = bitgetMarketDataServiceRaw.getBitgetCoins(null);
+        } catch (ExecutionException e) {
+            throw new ExchangeException(e);
+        }
     }
 
-    if (coinChainList != null && !coinChainList.isEmpty()) {
-      for (BitgetCoinsResponse bitgetCoinsResponse : coinChainList) {
-        List<BitgetCoinsResponse.Chain> chains = bitgetCoinsResponse.getChains();
-        for (BitgetCoinsResponse.Chain bitgetChain : chains) {
-          if (bitgetChain.getChain().equalsIgnoreCase(chain)) {
-            return new CurrencyChainStatus(
-                currency,
-                bitgetChain.getChain(),
-                bitgetChain.getContractAddress(),
-                bitgetChain.getRechargeable(),
-                bitgetChain.getWithdrawable(),
-                bitgetChain.getWithdrawFee(),
-                bitgetChain.getWithdrawFee());
+    if (bitgetCoins != null && !bitgetCoins.isEmpty()) {
+      for (BitgetCoinsResponse bitgetCoinsResponse : bitgetCoins) {
+        if (bitgetCoinsResponse.getCoin().equalsIgnoreCase(currency.getCurrencyCode())) {
+          List<BitgetCoinsResponse.Chain> chains = bitgetCoinsResponse.getChains();
+          for (BitgetCoinsResponse.Chain bitgetChain : chains) {
+            if (bitgetChain.getChain().equalsIgnoreCase(chain)) {
+              return new CurrencyChainStatus(
+                  currency,
+                  bitgetChain.getChain(),
+                  bitgetChain.getContractAddress(),
+                  bitgetChain.getRechargeable(),
+                  bitgetChain.getWithdrawable(),
+                  bitgetChain.getWithdrawFee(),
+                  bitgetChain.getWithdrawFee());
+            }
           }
         }
       }
@@ -141,5 +146,9 @@ public class BitgetAccountService extends BitgetAccountServiceRaw implements Acc
 
   public void setBitgetCoinInformation(List<BitgetCoinsResponse> bitgetCoins) {
     this.bitgetCoin = bitgetCoins;
+  }
+
+  public void setMarketDataServiceRaw(BitgetMarketDataServiceRaw marketDataService) {
+    this.bitgetMarketDataServiceRaw = marketDataService;
   }
 }

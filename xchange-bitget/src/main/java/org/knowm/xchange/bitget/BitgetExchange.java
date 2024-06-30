@@ -11,22 +11,11 @@ import org.knowm.xchange.bitget.service.BitgetAccountService;
 import org.knowm.xchange.bitget.service.BitgetMarketDataService;
 import org.knowm.xchange.bitget.service.BitgetTradeService;
 import org.knowm.xchange.client.ResilienceRegistries;
-import org.knowm.xchange.currency.Currency;
-import org.knowm.xchange.currency.CurrencyPair;
-import org.knowm.xchange.dto.Order;
-import org.knowm.xchange.dto.account.FundingRecord;
-import org.knowm.xchange.dto.marketdata.CandleStickData;
-import org.knowm.xchange.dto.marketdata.OrderBook;
-import org.knowm.xchange.dto.meta.CurrencyChainStatus;
 import org.knowm.xchange.exceptions.ExchangeException;
-import org.knowm.xchange.service.trade.params.*;
 
 import java.io.IOException;
 import java.util.*;
-
-import org.joda.time.DateTime;
-import org.knowm.xchange.service.trade.params.orders.DefaultQueryOrderParamCurrencyPair;
-import org.knowm.xchange.service.trade.params.orders.OrderQueryParams;
+import java.util.concurrent.ExecutionException;
 
 public class BitgetExchange extends BaseExchange implements Exchange {
 
@@ -65,9 +54,15 @@ public class BitgetExchange extends BaseExchange implements Exchange {
 
   @Override
   public void remoteInit() throws IOException, ExchangeException {
-    List<BitgetCoinsResponse> bitgetCoins = getMarketDataService().getBitgetCoins(null);
+    List<BitgetCoinsResponse> bitgetCoins;
+    try {
+      bitgetCoins = getMarketDataService().getBitgetCoins(null);
+    } catch (ExecutionException e) {
+      throw new ExchangeException(e);
+    }
     List<BitgetSymbolsResponse> bitgetSymbols = getMarketDataService().getBitgetSymbols(null);
     ((BitgetAccountService) accountService).setBitgetCoinInformation(bitgetCoins);
+    ((BitgetAccountService) accountService).setMarketDataServiceRaw(getMarketDataService());
     this.exchangeMetaData = BitgetAdapter.adaptMetadata(bitgetCoins, bitgetSymbols);
   }
 
