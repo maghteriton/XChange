@@ -54,12 +54,7 @@ public class BitgetExchange extends BaseExchange implements Exchange {
 
   @Override
   public void remoteInit() throws IOException, ExchangeException {
-    List<BitgetCoinsResponse> bitgetCoins;
-    try {
-      bitgetCoins = getMarketDataService().getBitgetCoins(null);
-    } catch (ExecutionException e) {
-      throw new ExchangeException(e);
-    }
+    List<BitgetCoinsResponse> bitgetCoins = getMarketDataService().getBitgetCoins(null);
     List<BitgetSymbolsResponse> bitgetSymbols = getMarketDataService().getBitgetSymbols(null);
     ((BitgetAccountService) accountService).setBitgetCoinInformation(bitgetCoins);
     ((BitgetAccountService) accountService).setMarketDataServiceRaw(getMarketDataService());

@@ -55,7 +55,8 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
 
     DefaultWithdrawFundsParams defaultParams = (DefaultWithdrawFundsParams) params;
 
-    BingxWithdrawWrapper withdraw = withdraw(
+    BingxWithdrawWrapper withdraw =
+        withdraw(
             defaultParams.getAddress(),
             defaultParams.getAddressTag(),
             defaultParams.getAmount(),
@@ -85,23 +86,26 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
   }
 
   @Override
-  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
-      throws IOException {
-    List<BingxWalletDTO> wallets = getWallets(currency.getCurrencyCode());
+  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain) {
+    List<BingxWalletDTO> wallets = getWallets(null);
 
-    if (!wallets.isEmpty()) {
-      List<BingxNetworkDTO> networkList = wallets.get(0).getNetworkList();
-      if (!networkList.isEmpty()) {
-        for (BingxNetworkDTO bingxNetwork : networkList) {
-          if (bingxNetwork.getNetwork().equalsIgnoreCase(chain)) {
-            return new CurrencyChainStatus(
-                currency,
-                bingxNetwork.getNetwork(),
-                bingxNetwork.getContractAddress(),
-                bingxNetwork.isDepositEnable(),
-                bingxNetwork.isWithdrawEnable(),
-                bingxNetwork.getWithdrawFee(),
-                bingxNetwork.getWithdrawFee());
+    if (wallets != null && !wallets.isEmpty()) {
+      for (BingxWalletDTO wallet : wallets) {
+        if (wallet.getCoin().equalsIgnoreCase(currency.getCurrencyCode())) {
+          List<BingxNetworkDTO> networkList = wallet.getNetworkList();
+          if (!networkList.isEmpty()) {
+            for (BingxNetworkDTO bingxNetwork : networkList) {
+              if (bingxNetwork.getNetwork().equalsIgnoreCase(chain)) {
+                return new CurrencyChainStatus(
+                    currency,
+                    bingxNetwork.getNetwork(),
+                    bingxNetwork.getContractAddress(),
+                    bingxNetwork.isDepositEnable(),
+                    bingxNetwork.isWithdrawEnable(),
+                    bingxNetwork.getWithdrawFee(),
+                    bingxNetwork.getWithdrawFee());
+              }
+            }
           }
         }
       }

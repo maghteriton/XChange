@@ -110,16 +110,11 @@ public class BitgetAccountService extends BitgetAccountServiceRaw implements Acc
   }
 
   @Override
-  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain)
-      throws IOException {
+  public CurrencyChainStatus getCurrencyChainStatus(Currency currency, String chain) {
 
     List<BitgetCoinsResponse> bitgetCoins = null;
     if (marketAPI != null) {
-        try {
-            bitgetCoins = bitgetMarketDataServiceRaw.getBitgetCoins(null);
-        } catch (ExecutionException e) {
-            throw new ExchangeException(e);
-        }
+      bitgetCoins = bitgetMarketDataServiceRaw.getBitgetCoins(null);
     }
 
     if (bitgetCoins != null && !bitgetCoins.isEmpty()) {

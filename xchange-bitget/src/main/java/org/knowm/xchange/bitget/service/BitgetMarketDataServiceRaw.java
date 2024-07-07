@@ -8,6 +8,7 @@ import org.knowm.xchange.bitget.model.dto.response.BitgetCoinsResponse;
 import org.knowm.xchange.bitget.model.dto.response.BitgetOrderBookResponse;
 import org.knowm.xchange.bitget.model.dto.response.BitgetSymbolsResponse;
 import org.knowm.xchange.client.ResilienceRegistries;
+import org.knowm.xchange.exceptions.ExchangeException;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,16 +39,20 @@ public class BitgetMarketDataServiceRaw extends BitgetBaseService {
                 .call());
   }
 
-  public List<BitgetCoinsResponse> getBitgetCoins(String coin) throws ExecutionException {
+  public List<BitgetCoinsResponse> getBitgetCoins(String coin) {
     String cacheKey = coin == null ? DEFAULT_CACHE_KEY : coin;
-    return coinsCache.get(
-        cacheKey,
-        () ->
-            classifyingExceptions(
-                () ->
-                    decorateApiCall(() -> marketAPI.getCoins(coin))
-                        .withRateLimiter(rateLimiter(PUBLIC_REST_ENDPOINT_RATE_LIMITER))
-                        .call()));
+    try {
+      return coinsCache.get(
+          cacheKey,
+          () ->
+              classifyingExceptions(
+                  () ->
+                      decorateApiCall(() -> marketAPI.getCoins(coin))
+                          .withRateLimiter(rateLimiter(PUBLIC_REST_ENDPOINT_RATE_LIMITER))
+                          .call()));
+    } catch (ExecutionException e) {
+      throw new ExchangeException(e);
+    }
   }
 
   public BitgetOrderBookResponse getBitgetOrderBook(String symbol) throws IOException {
