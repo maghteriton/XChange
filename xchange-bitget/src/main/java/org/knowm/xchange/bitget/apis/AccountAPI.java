@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.knowm.xchange.bitget.model.BitgetResponse;
 import org.knowm.xchange.bitget.model.dto.request.BitgetWithdrawalRequest;
+import org.knowm.xchange.bitget.model.dto.response.BitgetBalanceResponse;
 import org.knowm.xchange.bitget.model.dto.response.BitgetDepositAddressResponse;
 import org.knowm.xchange.bitget.model.BitgetAPIConstants;
 import org.knowm.xchange.bitget.model.dto.response.BitgetDepositRecordsResponse;
@@ -19,6 +20,17 @@ import javax.ws.rs.core.MediaType;
 @Path("/api")
 @Produces(MediaType.APPLICATION_JSON)
 public interface AccountAPI {
+
+  @GET
+  @Path("/v2/spot/account/assets")
+  BitgetResponse<List<BitgetBalanceResponse>> getAccountAssets(
+          @HeaderParam(BitgetAPIConstants.ACCESS_KEY) String apiKey,
+          @HeaderParam(BitgetAPIConstants.ACCESS_SIGN) ParamsDigest signature,
+          @HeaderParam(BitgetAPIConstants.ACCESS_PASSPHRASE) String apiPassphrase,
+          @HeaderParam(BitgetAPIConstants.ACCESS_TIMESTAMP) SynchronizedValueFactory<Long> nonce,
+          @QueryParam("coin") String coin,
+          @QueryParam("assetType") String assetType)
+          throws IOException, BitgetApiException;
 
   @GET
   @Path("/v2/spot/wallet/deposit-address")

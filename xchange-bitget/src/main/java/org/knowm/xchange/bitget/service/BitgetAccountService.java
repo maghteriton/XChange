@@ -2,11 +2,13 @@ package org.knowm.xchange.bitget.service;
 
 import org.knowm.xchange.bitget.BitgetAdapter;
 import org.knowm.xchange.bitget.BitgetExchange;
+import org.knowm.xchange.bitget.model.dto.response.BitgetBalanceResponse;
 import org.knowm.xchange.bitget.model.dto.response.BitgetCoinsResponse;
 import org.knowm.xchange.bitget.model.dto.response.BitgetOrderIdResponse;
 import org.knowm.xchange.bitget.service.exception.BitgetApiException;
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.Currency;
+import org.knowm.xchange.dto.account.AccountInfo;
 import org.knowm.xchange.dto.account.AddressWithTag;
 import org.knowm.xchange.dto.account.DepositAddress;
 import org.knowm.xchange.dto.account.FundingRecord;
@@ -28,6 +30,11 @@ public class BitgetAccountService extends BitgetAccountServiceRaw implements Acc
   public BitgetAccountService(
       BitgetExchange bitgetExchange, ResilienceRegistries resilienceRegistries) {
     super(bitgetExchange, resilienceRegistries);
+  }
+
+  @Override
+  public AccountInfo getAccountInfo() throws IOException {
+    return new AccountInfo(BitgetAdapter.adaptWallet(getBalances(null, null)));
   }
 
   @Override

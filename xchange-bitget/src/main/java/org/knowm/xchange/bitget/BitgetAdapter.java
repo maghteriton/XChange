@@ -5,8 +5,10 @@ import org.knowm.xchange.bitget.model.dto.response.*;
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
+import org.knowm.xchange.dto.account.Balance;
 import org.knowm.xchange.dto.account.DepositAddress;
 import org.knowm.xchange.dto.account.FundingRecord;
+import org.knowm.xchange.dto.account.Wallet;
 import org.knowm.xchange.dto.marketdata.CandleStick;
 import org.knowm.xchange.dto.marketdata.CandleStickData;
 import org.knowm.xchange.dto.marketdata.OrderBook;
@@ -264,7 +266,20 @@ public class BitgetAdapter {
     return new OrderBook(ts, asks, bids);
   }
 
-  private static final class PriceAndSize {
+    public static Wallet adaptWallet(List<BitgetBalanceResponse> bitgetBalanceResponses) {
+      List<Balance> balances = new ArrayList<>();
+      for (BitgetBalanceResponse bitgetBalanceResponse : bitgetBalanceResponses) {
+        Currency currency = new Currency(bitgetBalanceResponse.getCoin());
+        BigDecimal freeBalance = new BigDecimal(bitgetBalanceResponse.getAvailable());
+        BigDecimal lockedBalance = new BigDecimal(bitgetBalanceResponse.getLocked());
+        balances.add(
+                new Balance(currency, freeBalance.add(lockedBalance), freeBalance, lockedBalance));
+      }
+
+      return Wallet.Builder.from(balances).build();
+    }
+
+    private static final class PriceAndSize {
     final BigDecimal price;
     final BigDecimal size;
 

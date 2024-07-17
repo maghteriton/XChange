@@ -3,10 +3,7 @@ package org.knowm.xchange.bitget.service;
 import org.knowm.xchange.bitget.BitgetBaseService;
 import org.knowm.xchange.bitget.BitgetExchange;
 import org.knowm.xchange.bitget.model.dto.request.BitgetWithdrawalRequest;
-import org.knowm.xchange.bitget.model.dto.response.BitgetCoinsResponse;
-import org.knowm.xchange.bitget.model.dto.response.BitgetDepositAddressResponse;
-import org.knowm.xchange.bitget.model.dto.response.BitgetDepositRecordsResponse;
-import org.knowm.xchange.bitget.model.dto.response.BitgetOrderIdResponse;
+import org.knowm.xchange.bitget.model.dto.response.*;
 import org.knowm.xchange.bitget.service.exception.BitgetApiException;
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.dto.account.AddressWithTag;
@@ -26,6 +23,19 @@ public class BitgetAccountServiceRaw extends BitgetBaseService {
   protected BitgetAccountServiceRaw(
       BitgetExchange exchange, ResilienceRegistries resilienceRegistries) {
     super(exchange, resilienceRegistries);
+  }
+
+  public List<BitgetBalanceResponse> getBalances(String coin, String assetType)
+          throws IOException {
+    checkAuthenticated();
+    return classifyingExceptions(
+        () ->
+            decorateApiCall(
+                    () ->
+                        accountAPI.getAccountAssets(
+                            apiKey, digest, passphrase, nonceFactory, coin, assetType))
+                .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
+                .call());
   }
 
   public BitgetDepositAddressResponse getDepositAddress(String coin, String chain)
