@@ -70,8 +70,7 @@ public class BingxAccountService extends BingxAccountServiceRaw implements Accou
   @Override
   public List<DepositAddress> getDepositAddresses(Currency currency) throws IOException {
     List<DepositAddress> depositAddresses =
-        BingxAdapter.adaptDepositAddresses(
-            getDepositAddresses(currency.getCurrencyCode()).getData());
+        BingxAdapter.adaptDepositAddresses(getDepositAddresses(currency.getCurrencyCode()));
     // if address is not created, just return network information
     if (depositAddresses.isEmpty()) {
       List<BingxWalletDTO> wallets = getWallets(currency.getCurrencyCode());

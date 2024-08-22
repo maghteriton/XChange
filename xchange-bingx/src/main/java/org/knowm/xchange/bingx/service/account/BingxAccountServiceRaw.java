@@ -14,7 +14,6 @@ import com.google.common.cache.CacheBuilder;
 import org.knowm.xchange.bingx.BingxExchange;
 import org.knowm.xchange.bingx.dto.*;
 import org.knowm.xchange.bingx.dto.wrapper.BingxBalancesWrapper;
-import org.knowm.xchange.bingx.dto.wrapper.BingxDepositAddressesWrapper;
 import org.knowm.xchange.bingx.dto.wrapper.BingxWithdrawWrapper;
 import org.knowm.xchange.bingx.service.BingxBaseService;
 import org.knowm.xchange.client.ResilienceRegistries;
@@ -24,11 +23,13 @@ public class BingxAccountServiceRaw extends BingxBaseService {
 
   private static final String DEFAULT_CACHE_KEY = "defaultKey";
   private final Cache<String, List<BingxWalletDTO>> coinsCache;
+  private final Cache<String, List<BingxDepositAddressesDTO>> depositAddrCache;
 
   public BingxAccountServiceRaw(BingxExchange exchange, ResilienceRegistries resilienceRegistries) {
     super(exchange, resilienceRegistries);
 
     this.coinsCache = CacheBuilder.newBuilder().expireAfterWrite(2, TimeUnit.MINUTES).build();
+    this.depositAddrCache = CacheBuilder.newBuilder().expireAfterWrite(2, TimeUnit.MINUTES).build();
   }
 
   public BingxBalancesWrapper getBalances() throws IOException {
@@ -67,15 +68,24 @@ public class BingxAccountServiceRaw extends BingxBaseService {
     }
   }
 
-  public BingxDepositAddressesWrapper getDepositAddresses(String coin) throws IOException {
-    return classifyingExceptions(
-        () ->
-            decorateApiCall(
-                    () ->
-                        accountAPI.getDepositAddresses(
-                            apiKey, nonceFactory, 5000, signatureCreator, coin))
-                .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
-                .call());
+  public List<BingxDepositAddressesDTO> getDepositAddresses(String coin) throws IOException {
+    String cacheKey = coin == null ? DEFAULT_CACHE_KEY : coin;
+    try {
+      return depositAddrCache.get(
+          cacheKey,
+          () ->
+              classifyingExceptions(
+                      () ->
+                          decorateApiCall(
+                                  () ->
+                                      accountAPI.getDepositAddresses(
+                                          apiKey, nonceFactory, 5000, signatureCreator, coin))
+                              .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
+                              .call())
+                  .getData());
+    } catch (ExecutionException e) {
+      throw new ExchangeException(e);
+    }
   }
 
   public BingxWithdrawWrapper withdraw(
