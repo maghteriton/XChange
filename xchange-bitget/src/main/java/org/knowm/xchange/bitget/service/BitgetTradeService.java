@@ -2,6 +2,7 @@ package org.knowm.xchange.bitget.service;
 
 import org.knowm.xchange.bitget.BitgetAdapter;
 import org.knowm.xchange.bitget.BitgetExchange;
+import org.knowm.xchange.bitget.model.dto.response.BitgetOrderHistoryResponse;
 import org.knowm.xchange.bitget.service.exception.BitgetApiException;
 import org.knowm.xchange.client.ResilienceRegistries;
 import org.knowm.xchange.currency.CurrencyPair;
@@ -78,7 +79,11 @@ public class BitgetTradeService extends BitgetTradeServiceRaw implements TradeSe
       String orderId = queryOrderParamCurrencyPair.getOrderId();
       CurrencyPair currencyPair = queryOrderParamCurrencyPair.getCurrencyPair();
       String symbol = BitgetAdapter.convertToSymbol(currencyPair);
-      orders.addAll(BitgetAdapter.adaptOrder(currencyPair, getOrderHistory(symbol, orderId)));
+      List<BitgetOrderHistoryResponse> orderInfo = getOrderHistory(symbol, orderId);
+      if(orderInfo.isEmpty()) {
+        orderInfo.addAll(getOrderInfo(orderId));
+      }
+      orders.addAll(BitgetAdapter.adaptOrder(currencyPair, orderInfo));
     }
     return orders;
   }

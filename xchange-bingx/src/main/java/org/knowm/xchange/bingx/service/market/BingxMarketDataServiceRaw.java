@@ -2,6 +2,7 @@ package org.knowm.xchange.bingx.service.market;
 
 import static org.knowm.xchange.bingx.BingxExceptionClassifier.classifyingExceptions;
 import static org.knowm.xchange.bingx.BingxResilience.PRIVATE_REST_ENDPOINT_RATE_LIMITER;
+import static org.knowm.xchange.bingx.BingxResilience.PUBLIC_REST_ENDPOINT_RATE_LIMITER;
 
 import java.io.IOException;
 import java.util.Date;
@@ -24,7 +25,7 @@ public class BingxMarketDataServiceRaw extends BingxBaseService {
     return classifyingExceptions(
         () ->
             decorateApiCall(marketAPI::getSymbols)
-                .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
+                .withRateLimiter(rateLimiter(PUBLIC_REST_ENDPOINT_RATE_LIMITER))
                 .call());
   }
 
@@ -32,8 +33,8 @@ public class BingxMarketDataServiceRaw extends BingxBaseService {
 
     return classifyingExceptions(
         () ->
-            decorateApiCall(() -> marketAPI.getMarketDepth(symbol, nonceFactory))
-                .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
+            decorateApiCall(() -> marketAPI.getMarketDepth(symbol,100, nonceFactory))
+                .withRateLimiter(rateLimiter(PUBLIC_REST_ENDPOINT_RATE_LIMITER))
                 .call());
   }
 
@@ -53,7 +54,7 @@ public class BingxMarketDataServiceRaw extends BingxBaseService {
                             endTimeAsMs,
                             startTimeAsMs,
                             nonceFactory))
-                .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
+                .withRateLimiter(rateLimiter(PUBLIC_REST_ENDPOINT_RATE_LIMITER))
                 .call());
   }
 }

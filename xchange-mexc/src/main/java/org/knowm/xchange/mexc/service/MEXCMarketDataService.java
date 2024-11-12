@@ -78,7 +78,7 @@ public class MEXCMarketDataService extends MEXCMarketDataServiceRaw implements M
     List<MEXCCandleData> mexcCandleStickDataList;
     try {
       mexcCandleStickDataList =
-          getMEXCCandleStickData(currencyPair, interval.getCode(), after, 1000);
+          getMEXCCandleStickData(currencyPair, interval.getCode(), after, 100);
     } catch (MEXCException e) {
       throw new ExchangeException(e);
     }

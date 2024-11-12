@@ -71,4 +71,17 @@ public class BitgetTradeServiceRaw extends BitgetBaseService {
                 .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
                 .call());
   }
+
+  public List<BitgetOrderHistoryResponse> getOrderInfo(String orderId)
+          throws IOException {
+    checkAuthenticated();
+    return classifyingExceptions(
+            () ->
+                    decorateApiCall(
+                            () ->
+                                    tradeAPI.getOrderInfo(
+                                            apiKey, digest, passphrase, nonceFactory, orderId))
+                            .withRateLimiter(rateLimiter(PRIVATE_REST_ENDPOINT_RATE_LIMITER))
+                            .call());
+  }
 }

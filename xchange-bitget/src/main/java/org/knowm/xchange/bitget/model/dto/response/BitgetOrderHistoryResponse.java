@@ -37,6 +37,7 @@ public class BitgetOrderHistoryResponse {
   private String uTime;
   private String tpslType;
   private String triggerPrice;
+  private String cancelReason;
 
   @Data
   @JsonIgnoreProperties(ignoreUnknown = true)
@@ -45,11 +46,11 @@ public class BitgetOrderHistoryResponse {
     private FeeDetailItem newFees;
 
     // Map to handle dynamic fee items like XLM, USDT, etc.
-    private Map<String, FeeDetailItem> feeDetails = new HashMap<>();
+    private Map<String, FeeDetailItem> feeDetail = new HashMap<>();
 
     @JsonAnySetter
     public void addFeeDetail(String key, FeeDetailItem value) {
-      feeDetails.put(key, value);
+      feeDetail.put(key, value);
     }
 
     @Data

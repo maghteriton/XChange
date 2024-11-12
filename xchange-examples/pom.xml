@@ -201,12 +201,6 @@
 			<artifactId>xchange-poloniex</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- XChange OkCoin exchange support -->
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>xchange-okcoin</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- XChange OkEx exchange support -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>

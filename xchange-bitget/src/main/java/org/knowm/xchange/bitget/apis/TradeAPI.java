@@ -51,4 +51,15 @@ public interface TradeAPI {
       @QueryParam("symbol") String symbol,
       @QueryParam("orderId") String orderId)
       throws IOException, BitgetApiException;
+
+
+  @GET
+  @Path("/v2/spot/trade/orderInfo")
+  BitgetResponse<List<BitgetOrderHistoryResponse>> getOrderInfo(
+          @HeaderParam(BitgetAPIConstants.ACCESS_KEY) String apiKey,
+          @HeaderParam(BitgetAPIConstants.ACCESS_SIGN) ParamsDigest signature,
+          @HeaderParam(BitgetAPIConstants.ACCESS_PASSPHRASE) String apiPassphrase,
+          @HeaderParam(BitgetAPIConstants.ACCESS_TIMESTAMP) SynchronizedValueFactory<Long> nonce,
+          @QueryParam("orderId") String orderId)
+          throws IOException, BitgetApiException;
 }

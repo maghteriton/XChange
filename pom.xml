@@ -203,7 +203,6 @@
     <module>xchange-stream-huobi</module>
     <module>xchange-stream-kraken</module>
     <module>xchange-stream-lgo</module>
-    <module>xchange-stream-okcoin</module>
     <module>xchange-stream-okex</module>
     <module>xchange-stream-poloniex2</module>
     <module>xchange-stream-serum</module>

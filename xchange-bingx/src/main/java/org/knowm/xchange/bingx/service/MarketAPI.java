@@ -27,6 +27,7 @@ public interface MarketAPI {
     @Path("/v1/market/depth")
     BingxResultDTO<BingxMarketDepthDTO> getMarketDepth(
             @QueryParam("symbol") String symbol,
+            @QueryParam("limit") Integer limit,
             @QueryParam("timestamp") SynchronizedValueFactory<Long> timestamp
     ) throws IOException, BingxException;
 

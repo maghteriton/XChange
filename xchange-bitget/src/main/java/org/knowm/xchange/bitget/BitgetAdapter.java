@@ -123,38 +123,40 @@ public class BitgetAdapter {
     List<Order> orderHistory = new ArrayList<>();
     for (BitgetOrderHistoryResponse bitgetOrderHistoryResponse : bitgetOrderHistory) {
 
-      FeeDetailItem feeDetailItem =
-          (FeeDetailItem)
-              bitgetOrderHistoryResponse.getFeeDetail().getFeeDetails().values().toArray()[0];
-      boolean isFeeUSDT =
-          Currency.USDT.getCurrencyCode().equalsIgnoreCase(feeDetailItem.getFeeCoinCode());
-      BigDecimal usdtFee;
-      BigDecimal fee = null;
+      BitgetOrderHistoryResponse.BitgetFeeDetail feeDetail = bitgetOrderHistoryResponse.getFeeDetail();
 
-      // if newFees is not empty, calculate fees from newFees, but sometimes it can be empty, so we
-      // need to use old fee data
-      if (bitgetOrderHistoryResponse.getFeeDetail().getNewFees() != null) {
-        if (isFeeUSDT) {
-          usdtFee = bitgetOrderHistoryResponse.getFeeDetail().getNewFees().getT().abs();
-        } else {
-          usdtFee =
-              bitgetOrderHistoryResponse
-                  .getFeeDetail()
-                  .getNewFees()
-                  .getT()
-                  .multiply(bitgetOrderHistoryResponse.getPriceAvg())
-                  .abs();
-          fee = bitgetOrderHistoryResponse.getFeeDetail().getNewFees().getT();
+      BigDecimal usdtFee = BigDecimal.ZERO;
+      BigDecimal fee = BigDecimal.ZERO;
+      boolean isFeeUSDT = false;
+
+        if (feeDetail != null) {
+          FeeDetailItem feeDetailItem = (FeeDetailItem) feeDetail.getFeeDetail().values().toArray()[0];
+          isFeeUSDT = Currency.USDT.getCurrencyCode().equalsIgnoreCase(feeDetailItem.getFeeCoinCode());
+
+          // if newFees is not empty, calculate fees from newFees, but sometimes it can be empty, so we
+          // need to use old fee data
+          if (feeDetail.getNewFees() != null) {
+            if (isFeeUSDT) {
+              usdtFee = feeDetail.getNewFees().getT().abs();
+            } else {
+              usdtFee =
+                      feeDetail
+                              .getNewFees()
+                              .getT()
+                              .multiply(bitgetOrderHistoryResponse.getPriceAvg())
+                              .abs();
+              fee = feeDetail.getNewFees().getT();
+            }
+          } else {
+            if (isFeeUSDT) {
+              usdtFee = feeDetailItem.getTotalFee().abs();
+            } else {
+              usdtFee =
+                      feeDetailItem.getTotalFee().multiply(bitgetOrderHistoryResponse.getPriceAvg()).abs();
+              fee = feeDetailItem.getTotalFee();
+            }
+          }
         }
-      } else {
-        if (isFeeUSDT) {
-          usdtFee = feeDetailItem.getTotalFee().abs();
-        } else {
-          usdtFee =
-              feeDetailItem.getTotalFee().multiply(bitgetOrderHistoryResponse.getPriceAvg()).abs();
-          fee = feeDetailItem.getTotalFee();
-        }
-      }
 
       orderHistory.add(
           new LimitOrder.Builder(
@@ -185,7 +187,7 @@ public class BitgetAdapter {
         return PENDING_NEW;
       case "new":
         return NEW;
-      case "partially_fill":
+      case "partially_filled":
         return PARTIALLY_FILLED;
       case "filled":
         return FILLED;
