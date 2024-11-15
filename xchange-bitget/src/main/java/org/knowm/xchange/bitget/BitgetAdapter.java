@@ -165,8 +165,8 @@ public class BitgetAdapter {
               .originalAmount(bitgetOrderHistoryResponse.getSize())
               .cumulativeAmount(
                   isFeeUSDT
-                      ? bitgetOrderHistoryResponse.getSize()
-                      : bitgetOrderHistoryResponse.getSize().add(fee))
+                      ? bitgetOrderHistoryResponse.getBaseVolume()
+                      : bitgetOrderHistoryResponse.getBaseVolume().add(fee))
               .id(String.valueOf(bitgetOrderHistoryResponse.getOrderId()))
               .limitPrice(bitgetOrderHistoryResponse.getPrice())
               .averagePrice(bitgetOrderHistoryResponse.getPriceAvg())
