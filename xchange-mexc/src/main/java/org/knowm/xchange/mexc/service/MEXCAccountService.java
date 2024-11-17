@@ -59,12 +59,11 @@ public class MEXCAccountService extends MEXCAccountServiceRaw implements Account
       String withdrawId;
       try {
         withdrawId =
-            createMEXCWithdraw(
+                ((MEXCAccountServiceV3) exchangeV3.getAccountService()).withdrawFunds(
                     defaultParams.getCurrency(),
                     defaultParams.getChain(),
                     defaultParams.getAmount(),
-                    addressWithTag)
-                .getWithdrawId();
+                    addressWithTag);
       } catch (MEXCException e) {
         throw new ExchangeException(e);
       }

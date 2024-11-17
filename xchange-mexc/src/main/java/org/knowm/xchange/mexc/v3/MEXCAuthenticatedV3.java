@@ -16,21 +16,22 @@ import si.mazi.rescu.SynchronizedValueFactory;
 @Produces(MediaType.APPLICATION_JSON)
 public interface MEXCAuthenticatedV3 {
 
-  @GET
-  @Path("capital/config/getall")
-  List<CoinInfo> getCurrencyInformation(
-      @HeaderParam("x-mexc-apikey") String apiKey,
-      @QueryParam("signature") ParamsDigest signature,
-      @QueryParam("timestamp") SynchronizedValueFactory<Long> timestamp)
-      throws IOException, MEXCException;
+    @GET
+    @Path("capital/config/getall")
+    List<CoinInfo> getCurrencyInformation(
+            @HeaderParam("x-mexc-apikey") String apiKey,
+            @QueryParam("signature") ParamsDigest signature,
+            @QueryParam("timestamp") SynchronizedValueFactory<Long> timestamp)
+            throws IOException, MEXCException;
 
-  @GET
-  @Path("defaultSymbols")
-  MEXCResult<List<String>> getDefaultSymbols()
-          throws IOException, MEXCException;
 
-  @GET
-  @Path("exchangeInfo")
-  ExchangeInfo getExchangeInfo()
-          throws IOException, MEXCException;
+    @GET
+    @Path("defaultSymbols")
+    MEXCResult<List<String>> getDefaultSymbols()
+            throws IOException, MEXCException;
+
+    @GET
+    @Path("exchangeInfo")
+    ExchangeInfo getExchangeInfo()
+            throws IOException, MEXCException;
 }
