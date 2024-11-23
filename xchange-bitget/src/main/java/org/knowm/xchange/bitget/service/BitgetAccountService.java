@@ -89,7 +89,7 @@ public class BitgetAccountService extends BitgetAccountServiceRaw implements Acc
         }
 
       } catch (BitgetApiException e) {
-        throw new ExchangeException(e);
+        throw new ExchangeException(e.getMsg(), e);
       }
       return orderId;
     }
