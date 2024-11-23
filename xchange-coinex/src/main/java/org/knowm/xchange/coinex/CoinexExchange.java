@@ -36,11 +36,9 @@ public class CoinexExchange extends BaseExchange implements Exchange {
   }
 
   @Override
-  public void remoteInit() throws IOException, ExchangeException {
+  public void remoteInit() throws ExchangeException {
     List<CoinexMarketInfo> coinexMarketInfoList = ((CoinexMarketServiceRaw) marketDataService).getSymbols(null);
     List<CoinexAssets> coinexAssetList = ((CoinexAccountServiceRaw) accountService).getAssetList(null);
     exchangeMetaData = CoinexAdapters.adaptToExchangeMetaData(coinexMarketInfoList, coinexAssetList);
-
-    accountService.getCurrencyChainStatus(new Currency("CET"), "CSC");
   }
 }
