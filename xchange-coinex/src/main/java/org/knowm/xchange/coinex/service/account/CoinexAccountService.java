@@ -51,8 +51,8 @@ public class CoinexAccountService extends CoinexAccountServiceRaw implements Acc
                     contractAddress,
                     coinexChain.isDepositEnabled(),
                     coinexChain.isWithdrawEnabled(),
-                    new BigDecimal(coinexChain.getWithdrawalFee()),
-                    new BigDecimal(coinexChain.getWithdrawalFee())
+                    coinexChain.getWithdrawalFee(),
+                    coinexChain.getWithdrawalFee()
             );
         }
 

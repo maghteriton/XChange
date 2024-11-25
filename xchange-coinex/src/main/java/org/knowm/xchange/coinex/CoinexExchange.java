@@ -3,6 +3,7 @@ package org.knowm.xchange.coinex;
 import org.knowm.xchange.BaseExchange;
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.ExchangeSpecification;
+import org.knowm.xchange.coinex.dto.account.CoinexAssetDetail;
 import org.knowm.xchange.coinex.dto.account.CoinexAssets;
 import org.knowm.xchange.coinex.dto.market.CoinexMarketInfo;
 import org.knowm.xchange.coinex.service.account.CoinexAccountService;
@@ -38,13 +39,13 @@ public class CoinexExchange extends BaseExchange implements Exchange {
     @Override
     public void remoteInit() throws ExchangeException {
         List<CoinexMarketInfo> coinexMarketInfoList;
-        List<CoinexAssets> coinexAssetList;
+        List<CoinexAssetDetail> coinexAssetDetails;
         try {
-            coinexAssetList = ((CoinexAccountServiceRaw) accountService).getAssetList(null);
             coinexMarketInfoList = ((CoinexMarketServiceRaw) marketDataService).getSymbols(null);
+            coinexAssetDetails = ((CoinexAccountServiceRaw) accountService).getAssetDetails();
         } catch (IOException e) {
             throw new ExchangeException(e);
         }
-        exchangeMetaData = CoinexAdapters.adaptToExchangeMetaData(coinexMarketInfoList, coinexAssetList);
+        exchangeMetaData = CoinexAdapters.adaptToExchangeMetaData(coinexMarketInfoList, coinexAssetDetails);
     }
 }

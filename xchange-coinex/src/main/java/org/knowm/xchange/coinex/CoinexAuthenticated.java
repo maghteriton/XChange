@@ -49,6 +49,11 @@ public interface CoinexAuthenticated {
             throws IOException;
 
     @GET
+    @Path("/assets/all-deposit-withdraw-config")
+    CoinexResponse<List<CoinexAssetDetail>> getAllAssetDetails()
+            throws IOException;
+
+    @GET
     @Path("/assets/deposit-history")
     CoinexResponse<List<CoinexDepositHistory>> getDepositHistory(
             @HeaderParam(X_COINEX_KEY) String apiKey,

@@ -24,6 +24,7 @@ import org.knowm.xchange.dto.marketdata.OrderBook;
 import org.knowm.xchange.dto.meta.CurrencyMetaData;
 import org.knowm.xchange.dto.meta.ExchangeMetaData;
 import org.knowm.xchange.dto.meta.InstrumentMetaData;
+import org.knowm.xchange.dto.meta.WalletHealth;
 import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.instrument.Instrument;
 import org.knowm.xchange.service.trade.params.DefaultWithdrawFundsParams;
@@ -50,7 +51,7 @@ public class CoinexAdapters {
 
     public static ExchangeMetaData adaptToExchangeMetaData(
             List<CoinexMarketInfo> coinexMarketInfoList,
-            List<CoinexAssets> coinexAssetList) {
+            List<CoinexAssetDetail> coinexAssetList) {
         Map<Instrument, InstrumentMetaData> pairs = new HashMap<>();
         for (CoinexMarketInfo marketInfo : coinexMarketInfoList) {
             if (marketInfo.getQuoteCcy().equalsIgnoreCase(Currency.USDT.getCurrencyCode())) {
@@ -60,18 +61,33 @@ public class CoinexAdapters {
         }
 
         Map<Currency, CurrencyMetaData> currencies = new HashMap<>();
-        for (CoinexAssets coinexAssets : coinexAssetList) {
-            String currency = coinexAssets.getShortName();
-            CurrencyMetaData currencyMetaData =
-                    new CurrencyMetaData(
-                            null,
-                            null,
-                            null,
-                            null);
-            currencies.put(new Currency(currency), currencyMetaData);
+        for (CoinexAssetDetail coinexAssetDetail : coinexAssetList) {
+            String currency = coinexAssetDetail.getAsset().getCcy();
+            if(!coinexAssetDetail.getChains().isEmpty()) {
+                CoinexAssetDetail.Chain chain = coinexAssetDetail.getChains().get(0);
+                CurrencyMetaData currencyMetaData =
+                        new CurrencyMetaData(
+                                chain.getWithdrawalPrecision(),
+                                chain.getWithdrawalFee(),
+                                chain.getMinWithdrawAmount(),
+                                getWalletHealthStatus(chain));
+                currencies.put(new Currency(currency), currencyMetaData);
+            }
         }
 
         return new ExchangeMetaData(pairs, currencies, null, null, null);
+    }
+
+    private static WalletHealth getWalletHealthStatus(CoinexAssetDetail.Chain coinexChain) {
+        WalletHealth walletHealth = WalletHealth.ONLINE;
+        if (!coinexChain.isDepositEnabled() && !coinexChain.isWithdrawEnabled()) {
+            walletHealth = WalletHealth.OFFLINE;
+        } else if (!coinexChain.isDepositEnabled()) {
+            walletHealth = WalletHealth.DEPOSITS_DISABLED;
+        } else if (!coinexChain.isWithdrawEnabled()) {
+            walletHealth = WalletHealth.WITHDRAWALS_DISABLED;
+        }
+        return walletHealth;
     }
 
     public static String getCcy(Currency currency) {
@@ -82,6 +98,11 @@ public class CoinexAdapters {
         return String.format("%s%s",
                 currencyPair.getBase().getCurrencyCode().toUpperCase(),
                 currencyPair.getCounter().getCurrencyCode().toUpperCase());
+    }
+
+    public static CurrencyPair getMarket(String currencyPairString, String counter) {
+        String[] split = currencyPairString.split(counter);
+        return new CurrencyPair(split[0], counter);
     }
 
     public static Instrument adaptSymbol(CoinexMarketInfo coinexMarketInfo) {

@@ -30,6 +30,10 @@ public class CoinexAccountServiceRaw extends CoinexBaseService {
         return checkResult(coinex.getAssetDetails(CoinexAdapters.getCcy(currency)));
     }
 
+    public List<CoinexAssetDetail> getAssetDetails() throws IOException {
+        return checkResult(coinex.getAllAssetDetails());
+    }
+
     public List<CoinexDepositHistory> getDepositHistory(
             @Nullable Currency currency,
             @Nullable String txId,
